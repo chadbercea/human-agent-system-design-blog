@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getSortedPosts } from '../../lib/blog';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = await getSortedPosts();
+  const tagSet = new Set<string>();
+  for (const post of posts) {
+    for (const tag of post.data.tags) {
+      tagSet.add(tag);
+    }
+  }
+  return Array.from(tagSet).map((tag) => ({
+    params: { tag },
+    props: {
+      tag,
+      posts: posts.filter((p) => p.data.tags.includes(tag)),
+    },
+  }));
+};
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout title={`Tag: ${tag}`} description={`Posts tagged with ${tag}.`}>
+  <article>
+    <h1 class="text-4xl font-bold text-text mb-8">Tag: {tag}</h1>
+    <ol class="list-none p-0 m-0 flex flex-col gap-4">
+      {posts.map((post) => (
+        <PostCard post={post} />
+      ))}
+    </ol>
+    <p class="mt-6 text-text-muted">
+      <a href="/tags" class="text-accent underline underline-offset-2">All tags</a>
+    </p>
+  </article>
+</BaseLayout>

@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getSortedPosts } from '../../lib/blog';
+
+const posts = await getSortedPosts();
+const tagCounts = new Map<string, number>();
+for (const post of posts) {
+  for (const tag of post.data.tags) {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+  }
+}
+const tags = Array.from(tagCounts.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+---
+
+<BaseLayout title="Tags" description="Browse blog posts by tag.">
+  <article>
+    <h1 class="text-4xl font-bold text-text mb-8">Tags</h1>
+    <ul class="list-none p-0 m-0 flex flex-col gap-3">
+      {tags.map(([tag, count]) => (
+        <li>
+          <a href={`/tags/${tag}`} class="text-accent underline underline-offset-2 hover:no-underline">
+            {tag}
+          </a>
+          <span class="text-sm text-text-muted ml-2">({count})</span>
+        </li>
+      ))}
+    </ul>
+  </article>
+</BaseLayout>

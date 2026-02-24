@@ -1,10 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import PostCard from '../components/PostCard.astro';
+import { getSortedPosts, getPaginationForPosts } from '../lib/blog';
 
-const posts = (await getCollection('blog'))
-  .filter((post) => !post.data.draft)
-  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+const allPosts = await getSortedPosts();
+const { getPagePosts, totalPages } = getPaginationForPosts(allPosts);
+const posts = getPagePosts(1);
 ---
 
 <BaseLayout title="Blog" description="Human-agent system design blog.">
@@ -12,19 +13,21 @@ const posts = (await getCollection('blog'))
     <h1 class="text-4xl font-bold text-text mb-8">Blog</h1>
     <ol class="list-none p-0 m-0 flex flex-col gap-4">
       {posts.map((post) => (
-        <li class="border-b border-border pb-4 last:border-0 last:pb-0">
-          <a href={`/${post.slug}`} class="block group no-underline">
-            <time datetime={post.data.publishDate.toISOString()} class="text-sm text-text-muted block mb-1">
-              {post.data.publishDate.toLocaleDateString('en-CA', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
-            </time>
-            <span class="text-lg font-medium text-text group-hover:text-accent">{post.data.title}</span>
-          </a>
-        </li>
+        <PostCard post={post} />
       ))}
     </ol>
+    <nav class="mt-8 pt-6 border-t border-border flex items-center justify-between gap-4" aria-label="Pagination">
+      <span />
+      <span class="text-sm text-text-muted">
+        Page 1 of {totalPages}
+      </span>
+      {totalPages > 1 ? (
+        <a href="/page/2" class="text-accent underline underline-offset-2">
+          Next
+        </a>
+      ) : (
+        <span />
+      )}
+    </nav>
   </article>
 </BaseLayout>

@@ -7,6 +7,8 @@ tags:
   - human-agent
   - collaboration
 draft: false
+author: "Alex Chen"
+image: "https://placehold.co/1200x630/1a1a1a/fff?text=Human-Agent+Design"
 ---
 
 # Human-Agent System Design: An Introduction

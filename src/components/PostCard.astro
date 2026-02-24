@@ -1,0 +1,44 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+---
+
+<li class="border-b border-border pb-4 last:border-0 last:pb-0">
+  <a href={`/${post.slug}`} class="block group no-underline">
+    {post.data.image && (
+      <div class="mb-2 rounded overflow-hidden border border-border">
+        <img
+          src={post.data.image}
+          alt=""
+          class="w-full h-32 object-cover"
+          width={400}
+          height={128}
+          loading="lazy"
+        />
+      </div>
+    )}
+    <time datetime={post.data.publishDate.toISOString()} class="text-sm text-text-muted block mb-1">
+      {post.data.publishDate.toLocaleDateString('en-CA', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })}
+    </time>
+    <span class="text-lg font-medium text-text group-hover:text-accent">{post.data.title}</span>
+    {post.data.author && (
+      <span class="text-sm text-text-muted block mt-1">By {post.data.author}</span>
+    )}
+    {post.data.tags.length > 0 && (
+      <ul class="list-none p-0 m-0 flex flex-wrap gap-2 mt-2">
+        {post.data.tags.map((tag) => (
+          <li class="text-xs font-medium px-2 py-1 rounded bg-bg-elevated border border-border text-text-muted">{tag}</li>
+        ))}
+      </ul>
+    )}
+  </a>
+</li>

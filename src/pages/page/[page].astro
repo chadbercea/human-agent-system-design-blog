@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getSortedPosts, getPaginationForPosts } from '../../lib/blog';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const allPosts = await getSortedPosts();
+  const { totalPages } = getPaginationForPosts(allPosts);
+  return Array.from({ length: totalPages - 1 }, (_, i) => {
+    const pageNum = i + 2; // page 2, 3, ...
+    return {
+      params: { page: String(pageNum) },
+      props: {
+        posts: getPaginationForPosts(allPosts).getPagePosts(pageNum),
+        currentPage: pageNum,
+        totalPages,
+        prevUrl: pageNum === 2 ? '/' : `/page/${pageNum - 1}`,
+        nextUrl: pageNum < totalPages ? `/page/${pageNum + 1}` : null,
+      },
+    };
+  });
+};
+
+const { posts: pagePosts, currentPage, totalPages, prevUrl, nextUrl } = Astro.props;
+---
+
+<BaseLayout title="Blog" description="Human-agent system design blog.">
+  <article>
+    <h1 class="text-4xl font-bold text-text mb-8">Blog</h1>
+    <ol class="list-none p-0 m-0 flex flex-col gap-4">
+      {pagePosts.map((post) => (
+        <PostCard post={post} />
+      ))}
+    </ol>
+    <nav class="mt-8 pt-6 border-t border-border flex items-center justify-between gap-4" aria-label="Pagination">
+      {prevUrl ? (
+        <a href={prevUrl} class="text-accent underline underline-offset-2">
+          Previous
+        </a>
+      ) : (
+        <span />
+      )}
+      <span class="text-sm text-text-muted">
+        Page {currentPage} of {totalPages}
+      </span>
+      {nextUrl ? (
+        <a href={nextUrl} class="text-accent underline underline-offset-2">
+          Next
+        </a>
+      ) : (
+        <span />
+      )}
+    </nav>
+  </article>
+</BaseLayout>

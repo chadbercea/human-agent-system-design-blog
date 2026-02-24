@@ -1,0 +1,21 @@
+---
+description: All project commands must run inside Docker; host npm/node is unacceptable
+alwaysApply: true
+---
+
+# Run Everything in Docker
+
+This project runs in Docker. **All** commands that execute project tooling must run **inside the container**. Running npm, node, or project scripts on the host is unacceptable.
+
+## Required pattern
+
+- **Build:** `docker compose run --rm dev npm run build`
+- **Dev server:** `docker compose up dev` (or `docker compose run --rm dev npm run dev -- --host`)
+- **Install deps:** `docker compose run --rm dev npm install` (or add to Dockerfile/rebuild)
+- **Lint/check:** `docker compose run --rm dev npm run check` (or equivalent)
+
+Do **not** run `npm run build`, `npm run dev`, `npm install`, or `npm run check` directly in the workspace shell unless the user explicitly asks to run something on the host.
+
+## When in doubt
+
+If a command touches Node, the project’s `package.json` scripts, or `node_modules`, run it via `docker compose run --rm dev <command>` (or the appropriate compose service).
