@@ -6,9 +6,10 @@ interface Props {
   title: string;
   description?: string;
   image?: string;
+  fullWidth?: boolean;
 }
 
-const { title, description, image } = Astro.props;
+const { title, description, image, fullWidth = false } = Astro.props;
 const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : null;
 ---
 
@@ -18,9 +19,13 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href :
     <meta charset="UTF-8" />
     <ViewTransitions />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0a" />
     <meta name="description" content={description ?? ''} />
     <title>{title}</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description ?? ''} />
@@ -32,23 +37,39 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href :
     <meta name="twitter:description" content={description ?? ''} />
     {image && <meta name="twitter:image" content={image} />}
   </head>
-  <body>
+  <body class="bg-bg text-text" data-theme="brutalist-dark">
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <header class="border-b border-border bg-bg-elevated">
-      <nav class="mx-auto max-w-content px-content py-4 flex items-center gap-6">
-        <a href="/" class="text-xl font-semibold text-text no-underline hover:underline">Blog</a>
-        <a href="/tags" class="text-text-muted no-underline hover:text-accent hover:underline">Tags</a>
+    <header class="border-b border-border">
+      <nav class="nav-editorial" aria-label="Main">
+        <a href="/" class="nav-editorial__link">Blog</a>
+        <a href="/tags" class="nav-editorial__link nav-editorial__link--muted">Tags</a>
       </nav>
     </header>
-    <main id="main-content" class="flex-1 px-content py-8 sm:py-12">
-      <div class="mx-auto max-w-content">
+    <main id="main-content" class="flex-1 px-content py-[clamp(1.5rem,4vw,3rem)]">
+      <div class={fullWidth ? 'layout--full' : 'mx-auto max-w-content'}>
         <slot />
       </div>
     </main>
-    <footer class="border-t border-border bg-bg-elevated text-sm text-text-muted">
-      <div class="mx-auto max-w-content px-content py-6">
-        <p>Human-agent system design blog.</p>
+    <footer class="border-t border-border py-8">
+      <div class="mx-auto max-w-content px-content">
+        <p class="font-mono text-xs text-text-muted uppercase tracking-widest">Human–agent system design</p>
       </div>
     </footer>
+    <script>
+      if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (!e.isIntersecting) continue;
+              const link = e.target.querySelector('.card-link');
+              if (link) link.classList.add('animate-in');
+              observer.unobserve(e.target);
+            }
+          },
+          { rootMargin: '0px 0px -40px 0px', threshold: 0 }
+        );
+        document.querySelectorAll('[data-animate-in="true"]').forEach((el) => observer.observe(el));
+      }
+    </script>
   </body>
 </html>

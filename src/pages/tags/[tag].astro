@@ -22,18 +22,47 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 const { tag, posts } = Astro.props;
+const heroPosts = posts.slice(0, 5);
+const belowPosts = posts.slice(5);
 ---
 
-<BaseLayout title={`Tag: ${tag}`} description={`Posts tagged with ${tag}.`}>
+<BaseLayout title={`Tag: ${tag}`} description={`Posts tagged with ${tag}.`} fullWidth>
   <article>
-    <h1 class="text-4xl font-bold text-text mb-8">Tag: {tag}</h1>
-    <ol class="list-none p-0 m-0 flex flex-col gap-4">
-      {posts.map((post) => (
-        <PostCard post={post} />
-      ))}
-    </ol>
-    <p class="mt-6 text-text-muted">
-      <a href="/tags" class="text-accent underline underline-offset-2">All tags</a>
+    <p class="font-mono text-sm text-text-muted uppercase tracking-[0.12em] mb-2">Tag</p>
+    <h1 class="listing-title mb-12">{tag}</h1>
+
+    <!-- Mobile: single column of all cards -->
+    <div class="listing-mobile">
+      <ol class="list-none p-0 m-0">
+        {posts.map((post) => (
+          <PostCard post={post} />
+        ))}
+      </ol>
+    </div>
+
+    <!-- Desktop: hero grid (first 5) + below fold -->
+    <div class="listing-desktop">
+      {heroPosts.length > 0 && (
+        <ul class="hero-grid list-none p-0 m-0">
+          {heroPosts[0] && (
+            <PostCard post={heroPosts[0]} variant="lead" gridClass="hero-grid__lead" />
+          )}
+          {heroPosts.slice(1, 5).map((post, i) => (
+            <PostCard post={post} variant="tile" gridClass={i === 1 ? 'hero-grid__tile hero-grid__tile--wide' : 'hero-grid__tile'} />
+          ))}
+        </ul>
+      )}
+      {belowPosts.length > 0 && (
+        <ol class="list-none p-0 m-0 below-fold">
+          {belowPosts.map((post) => (
+            <PostCard post={post} animateIn />
+          ))}
+        </ol>
+      )}
+    </div>
+
+    <p class="mt-10 pt-6 border-t border-border font-mono text-sm text-text-muted">
+      <a href="/tags" class="link">All tags</a>
     </p>
   </article>
 </BaseLayout>

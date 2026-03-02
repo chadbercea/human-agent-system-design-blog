@@ -14,14 +14,12 @@ const tags = Array.from(tagCounts.entries()).sort((a, b) => a[0].localeCompare(b
 
 <BaseLayout title="Tags" description="Browse blog posts by tag.">
   <article>
-    <h1 class="text-4xl font-bold text-text mb-8">Tags</h1>
-    <ul class="list-none p-0 m-0 flex flex-col gap-3">
+    <h1 class="text-4xl sm:text-5xl font-bold text-text mb-12 tracking-tight">Tags</h1>
+    <ul class="list-none p-0 m-0 font-mono text-sm uppercase tracking-wide">
       {tags.map(([tag, count]) => (
-        <li>
-          <a href={`/tags/${tag}`} class="text-accent underline underline-offset-2 hover:no-underline">
-            {tag}
-          </a>
-          <span class="text-sm text-text-muted ml-2">({count})</span>
+        <li class="border-b border-border py-3 first:pt-0 last:border-0">
+          <a href={`/tags/${tag}`} class="text-text no-underline hover:text-accent">{tag}</a>
+          <span class="text-text-muted ml-2">({count})</span>
         </li>
       ))}
     </ul>

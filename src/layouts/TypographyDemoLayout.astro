@@ -1,0 +1,41 @@
+---
+import '../styles/global.css';
+import '../styles/typography-demo.css';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <title>{title}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <header class="type-demo-header">
+      <nav class="type-demo-nav" aria-label="Demo">
+        <a href="/" class="type-demo-nav-link">Blog</a>
+        <a href="/typography-demo" class="type-demo-nav-link type-demo-nav-link--current">Type demo</a>
+      </nav>
+    </header>
+    <main id="main-content" class="type-demo-main">
+      <div class="type-demo-content">
+        <slot />
+      </div>
+    </main>
+    <footer class="type-demo-footer">
+      <p class="type-demo-footer-text">Typography demo · Poppins, IBM Plex Mono, Fraunces</p>
+    </footer>
+  </body>
+</html>

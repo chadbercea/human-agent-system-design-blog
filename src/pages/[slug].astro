@@ -16,27 +16,30 @@ const { Content } = await post.render();
 ---
 
 <BaseLayout title={post.data.title} description={post.data.description} image={post.data.image}>
-  <article class="prose-post">
-    <header class="mb-8 pb-6 border-b border-border">
-      <h1 class="text-4xl font-bold text-text mb-3">{post.data.title}</h1>
-      <time datetime={post.data.publishDate.toISOString()} class="text-sm text-text-muted block mb-3">
+  <article class="prose-post editorial-article">
+    <header class="editorial-header">
+      <p class="editorial-eyebrow" aria-hidden="true">Article</p>
+      <time datetime={post.data.publishDate.toISOString()} class="editorial-meta">
         {post.data.publishDate.toLocaleDateString('en-CA', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
         })}
       </time>
+      <h1 class="editorial-title">{post.data.title}</h1>
       {post.data.author && (
-        <p class="text-sm text-text-muted mb-3">By {post.data.author}</p>
+        <p class="type-byline editorial-byline">By {post.data.author}</p>
       )}
       {post.data.tags.length > 0 && (
-        <ul class="list-none p-0 m-0 flex flex-wrap gap-2">
+        <ul class="editorial-tags" aria-label="Tags">
           {post.data.tags.map((tag) => (
-            <li class="text-xs font-medium px-2 py-1 rounded bg-bg-elevated border border-border text-text-muted">{tag}</li>
+            <li>{tag}</li>
           ))}
         </ul>
       )}
     </header>
-    <Content />
+    <div class="editorial-body">
+      <Content />
+    </div>
   </article>
 </BaseLayout>

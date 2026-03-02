@@ -1,0 +1,183 @@
+/* Demo-only styles for typography-demo page. Uses same tokens as global.css. */
+
+.type-demo-header {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.type-demo-nav {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-5) var(--content-padding-inline);
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-family: "Poppins", var(--font-sans);
+  font-weight: 600;
+  font-size: var(--font-size-base);
+}
+
+.type-demo-nav-link {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.type-demo-nav-link:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.type-demo-nav-link--current {
+  color: var(--color-accent);
+}
+
+.type-demo-main {
+  flex: 1;
+  padding: var(--space-12) var(--content-padding-inline);
+}
+
+.type-demo-content {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+.type-demo-footer {
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-8) var(--content-padding-inline);
+}
+
+.type-demo-footer-text {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  font-family: "IBM Plex Mono", var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Type specimens */
+.type-hero {
+  font-family: "Poppins", var(--font-sans);
+  font-weight: 700;
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+}
+
+.type-label {
+  font-family: "IBM Plex Mono", var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--space-2);
+}
+
+.type-heading-1 {
+  font-family: "Poppins", var(--font-sans);
+  font-weight: 700;
+  font-size: var(--font-size-4xl);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+}
+
+.type-heading-2 {
+  font-family: "Poppins", var(--font-sans);
+  font-weight: 600;
+  font-size: var(--font-size-2xl);
+  line-height: 1.35;
+  color: var(--color-text);
+  margin-top: var(--space-12);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.type-heading-2:first-of-type {
+  margin-top: var(--space-8);
+}
+
+.type-body {
+  font-family: "Poppins", var(--font-sans);
+  font-weight: 400;
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+}
+
+.type-body--medium {
+  font-weight: 500;
+}
+
+.type-pullquote {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 400;
+  font-size: var(--font-size-xl);
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: var(--space-8) 0;
+  padding-left: var(--space-4);
+  border-left: 3px solid var(--color-accent);
+}
+
+.type-pullquote--italic {
+  font-style: italic;
+}
+
+.type-byline {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-6);
+}
+
+.type-meta {
+  font-family: "IBM Plex Mono", var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-2);
+}
+
+.type-tags {
+  font-family: "IBM Plex Mono", var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: var(--space-2);
+}
+
+.type-code-inline {
+  font-family: "IBM Plex Mono", var(--font-mono);
+  font-size: 0.9em;
+  padding: 0.15em 0.4em;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.type-code-block {
+  font-family: "IBM Plex Mono", var(--font-mono);
+  font-size: var(--font-size-sm);
+  padding: var(--space-4);
+  margin: var(--space-4) 0;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  overflow-x: auto;
+  color: var(--color-text);
+}
+
+.type-code-block code {
+  padding: 0;
+  background: none;
+  border: none;
+}

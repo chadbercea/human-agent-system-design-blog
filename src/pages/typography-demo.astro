@@ -1,0 +1,60 @@
+---
+import TypographyDemoLayout from '../layouts/TypographyDemoLayout.astro';
+
+const codeSnippet = `export const getStaticPaths = async ({ paginate }) => {
+  const posts = await getCollection('blog');
+  return paginate(posts, { pageSize: 10 });
+};`;
+---
+
+<TypographyDemoLayout title="Typography demo — Poppins, IBM Plex Mono, Fraunces">
+  <p class="type-label">Typography demo</p>
+  <h1 class="type-hero">Brutalist editorial from the future</h1>
+  <p class="type-meta">Poppins · IBM Plex Mono · Fraunces</p>
+
+  <p class="type-body">
+    This page shows how the three fonts work together: <strong>Poppins</strong> for structure and reading,
+    <strong>IBM Plex Mono</strong> for system and data, and <strong>Fraunces</strong> for editorial accent.
+    Human readability comes first; type does the work.
+  </p>
+
+  <h2 class="type-heading-2">Headings in Poppins</h2>
+  <p class="type-body">
+    Headings use Poppins at 600–700 weight with tight letter-spacing. Body copy stays at 400 (or 500 for lead paragraphs)
+    with a relaxed line-height so long reads stay comfortable. This is what a typical article opener might look like.
+  </p>
+
+  <h2 class="type-heading-2">Mono for system and code</h2>
+  <p class="type-meta">2025-03-02 · 4 min read</p>
+  <p class="type-body">
+    Dates, tags, and labels use IBM Plex Mono in small sizes with uppercase and letter-spacing. Inline code
+    like <code class="type-code-inline">getStaticPaths()</code> or <code class="type-code-inline">paginate()</code>
+    stays in mono so it reads as technical without breaking the flow.
+  </p>
+  <pre class="type-code-block"><code>{codeSnippet}</code></pre>
+
+  <h2 class="type-heading-2">Fraunces for editorial accent</h2>
+  <p class="type-body">
+    The serif is used sparingly: pull quotes, bylines, or a single line that should feel authored rather than systematic.
+  </p>
+  <blockquote class="type-pullquote type-pullquote--italic">
+    Use Fraunces for one or two sentences that need to breathe. Less is more—keep it special.
+  </blockquote>
+  <p class="type-byline">By the design system</p>
+  <p class="type-body">
+    Bylines can sit in Fraunces for a soft editorial touch, or in mono for a more utilitarian feel. Tags below
+    stay in mono so the hierarchy stays clear.
+  </p>
+  <p class="type-tags">system-design · human-agent · typography · editorial</p>
+
+  <h2 class="type-heading-2">Full specimen summary</h2>
+  <ul class="type-body" style="list-style: disc; padding-left: 1.5rem;">
+    <li><strong>Poppins</strong>: headings (600–700), body (400–500), nav and UI</li>
+    <li><strong>IBM Plex Mono</strong>: code, dates, tags, captions, labels</li>
+    <li><strong>Fraunces</strong>: pull quotes, bylines, section intros</li>
+  </ul>
+  <p class="type-body">
+    Review this demo at <code class="type-code-inline">/typography-demo</code>. When you’re happy with the pairing,
+    we can apply the same stack to the blog.
+  </p>
+</TypographyDemoLayout>

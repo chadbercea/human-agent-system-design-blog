@@ -25,29 +25,23 @@ export const getStaticPaths: GetStaticPaths = async () => {
 const { posts: pagePosts, currentPage, totalPages, prevUrl, nextUrl } = Astro.props;
 ---
 
-<BaseLayout title="Blog" description="Human-agent system design blog.">
+<BaseLayout title="Blog" description="Human-agent system design blog." fullWidth>
   <article>
-    <h1 class="text-4xl font-bold text-text mb-8">Blog</h1>
-    <ol class="list-none p-0 m-0 flex flex-col gap-4">
+    <h1 class="listing-title mb-12">Blog</h1>
+    <ol class="list-none p-0 m-0">
       {pagePosts.map((post) => (
-        <PostCard post={post} />
+        <PostCard post={post} animateIn />
       ))}
     </ol>
-    <nav class="mt-8 pt-6 border-t border-border flex items-center justify-between gap-4" aria-label="Pagination">
+    <nav class="mt-12 pt-8 border-t border-border flex items-center justify-between gap-4 font-mono text-sm text-text-muted uppercase tracking-wider" aria-label="Pagination">
       {prevUrl ? (
-        <a href={prevUrl} class="text-accent underline underline-offset-2">
-          Previous
-        </a>
+        <a href={prevUrl} class="link">Previous</a>
       ) : (
         <span />
       )}
-      <span class="text-sm text-text-muted">
-        Page {currentPage} of {totalPages}
-      </span>
+      <span>Page {currentPage} of {totalPages}</span>
       {nextUrl ? (
-        <a href={nextUrl} class="text-accent underline underline-offset-2">
-          Next
-        </a>
+        <a href={nextUrl} class="link">Next</a>
       ) : (
         <span />
       )}

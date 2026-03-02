@@ -6,25 +6,77 @@ import { getSortedPosts, getPaginationForPosts } from '../lib/blog';
 const allPosts = await getSortedPosts();
 const { getPagePosts, totalPages } = getPaginationForPosts(allPosts);
 const posts = getPagePosts(1);
+const heroPosts = posts.slice(0, 5);
+const belowPosts = posts.slice(5);
 ---
 
-<BaseLayout title="Blog" description="Human-agent system design blog.">
+<BaseLayout title="Blog" description="Human-agent system design blog." fullWidth>
   <article>
-    <h1 class="text-4xl font-bold text-text mb-8">Blog</h1>
-    <ol class="list-none p-0 m-0 flex flex-col gap-4">
-      {posts.map((post) => (
-        <PostCard post={post} />
-      ))}
-    </ol>
-    <nav class="mt-8 pt-6 border-t border-border flex items-center justify-between gap-4" aria-label="Pagination">
+    <header class="paper-masthead mb-6">
+      <p class="font-mono text-sm text-text-muted uppercase tracking-[0.12em] mb-2">Blog</p>
+      <h1 class="listing-title">Latest</h1>
+      <!-- Visible IA: what’s in this issue -->
+      {heroPosts.length > 0 && (
+        <nav class="paper-issue-index" aria-label="In this issue">
+          {heroPosts.map((post, i) => (
+            <a href={`/${post.slug}`} class={i === 0 ? 'text-accent font-medium' : ''}>
+              {i === 0 ? 'Lead' : (i === 1 || i === 2) ? 'Story' : 'Brief'}: {post.data.title}
+            </a>
+          ))}
+        </nav>
+      )}
+      <hr class="paper-masthead-rule" aria-hidden="true" />
+    </header>
+
+    <!-- Mobile: single column of all cards -->
+    <div class="listing-mobile">
+      <ol class="list-none p-0 m-0">
+        {posts.map((post) => (
+          <PostCard post={post} />
+        ))}
+      </ol>
+    </div>
+
+    <!-- Desktop: newspaper hierarchy — lead, 2 secondary, 2 briefs (fills viewport), then more -->
+    <div class="listing-desktop">
+      {heroPosts.length > 0 && (
+        <div class="home-hero-wrap">
+        <ul class="hero-grid list-none p-0 m-0">
+          {heroPosts[0] && (
+            <PostCard post={heroPosts[0]} variant="lead" gridClass="hero-grid__lead" />
+          )}
+          {heroPosts[1] && (
+            <PostCard post={heroPosts[1]} variant="secondary" gridClass="hero-grid__secondary" />
+          )}
+          {heroPosts[2] && (
+            <PostCard post={heroPosts[2]} variant="secondary" gridClass="hero-grid__secondary" />
+          )}
+          {heroPosts[3] && (
+            <PostCard post={heroPosts[3]} variant="brief" gridClass="hero-grid__brief" />
+          )}
+          {heroPosts[4] && (
+            <PostCard post={heroPosts[4]} variant="brief" gridClass="hero-grid__brief" />
+          )}
+        </ul>
+        </div>
+      )}
+      {belowPosts.length > 0 && (
+        <div>
+          <p class="paper-below-label" aria-hidden="true">More stories</p>
+          <ol class="list-none p-0 m-0 below-fold">
+            {belowPosts.map((post) => (
+              <PostCard post={post} animateIn />
+            ))}
+          </ol>
+        </div>
+      )}
+    </div>
+
+    <nav class="mt-12 pt-8 border-t border-border flex items-center justify-between gap-4 font-mono text-sm text-text-muted uppercase tracking-wider" aria-label="Pagination">
       <span />
-      <span class="text-sm text-text-muted">
-        Page 1 of {totalPages}
-      </span>
+      <span>Page 1 of {totalPages}</span>
       {totalPages > 1 ? (
-        <a href="/page/2" class="text-accent underline underline-offset-2">
-          Next
-        </a>
+        <a href="/page/2" class="link">Next</a>
       ) : (
         <span />
       )}

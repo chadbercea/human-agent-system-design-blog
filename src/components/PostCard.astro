@@ -3,40 +3,52 @@ import type { CollectionEntry } from 'astro:content';
 
 interface Props {
   post: CollectionEntry<'blog'>;
+  variant?: 'lead' | 'secondary' | 'brief' | 'tile' | 'default';
+  gridClass?: string;
+  animateIn?: boolean;
 }
 
-const { post } = Astro.props;
+const { post, variant = 'default', gridClass, animateIn = false } = Astro.props;
+const sectionLabel = post.data.tags.length > 0 ? post.data.tags[0] : null;
 ---
 
-<li class="border-b border-border pb-4 last:border-0 last:pb-0">
-  <a href={`/${post.slug}`} class="block group no-underline">
-    {post.data.image && (
-      <div class="mb-2 rounded overflow-hidden border border-border">
-        <img
-          src={post.data.image}
-          alt=""
-          class="w-full h-32 object-cover"
-          width={400}
-          height={128}
-          loading="lazy"
-        />
-      </div>
+<li class:list={[
+  variant === 'lead' && 'paper-card paper-card--lead border border-border p-6 min-h-0',
+  variant === 'secondary' && 'paper-card paper-card--secondary border border-border p-4 min-h-0',
+  variant === 'brief' && 'paper-card paper-card--brief border border-border p-3 min-h-0',
+  variant === 'tile' && 'paper-card paper-card--tile border border-border p-4 min-h-0',
+  variant === 'default' && 'border-b border-border py-6 first:pt-0 last:border-0',
+  gridClass
+]} data-animate-in={animateIn ? 'true' : undefined}>
+  <a href={`/${post.slug}`} class="block group link-block card-link h-full flex flex-col">
+    {variant !== 'brief' && sectionLabel && (
+      <span class="paper-section-label block mb-2">{sectionLabel}</span>
     )}
-    <time datetime={post.data.publishDate.toISOString()} class="text-sm text-text-muted block mb-1">
+    <time datetime={post.data.publishDate.toISOString()} class="card-meta block mb-2">
       {post.data.publishDate.toLocaleDateString('en-CA', {
         year: 'numeric',
-        month: 'short',
+        month: (variant === 'tile' || variant === 'brief') ? 'short' : 'long',
         day: 'numeric',
       })}
     </time>
-    <span class="text-lg font-medium text-text group-hover:text-accent">{post.data.title}</span>
-    {post.data.author && (
-      <span class="text-sm text-text-muted block mt-1">By {post.data.author}</span>
+    <span class:list={[
+      'text-text block group-hover:text-accent flex-1',
+      variant === 'lead' && 'card-title-lead',
+      variant === 'secondary' && 'card-title-secondary',
+      variant === 'brief' && 'card-title-brief',
+      variant === 'tile' && 'card-title-tile',
+      variant === 'default' && 'card-title-default',
+    ]}>{post.data.title}</span>
+    {(variant === 'lead' || variant === 'secondary') && post.data.author && (
+      <span class="card-byline block mt-1">By {post.data.author}</span>
     )}
-    {post.data.tags.length > 0 && (
-      <ul class="list-none p-0 m-0 flex flex-wrap gap-2 mt-2">
+    {(variant === 'lead' || variant === 'secondary') && post.data.description && (
+      <p class="paper-deck mt-2">{post.data.description}</p>
+    )}
+    {variant === 'lead' && post.data.tags.length > 0 && (
+      <ul class="list-none p-0 m-0 flex flex-wrap gap-x-3 gap-y-1 mt-2 card-meta">
         {post.data.tags.map((tag) => (
-          <li class="text-xs font-medium px-2 py-1 rounded bg-bg-elevated border border-border text-text-muted">{tag}</li>
+          <li>{tag}</li>
         ))}
       </ul>
     )}

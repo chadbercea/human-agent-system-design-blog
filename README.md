@@ -28,27 +28,27 @@ Deploy the `dist` output to Vercel (default Astro adapter; no config required).
 
 ## Docker
 
-Everything runs inside Docker (Node 20). Use either dev (live reload) or production (built site).
+Everything runs inside Docker (Node 20). **Do not run npm/node on the host** for this project.
+
+**Run the blog (dev, live reload):**
+
+```bash
+./run-dev.sh
+```
+
+Or manually:
+
+```bash
+docker compose down
+docker compose up --build dev
+```
+
+Then open **http://localhost:4321** in your browser. The container must stay running (foreground); you should see `Local http://localhost:4321/` in the logs. Port **4321** is mapped host:container.
 
 **Production (build + preview):**
 
 ```bash
-docker build -t blog .
-docker run -p 4321:4321 blog
-```
-
-Or with Compose:
-
-```bash
-docker compose up prod
+docker compose up --build prod
 ```
 
 Open http://localhost:4321
-
-**Development (live reload):**
-
-```bash
-docker compose up dev
-```
-
-Source is mounted so edits apply immediately. Open http://localhost:4321

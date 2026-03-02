@@ -9,6 +9,7 @@ export default {
       fontFamily: {
         sans: ['var(--font-sans)'],
         mono: ['var(--font-mono)'],
+        serif: ['var(--font-serif)'],
       },
       fontSize: {
         xs: ['var(--font-size-xs)', { lineHeight: 'var(--line-height-normal)' }],
@@ -19,6 +20,7 @@ export default {
         '2xl': ['var(--font-size-2xl)', { lineHeight: 'var(--line-height-snug)' }],
         '3xl': ['var(--font-size-3xl)', { lineHeight: 'var(--line-height-tight)' }],
         '4xl': ['var(--font-size-4xl)', { lineHeight: 'var(--line-height-tight)' }],
+        '5xl': ['var(--font-size-5xl)', { lineHeight: 'var(--line-height-tight)' }],
       },
       spacing: {
         content: 'var(--content-padding-inline)',

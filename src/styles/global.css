@@ -2,24 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Typography as visual interest: Poppins + Mono + Fraunces. Brutalist editorial, dark-first.
+   Brutalist frame: no border-radius, no box-shadow, no gradients; structure and type only. */
 :root {
-  /* Type scale */
-  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --font-serif: "Fraunces", Georgia, serif;
 
-  --font-size-xs: 0.75rem;     /* 12px */
-  --font-size-sm: 0.875rem;    /* 14px */
-  --font-size-base: 1rem;      /* 16px */
-  --font-size-lg: 1.125rem;    /* 18px */
-  --font-size-xl: 1.25rem;    /* 20px */
-  --font-size-2xl: 1.5rem;    /* 24px */
-  --font-size-3xl: 2rem;       /* 32px */
-  --font-size-4xl: 2.5rem;     /* 40px */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+  --font-size-4xl: 2.5rem;
+  --font-size-5xl: 3rem;
+  --font-size-6xl: 4rem;
+  --font-size-7xl: 5rem;
 
-  --line-height-tight: 1.25;
-  --line-height-snug: 1.375;
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.35;
   --line-height-normal: 1.5;
-  --line-height-relaxed: 1.625;
+  --line-height-relaxed: 1.6;
   --line-height-loose: 1.75;
 
   --font-weight-normal: 400;
@@ -27,47 +32,35 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  /* Spacing scale (4px base) */
-  --space-1: 0.25rem;   /* 4px */
-  --space-2: 0.5rem;    /* 8px */
-  --space-3: 0.75rem;   /* 12px */
-  --space-4: 1rem;      /* 16px */
-  --space-5: 1.25rem;   /* 20px */
-  --space-6: 1.5rem;    /* 24px */
-  --space-8: 2rem;      /* 32px */
-  --space-10: 2.5rem;   /* 40px */
-  --space-12: 3rem;     /* 48px */
-  --space-16: 4rem;     /* 64px */
-  --space-20: 5rem;     /* 80px */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
 
-  /* Layout */
-  --content-max-width: 42rem;
-  --content-padding-inline: var(--space-4);
+  --content-max-width: min(42rem, 100vw - 2 * var(--content-padding-inline));
+  --content-padding-inline: clamp(1rem, 3vw, 2rem);
 
-  /* Color tokens */
-  --color-bg: #fafafa;
-  --color-bg-elevated: #ffffff;
-  --color-text: #1a1a1a;
-  --color-text-muted: #525252;
-  --color-border: #e5e5e5;
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-accent-visited: #5b21b6;
-  --color-focus-ring: var(--color-accent);
+  /* Dark (default): brutalist editorial */
+  --color-bg: #0a0a0a;
+  --color-bg-elevated: #111111;
+  --color-text: #fafafa;
+  --color-text-muted: #737373;
+  --color-border: #262626;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #60a5fa;
+  --color-accent-visited: #93c5fd;
+  --color-focus-ring: #3b82f6;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #0a0a0a;
-    --color-bg-elevated: #171717;
-    --color-text: #fafafa;
-    --color-text-muted: #a3a3a3;
-    --color-border: #262626;
-    --color-accent: #60a5fa;
-    --color-accent-hover: #93c5fd;
-    --color-accent-visited: #a78bfa;
-  }
-}
+/* Forced dark: brutalist editorial. No light theme so the intended look is always visible. */
 
 @layer base {
   html {
@@ -85,23 +78,38 @@
     flex-direction: column;
   }
 
+  /* Links: no default blue/underline so cards and nav don’t inherit. Use .link or .prose-post a for accent. */
   a {
-    color: var(--color-accent);
-    text-decoration: underline;
-    text-underline-offset: 0.15em;
-  }
-
-  a:hover {
-    color: var(--color-accent-hover);
-  }
-
-  a:visited {
-    color: var(--color-accent-visited);
+    color: inherit;
+    text-decoration: none;
   }
 
   a:focus-visible {
     outline: 2px solid var(--color-focus-ring);
     outline-offset: 2px;
+  }
+
+  /* Inline/content links: blue, underline on hover */
+  a.link,
+  .prose-post a {
+    color: var(--color-accent);
+  }
+
+  a.link:hover,
+  a.link:visited,
+  .prose-post a:hover {
+    color: var(--color-accent-hover);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .prose-post a:visited {
+    color: var(--color-accent-visited);
+  }
+
+  /* Block-level link (e.g. card): no underline, children keep their own color */
+  a.link-block:hover {
+    text-decoration: none;
   }
 
   :focus-visible {
@@ -110,8 +118,10 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
     line-height: var(--line-height-tight);
     font-weight: var(--font-weight-bold);
+    letter-spacing: -0.02em;
   }
 
   .skip-link {
@@ -135,26 +145,37 @@
   }
 }
 
-/* Post body (markdown content) */
+/* Editorial prose: big bold hierarchy, brutalist, no radius */
+.prose-post h1 {
+  font-size: clamp(2rem, 4vw, var(--font-size-5xl));
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-4);
+}
+
 .prose-post h2 {
   font-size: var(--font-size-2xl);
-  margin-top: var(--space-10);
+  font-weight: 600;
+  margin-top: var(--space-12);
   margin-bottom: var(--space-3);
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--color-border);
 }
 
 .prose-post h2:first-of-type {
-  margin-top: var(--space-6);
+  margin-top: var(--space-8);
 }
 
 .prose-post h3 {
   font-size: var(--font-size-xl);
+  font-weight: 600;
   margin-top: var(--space-8);
   margin-bottom: var(--space-2);
 }
 
 .prose-post p {
+  font-family: var(--font-sans);
+  font-weight: 400;
   margin-bottom: var(--space-4);
   line-height: var(--line-height-relaxed);
 }
@@ -179,11 +200,10 @@
 
 .prose-post code {
   font-family: var(--font-mono);
-  font-size: var(--font-size-sm);
+  font-size: 0.9em;
   padding: var(--space-1) var(--space-2);
   background-color: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
-  border-radius: 0.25rem;
 }
 
 .prose-post pre {
@@ -193,7 +213,6 @@
   margin-bottom: var(--space-4);
   background-color: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
-  border-radius: 0.25rem;
   overflow-x: auto;
 }
 
@@ -203,9 +222,383 @@
   border: none;
 }
 
+/* Editorial moment: pull quote in serif for human voice */
 .prose-post blockquote {
-  margin: var(--space-4) 0;
+  font-family: var(--font-serif);
+  font-size: var(--font-size-lg);
+  font-weight: 400;
+  margin: var(--space-8) 0;
   padding-left: var(--space-4);
-  border-left: 4px solid var(--color-border);
+  border-left: 3px solid var(--color-accent);
   color: var(--color-text-muted);
+  line-height: var(--line-height-relaxed);
+}
+
+.prose-post blockquote p {
+  font-family: inherit;
+}
+
+/* Byline as editorial accent (Fraunces) */
+.type-byline {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+/* Editorial article set: eyebrow → meta → title → byline → tags → body */
+.editorial-header {
+  margin-bottom: var(--space-12);
+  padding-bottom: var(--space-10);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.editorial-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--space-2);
+}
+
+.editorial-meta {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: var(--space-4);
+}
+
+.editorial-title {
+  font-family: var(--font-sans);
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+}
+
+.editorial-byline {
+  margin-bottom: var(--space-4);
+}
+
+.editorial-tags {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.editorial-body {
+  max-inline-size: 65ch;
+}
+
+/* Nav: full-width bar, same padding as main for alignment */
+.nav-editorial {
+  width: 100%;
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+  padding: var(--space-4) var(--content-padding-inline);
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.nav-editorial__link {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.nav-editorial__link:hover {
+  color: var(--color-accent);
+}
+
+.nav-editorial__link--muted {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.nav-editorial__link--muted:hover {
+  color: var(--color-accent);
+}
+
+/* Card byline: Fraunces accent so list view shows the full stack (typography as visual interest) */
+.card-byline {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+/* Listing page title: big editorial headline */
+.listing-title {
+  font-family: var(--font-sans);
+  font-size: clamp(2.5rem, 6vw, var(--font-size-7xl));
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+}
+
+/* Card meta (date, tags): readable size, not tiny */
+.card-meta {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Card titles: lead = big, default = large, tile = medium */
+.card-title-lead {
+  font-family: var(--font-sans);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.02em;
+}
+
+.card-title-default {
+  font-family: var(--font-sans);
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-weight: 600;
+  line-height: var(--line-height-snug);
+}
+
+.card-title-tile {
+  font-family: var(--font-sans);
+  font-size: clamp(1.125rem, 2vw, 1.35rem);
+  font-weight: 600;
+  line-height: var(--line-height-snug);
+}
+
+/* Newspaper hierarchy: secondary story (medium), brief (small) */
+.card-title-secondary {
+  font-family: var(--font-sans);
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  font-weight: 600;
+  line-height: var(--line-height-snug);
+}
+
+.card-title-brief {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  line-height: var(--line-height-snug);
+}
+
+/* Section label above headline (newspaper-style) */
+.paper-section-label {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* Deck / subhead (lead paragraph under headline) */
+.paper-deck {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Full-width layout for listing pages (newspaper editorial) */
+.layout--full {
+  width: 100%;
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+  padding-inline: 0;
+}
+
+/* Hero grid: fills first viewport — lead (2×2), secondary (1×2 each), briefs (1×1) */
+.home-hero-wrap {
+  min-height: min(calc(100vh - 12rem), 900px);
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 1fr 1fr auto;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+  flex: 1;
+  min-height: 0;
+}
+
+.hero-grid > li {
+  display: flex;
+  min-height: 0;
+}
+
+.hero-grid__lead {
+  grid-column: 1 / 3;
+  grid-row: 1 / 3;
+  min-height: 0;
+}
+
+.hero-grid__secondary {
+  grid-column: span 1;
+  grid-row: span 2;
+  min-height: 0;
+}
+
+.hero-grid__brief {
+  grid-column: span 1;
+  grid-row: span 1;
+  min-height: 80px;
+}
+
+/* Legacy tile placement (e.g. tag pages) */
+.hero-grid__tile {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+.hero-grid__tile--wide {
+  grid-column: span 2;
+}
+
+@media (max-width: 63.999rem) {
+  .hero-grid {
+    display: block;
+    margin-bottom: var(--space-8);
+  }
+}
+
+/* Listing: mobile = single column; desktop = hero + below fold */
+.listing-mobile {
+  display: block;
+}
+
+.listing-desktop {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .listing-mobile {
+    display: none;
+  }
+
+  .listing-desktop {
+    display: block;
+  }
+}
+
+.below-fold {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Below-fold section label (newspaper "continued" / "more") */
+.paper-masthead {
+  padding-bottom: var(--space-3);
+}
+
+.paper-masthead-rule {
+  margin-top: var(--space-4);
+  border: none;
+  border-top: 2px solid var(--color-border);
+}
+
+/* In this issue: visible IA — list of stories above the fold */
+.paper-issue-index {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.paper-issue-index a {
+  color: inherit;
+}
+
+.paper-issue-index a:hover {
+  color: var(--color-accent);
+}
+
+.paper-below-label {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-top: var(--space-10);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Card hover: subtle brutalist transition */
+.card-link {
+  transition: border-color 0.2s ease, color 0.2s ease;
+  border-left: 2px solid transparent;
+}
+
+.card-link:hover {
+  border-left-color: var(--color-accent);
+}
+
+/* Scroll-in animation (optional); respect reduced motion */
+[data-animate-in] .card-link {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card-link.animate-in {
+    animation: cardFadeIn 0.35s ease forwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-animate-in] .card-link {
+    opacity: 1;
+  }
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
