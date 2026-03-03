@@ -4,9 +4,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)'],
-        mono: ['var(--font-mono)'],
-        serif: ['var(--font-serif)'],
+        sans: ['var(--font-human)'],
+        mono: ['var(--font-system)'],
+        serif: ['var(--font-editorial)'],
       },
     },
   },
