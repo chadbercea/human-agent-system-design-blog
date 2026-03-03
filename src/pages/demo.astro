@@ -1,0 +1,206 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Design demo" description="A tour of the HAS Design blog structure, content model, and interactions.">
+  <article class="demo" style="max-width: 42rem; margin: 0 auto; padding: var(--space-lg) var(--space-md);">
+    <header class="animate-in">
+      <p class="demo__label">DESIGN DEMO</p>
+      <h1 class="demo__title">What this blog is made of</h1>
+      <p class="demo__lead">
+        This page walks through the structure and behavior built in Phases 1–7. Each section explains a part of the system and links to where you can see it live.
+      </p>
+    </header>
+    <hr class="rule" />
+
+    <!-- Phase 1 -->
+    <section class="demo__section animate-in">
+      <h2 class="demo__heading">1. Content architecture</h2>
+      <p class="demo__body">
+        Every article has structured frontmatter: <strong>series</strong> (e.g. foundations, guardrails, the-stack), <strong>seriesPart</strong> and <strong>seriesTotal</strong> for ordering, <strong>altitude</strong> (foundations, patterns, advanced, field-notes, opinion), <strong>prerequisites</strong> (slugs of articles to read first), <strong>nextArticle</strong> / <strong>prevArticle</strong> for handoff, and <strong>readingTime</strong> in minutes.
+      </p>
+      <p class="demo__body">
+        That schema powers series pages, the index bands, clearance blocks, and “CLEARED FOR” links. Try an article that has prerequisites and a next article:
+      </p>
+      <p class="demo__cta">
+        <a href="/defining-handoff-protocols" class="vector">Defining Handoff Protocols</a> (has prerequisites + next)
+      </p>
+    </section>
+    <hr class="rule" />
+
+    <!-- Phase 2 -->
+    <section class="demo__section animate-in">
+      <h2 class="demo__heading">2. Design tokens</h2>
+      <p class="demo__body">
+        The base layer is CSS custom properties: three font voices, a dark field palette, type scale, and spacing. This page uses them.
+      </p>
+      <ul class="demo__list">
+        <li><strong>Human (Poppins)</strong> — UI, body, structure. This paragraph.</li>
+        <li><strong>Editorial (Fraunces)</strong> — Headlines, deck, bylines. The heading above.</li>
+        <li><strong>System (IBM Plex Mono)</strong> — Labels, metadata, squawk. The “DESIGN DEMO” and “1. Content architecture” labels.</li>
+      </ul>
+      <p class="demo__body">
+        Colors: background <code>#0a0a0a</code>, text <code>#fafafa</code>, vector accent <code>#4a9eff</code> for links and “actionable” elements, hover warm <code>#f0e0c8</code>.
+      </p>
+    </section>
+    <hr class="rule" />
+
+    <!-- Phase 3 -->
+    <section class="demo__section animate-in">
+      <h2 class="demo__heading">3. The ATIS — site header</h2>
+      <p class="demo__body">
+        The header at the top of every page is the ATIS (orientation broadcast). Row 1: nameplate (ear link, HAS DESIGN + tagline, SUBSCRIBE + date). Row 2: one-line broadcast. Row 3: sector nav — FOUNDATIONS, PATTERNS, ADVANCED, FIELD NOTES, OPINION.
+      </p>
+      <p class="demo__body">
+        Sector links go to <strong>series pages</strong> when that series exists (e.g. <a href="/series/foundations" class="vector">/series/foundations</a>), or to the index for fallback. FIELD NOTES and OPINION go to <a href="/#traffic" class="vector">/#traffic</a>. The current section gets an always-visible underline (active state).
+      </p>
+      <p class="demo__body">
+        Scroll up and hover a sector link to see the underline animate in.
+      </p>
+    </section>
+    <hr class="rule" />
+
+    <!-- Phase 4 -->
+    <section class="demo__section animate-in">
+      <h2 class="demo__heading">4. The Scope — index page</h2>
+      <p class="demo__body">
+        The home page is “The Scope”: content by altitude, not by date.
+      </p>
+      <ul class="demo__list">
+        <li><strong>Active series banner</strong> — “NOW PUBLISHING” plus the series with the latest publish date, part count, total minutes, and “START WITH PART 1”.</li>
+        <li><strong>Altitude bands</strong> — ADVANCED, PATTERNS, FOUNDATIONS. Two-column grid with a vertical rule; each article shows series+part, title, description, reading time. Hover for warm title and “READ →” slide-in.</li>
+        <li><strong>Traffic</strong> — field-notes and opinion in a single-column list, date-sorted, lighter title color.</li>
+      </ul>
+      <p class="demo__cta">
+        <a href="/" class="vector">Go to The Scope</a>
+      </p>
+    </section>
+    <hr class="rule" />
+
+    <!-- Phase 5 -->
+    <section class="demo__section animate-in">
+      <h2 class="demo__heading">5. The Procedure — article page</h2>
+      <p class="demo__body">
+        An article is a “published procedure”: squawk bar (series/part or altitude, reading time, dates), optional “CLEARANCE REQUIRED” (linked prerequisites), title + deck + byline, body prose (max-width 42rem, styled headings/code/blockquote), then “CLEARED FOR” handoff (next article) and optional “← PREVIOUS”, then tags.
+      </p>
+      <p class="demo__body">
+        Only on article pages: a thin <strong>reading progress bar</strong> at the very top of the viewport (blue, 2px). Scroll an article to see it fill.
+      </p>
+      <p class="demo__cta">
+        <a href="/sample-post" class="vector">Human-Agent System Design: An Introduction</a> (Part 1, has next)
+      </p>
+    </section>
+    <hr class="rule" />
+
+    <!-- Phase 6 -->
+    <section class="demo__section animate-in">
+      <h2 class="demo__heading">6. Sectors — series pages</h2>
+      <p class="demo__body">
+        Each series (foundations, guardrails, the-stack) has a dedicated page: “SECTOR” label, series title, short description, “X PARTS · Y MIN TOTAL”, then a numbered procedure list (01, 02, …) with title, description, reading time per part. “BEGIN WITH PART 1 →” at the bottom.
+      </p>
+      <p class="demo__cta">
+        <a href="/series/foundations" class="vector">Foundations series</a> ·
+        <a href="/series/guardrails" class="vector">Guardrails series</a> ·
+        <a href="/series/the-stack" class="vector">The Stack series</a>
+      </p>
+    </section>
+    <hr class="rule" />
+
+    <!-- Phase 7 -->
+    <section class="demo__section animate-in">
+      <h2 class="demo__heading">7. Polish & interactions</h2>
+      <p class="demo__body">
+        Additive behavior only: no layout or content changes.
+      </p>
+      <ul class="demo__list">
+        <li><strong>Article link hover</strong> — Title color → warm cream, 200ms. “READ →” slides in (opacity + translateX), 150ms. Cursor pointer on the whole row.</li>
+        <li><strong>ATIS nav</strong> — Underline scales in from the left on hover; active section has underline and bright color always.</li>
+        <li><strong>Horizontal rules</strong> — <code>hr.rule</code> starts at scaleX(0) and draws in from the left when the section enters view (Intersection Observer).</li>
+        <li><strong>Content fade-in</strong> — Elements with <code>.animate-in</code> start slightly down and transparent, then fade up when in view. Staggered delay (0, 100, 200ms…) inside altitude bands and sector lists.</li>
+        <li><strong>Reading progress</strong> — Article pages only: blue bar at top tracks scroll.</li>
+      </ul>
+      <p class="demo__body">
+        Scroll this page to see rules draw in and sections fade up. Hover any content link (e.g. the ones above) for the warm color.
+      </p>
+    </section>
+    <hr class="rule" />
+
+    <footer class="demo__footer animate-in">
+      <p class="demo__label">END OF DEMO</p>
+      <p class="demo__body">
+        <a href="/" class="vector">Back to The Scope</a> ·
+        <a href="/tags" class="vector">All tags</a>
+      </p>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .demo__label {
+    font-family: var(--font-system);
+    font-size: var(--text-xs);
+    color: var(--color-vector);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 0 0 var(--space-xs);
+  }
+
+  .demo__title {
+    font-family: var(--font-editorial);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-sm);
+  }
+
+  .demo__lead {
+    font-family: var(--font-human);
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  .demo__heading {
+    font-family: var(--font-editorial);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-sm);
+  }
+
+  .demo__body {
+    font-family: var(--font-human);
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+    margin: 0 0 var(--space-md);
+  }
+
+  .demo__body code {
+    font-family: var(--font-system);
+    font-size: 0.9em;
+    background: #111;
+    padding: 2px 6px;
+    border-radius: 2px;
+  }
+
+  .demo__list {
+    font-family: var(--font-human);
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+    margin: 0 0 var(--space-md);
+    padding-left: var(--space-lg);
+  }
+
+  .demo__cta {
+    font-family: var(--font-system);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-md);
+  }
+
+  .demo__footer {
+    margin-top: var(--space-lg);
+  }
+</style>
