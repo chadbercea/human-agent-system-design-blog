@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import { getCollection } from 'astro:content';
 
 interface Props {
@@ -32,6 +33,7 @@ function excerpt(text: string, maxLen = 80) {
 <!doctype html>
 <html lang="en">
   <head>
+    <ClientRouter />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
@@ -44,10 +46,12 @@ function excerpt(text: string, maxLen = 80) {
   </head>
   <body class="blog-layout">
     <div class="blog-shell">
-      <aside class="sidebar" aria-label="Blog navigation">
+      <aside class="sidebar" aria-label="Blog navigation" transition:name="sidebar" transition:persist>
         <div class="sidebar-branding">
-          <h1 class="sidebar-branding__title">HAS DESIGN</h1>
-          <p class="sidebar-branding__tagline">HUMAN-AGENT-SYSTEM DESIGN</p>
+          <a href="/" class="sidebar-branding-link">
+            <span class="sidebar-branding__title">HAS DESIGN</span>
+            <span class="sidebar-branding__tagline">HUMAN-AGENT-SYSTEM DESIGN</span>
+          </a>
           <hr class="rule" />
         </div>
         <div class="sidebar-foundations">
@@ -87,7 +91,7 @@ function excerpt(text: string, maxLen = 80) {
           ))}
         </div>
       </aside>
-      <main class="content-panel" id="content-panel">
+      <main class="content-panel" id="content-panel" transition:animate="fade">
         <slot />
         <footer class="blog-footer">
           <p>
@@ -98,7 +102,24 @@ function excerpt(text: string, maxLen = 80) {
       </main>
     </div>
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
+      function updateActiveArticle() {
+        const path = window.location.pathname;
+        const segments = path.split('/').filter(Boolean);
+        const slug = segments.length === 1 ? segments[0] : null;
+
+        document.querySelectorAll('.sidebar-article').forEach((el) => {
+          el.classList.remove('active');
+          if (el.getAttribute('data-slug') === slug) {
+            el.classList.add('active');
+            el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          }
+        });
+      }
+
+      document.addEventListener('astro:page-load', () => {
+        updateActiveArticle();
+
+        const contentPanel = document.getElementById('content-panel');
         const rules = document.querySelectorAll('hr.rule');
         const ruleObserver = new IntersectionObserver(
           (entries) => {
@@ -109,7 +130,7 @@ function excerpt(text: string, maxLen = 80) {
               }
             });
           },
-          { threshold: 0.1, root: document.getElementById('content-panel') }
+          { threshold: 0.1, root: contentPanel }
         );
         rules.forEach((rule) => ruleObserver.observe(rule));
 
@@ -123,7 +144,7 @@ function excerpt(text: string, maxLen = 80) {
               }
             });
           },
-          { threshold: 0.1, root: document.getElementById('content-panel') }
+          { threshold: 0.1, root: contentPanel }
         );
         animateEls.forEach((el) => animateObserver.observe(el));
 
@@ -132,6 +153,14 @@ function excerpt(text: string, maxLen = 80) {
             (el as HTMLElement).style.transitionDelay = `${i * 100}ms`;
           });
         });
+      });
+
+      document.addEventListener('astro:after-swap', () => {
+        updateActiveArticle();
+        const panel = document.getElementById('content-panel');
+        if (panel) {
+          panel.scrollTo({ top: 0, behavior: 'instant' });
+        }
       });
     </script>
   </body>
@@ -161,7 +190,18 @@ function excerpt(text: string, maxLen = 80) {
     flex-shrink: 0;
   }
 
+  .sidebar-branding-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .sidebar-branding-link:hover {
+    color: inherit;
+  }
+
   .sidebar-branding__title {
+    display: block;
     font-family: var(--font-editorial);
     font-weight: 900;
     font-size: 1.5rem;
@@ -171,6 +211,7 @@ function excerpt(text: string, maxLen = 80) {
   }
 
   .sidebar-branding__tagline {
+    display: block;
     font-family: var(--font-system);
     font-size: var(--text-xs);
     letter-spacing: 0.1em;
