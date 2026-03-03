@@ -1,0 +1,202 @@
+---
+const mainSiteUrl = 'https://humanagentsystem.design';
+const dateline = new Date().toLocaleDateString('en-US', {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const sectors = [
+  { label: 'FOUNDATIONS', href: '/tags/foundations' },
+  { label: 'PATTERNS', href: '/tags/patterns' },
+  { label: 'ADVANCED', href: '/tags/advanced' },
+  { label: 'FIELD NOTES', href: '/tags/field-notes' },
+  { label: 'OPINION', href: '/tags/opinion' },
+];
+---
+
+<header class="atis" role="banner">
+  <!-- Row 1 — Nameplate -->
+  <div class="atis__row atis__nameplate">
+    <div class="atis__zone atis__zone--left">
+      <a href={mainSiteUrl} class="atis__ear-link">humanagentsystem.design</a>
+    </div>
+    <div class="atis__zone atis__zone--center">
+      <h1 class="atis__title">HAS DESIGN</h1>
+      <p class="atis__tagline">HUMAN-AGENT-SYSTEM DESIGN</p>
+    </div>
+    <div class="atis__zone atis__zone--right">
+      <a href="/rss.xml" class="atis__subscribe">SUBSCRIBE</a>
+      <p class="atis__dateline">{dateline}</p>
+      <p class="atis__vol">DIGITAL · VOL. 1, NO. 1</p>
+    </div>
+  </div>
+  <hr class="rule" />
+
+  <!-- Row 2 — Broadcast -->
+  <div class="atis__row atis__broadcast">
+    <p class="atis__broadcast-text">
+      A design discipline for the boundary layers between humans, autonomous agents, and the systems they operate in.
+    </p>
+  </div>
+  <hr class="rule" />
+
+  <!-- Row 3 — Sector Nav -->
+  <nav class="atis__row atis__sectors" aria-label="Sectors by altitude">
+    {sectors.map((sector, i) => (
+      <>
+        {i > 0 && <span class="atis__sector-sep" aria-hidden="true"> · </span>}
+        <a href={sector.href} class="atis__sector-link">{sector.label}</a>
+      </>
+    ))}
+  </nav>
+  <hr class="rule" />
+</header>
+
+<style>
+  .atis {
+    padding: var(--space-lg) var(--space-md);
+    max-width: 100%;
+  }
+
+  .atis__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm) var(--space-lg);
+  }
+
+  .atis__nameplate {
+    justify-content: space-between;
+    text-align: center;
+  }
+
+  .atis__zone {
+    flex: 0 1 auto;
+  }
+
+  .atis__zone--left {
+    text-align: left;
+  }
+
+  .atis__zone--center {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .atis__zone--right {
+    text-align: right;
+  }
+
+  .atis__ear-link {
+    font-family: var(--font-system);
+    font-size: var(--text-xs);
+    color: var(--color-text-dim);
+    text-decoration: none;
+  }
+
+  .atis__ear-link:hover {
+    color: var(--color-text-muted);
+  }
+
+  .atis__title {
+    font-family: var(--font-editorial);
+    font-size: var(--text-4xl);
+    font-weight: 900;
+    color: var(--color-text);
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .atis__tagline {
+    font-family: var(--font-system);
+    font-size: var(--text-sm);
+    letter-spacing: 0.12em;
+    color: var(--color-text-muted);
+    margin: var(--space-xs) 0 0;
+  }
+
+  .atis__subscribe {
+    font-family: var(--font-system);
+    font-size: var(--text-sm);
+    color: var(--color-vector);
+    text-decoration: none;
+    display: block;
+  }
+
+  .atis__subscribe:hover {
+    color: var(--color-vector-bright);
+  }
+
+  .atis__dateline,
+  .atis__vol {
+    font-family: var(--font-system);
+    font-size: var(--text-xs);
+    color: var(--color-text-dim);
+    margin: var(--space-xs) 0 0;
+  }
+
+  .atis__broadcast {
+    justify-content: center;
+  }
+
+  .atis__broadcast-text {
+    font-family: var(--font-system);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    letter-spacing: 0.06em;
+    margin: 0;
+    max-width: 42rem;
+    text-align: center;
+  }
+
+  .atis__sectors {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .atis__sector-link {
+    font-family: var(--font-human);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-dim);
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 2px;
+    transition: color 150ms ease-out;
+  }
+
+  .atis__sector-link:hover {
+    color: var(--color-text);
+  }
+
+  .atis__sector-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--color-text);
+    width: 0;
+    transition: width 150ms ease-out;
+  }
+
+  .atis__sector-link:hover::after {
+    width: 100%;
+  }
+
+  .atis__sector-sep {
+    font-family: var(--font-human);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--color-text-dim);
+    pointer-events: none;
+  }
+</style>
