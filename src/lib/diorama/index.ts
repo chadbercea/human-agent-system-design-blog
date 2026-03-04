@@ -3,3 +3,8 @@ export { createRenderer } from './renderer';
 export { createOrthographicCamera } from './camera';
 export { createLights } from './lights';
 export { createGround } from './ground';
+export { createRunway } from './runway';
+export { createTower, type TowerGroup } from './tower';
+export { createAircraft, LIVERIES, type AircraftGroup, type LiveryConfig } from './aircraft';
+export { createTaxiwaysAndApron } from './taxiways';
+export { createHoldingRing } from './holding';

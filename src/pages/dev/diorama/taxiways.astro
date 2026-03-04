@@ -1,0 +1,30 @@
+---
+if (!import.meta.env.DEV) {
+  return Astro.redirect('/');
+}
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diorama · Taxiways</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; overflow: hidden; }
+      #diorama-container { width: 100vw; height: 100vh; position: relative; }
+      #diorama-scene-info {
+        position: absolute; left: 0; bottom: 0;
+        padding: 0.5rem 0.75rem; background: rgba(0,0,0,0.7); color: #aaa;
+        font-family: ui-monospace, monospace; font-size: 12px; z-index: 5; pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="diorama-container"></div>
+    <div id="diorama-scene-info" aria-live="polite">—</div>
+    <script>
+      import '/src/scripts/dev-diorama-taxiways';
+    </script>
+  </body>
+</html>
