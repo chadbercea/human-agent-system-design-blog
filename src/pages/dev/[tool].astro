@@ -1,0 +1,49 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { getSortedArticles } from '../../lib/articles.ts';
+
+export async function getStaticPaths() {
+  if (import.meta.env.PROD) return [];
+  return [{ params: { tool: 'type' } }, { params: { tool: 'prose' } }];
+}
+
+const { tool } = Astro.params;
+const articles = await getSortedArticles();
+const title = tool === 'prose' ? 'Dev — Prose specimen' : 'Dev — Type specimen';
+---
+
+<SiteLayout title={title} articles={articles}>
+  {
+    tool === 'type' ? (
+      <div class="prose">
+        <h1>Type specimen</h1>
+        <p class="article-header__meta">Mono · body · headings (dev only)</p>
+        <h2>Heading two</h2>
+        <p>
+          Body text uses <strong>serif prose</strong> with <span class="specimen-mono">mono labels</span>.
+        </p>
+        <h3>Heading three</h3>
+        <p>
+          <a href="#">Link accent</a> — check hover and visited against tokens.
+        </p>
+      </div>
+    ) : (
+      <article class="prose">
+        <h1>Prose block</h1>
+        <p>Paragraph with <em>emphasis</em> and <code>inline code</code>.</p>
+        <h2>List</h2>
+        <ul>
+          <li>First</li>
+          <li>Second</li>
+        </ul>
+        <blockquote>
+          <p>Blockquote uses muted token color.</p>
+        </blockquote>
+        <pre><code>{`const x = 1;
+console.log(x);`}</code></pre>
+        <hr />
+        <p>Horizontal rule above.</p>
+      </article>
+    )
+  }
+</SiteLayout>

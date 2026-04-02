@@ -25,6 +25,10 @@ Do not contradict the briefing:
 
 If repo files or `docs/` disagree with the above, **the Linear briefing wins**; update or remove stale files.
 
+## Repo baseline (implementation)
+
+The tree is intended to **match** this briefing: `articles` content collection, tokenized CSS under `src/styles/`, two-column `SiteLayout`, no Tailwind/Three/diorama, `/dev/type` and `/dev/prose` omitted from **production** builds. Open issues (e.g. **ILI-561** self-hosted fonts) **refine** this baseline—do not reintroduce the canceled stack.
+
 ## Deployments
 
 Production deploys via **Vercel** (GitHub integration). Treat **`main`** as the production branch: merge PRs to **`main`** to ship.

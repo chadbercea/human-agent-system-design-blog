@@ -32,6 +32,10 @@ npm run check
 
 **Vercel** builds from GitHub. Production branch: **`main`**. Static output is `dist/` (see `vercel.json`).
 
+Set **`PUBLIC_SITE_URL`** to the canonical site (e.g. `https://your.domain`) in the Vercel project environment for correct RSS, sitemap, and canonical URLs. If unset, production builds fall back to **`https://$VERCEL_URL`** when Vercel provides it.
+
+**Content:** Markdown articles live in `src/content/articles/` (see `src/content/config.ts` for frontmatter).
+
 ## Docker (optional)
 
 Docker Compose is available for local dev if you prefer containers; it is **not** required.

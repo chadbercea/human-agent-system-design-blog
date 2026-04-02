@@ -1,0 +1,46 @@
+---
+import '../styles/global.css';
+import { articleSlug, type ArticleEntry } from '../lib/articles.ts';
+
+interface Props {
+  title: string;
+  description?: string;
+  articles: ArticleEntry[];
+}
+
+const { title, description = '', articles } = Astro.props;
+const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : null;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar" aria-label="Site">
+        <p class="sidebar__title">
+          <a href="/">HAS Design</a>
+        </p>
+        <ul class="sidebar__nav">
+          {
+            articles.map((a) => (
+              <li>
+                <a href={`/${articleSlug(a.id)}`}>{a.data.title}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </aside>
+      <div class="content">
+        <slot />
+      </div>
+    </div>
+  </body>
+</html>

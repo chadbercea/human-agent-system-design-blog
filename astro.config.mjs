@@ -1,16 +1,11 @@
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
+const site =
+  process.env.PUBLIC_SITE_URL?.replace(/\/$/, '') ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:4321');
+
 export default defineConfig({
-  site: 'https://your-domain.com',
-  integrations: [tailwind(), sitemap()],
-  vite: {
-    optimizeDeps: {
-      include: ['three'],
-    },
-    ssr: {
-      noExternal: ['three'],
-    },
-  },
+  site,
+  integrations: [sitemap()],
 });

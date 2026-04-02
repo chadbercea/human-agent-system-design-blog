@@ -1,0 +1,23 @@
+:root {
+  color-scheme: dark light;
+
+  --color-bg: #0d0d0d;
+  --color-surface: #141414;
+  --color-text: #e8e8e8;
+  --color-text-muted: #8a8a8a;
+  --color-rule: #2a2a2a;
+  --color-link: #6eb3ff;
+  --color-link-hover: #9dccff;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-bg: #fafafa;
+    --color-surface: #f0f0f0;
+    --color-text: #1a1a1a;
+    --color-text-muted: #5c5c5c;
+    --color-rule: #d4d4d4;
+    --color-link: #0b5cad;
+    --color-link-hover: #084a8f;
+  }
+}

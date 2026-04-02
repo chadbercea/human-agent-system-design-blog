@@ -1,0 +1,5 @@
+/* Self-hosted WOFF2 in public/fonts/ — ILI-561. Until then: system stacks only (no CDN). */
+:root {
+  --font-prose: ui-serif, Georgia, 'Times New Roman', Times, serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+}
