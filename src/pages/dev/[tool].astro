@@ -29,20 +29,148 @@ const title = tool === 'prose' ? 'Dev — Prose specimen' : 'Dev — Type specim
       </div>
     ) : (
       <article class="prose">
-        <h1>Prose block</h1>
-        <p>Paragraph with <em>emphasis</em> and <code>inline code</code>.</p>
-        <h2>List</h2>
-        <ul>
-          <li>First</li>
-          <li>Second</li>
-        </ul>
+        <h1>Prose specimen</h1>
+
+        <p>
+          This page exercises every HTML element that the <code>.prose</code> class
+          styles. It exists so you can assess the reading experience as a whole — does
+          it feel settled and calm? Open this in a browser and read it top to bottom.
+        </p>
+
+        <p>
+          A second paragraph follows the first to verify <code>p + p</code> spacing.
+          The gap between consecutive paragraphs should be exactly
+          <code>var(--space-6)</code> — enough to breathe, not enough to fragment the
+          thought. Notice how <strong>bold text</strong> and <em>italic text</em> sit
+          inside the flow without breaking the line rhythm.
+        </p>
+
+        <p>
+          Here is a third paragraph with a <a href="#">sample link</a> embedded in the
+          prose. The underline should be faint at rest and brighten on hover. Links
+          should never change font-weight — that would reflow the text around them.
+        </p>
+
+        <h2>Heading level two</h2>
+
+        <p>
+          An h2 signals a major section break. It gets generous top margin
+          (<code>--space-16</code>) to separate it from preceding content, and tight
+          leading to keep multi-line headings compact.
+        </p>
+
+        <h3>Heading level three</h3>
+
+        <p>
+          An h3 marks a subsection. Its top margin (<code>--space-12</code>) is
+          smaller than h2 but still creates a clear visual break. The font size steps
+          down to <code>--text-xl</code>.
+        </p>
+
+        <h4>Heading level four</h4>
+
+        <p>
+          An h4 is for fine-grained structure within a subsection. It uses medium
+          weight rather than bold to differentiate it from h3 while keeping the
+          hierarchy legible.
+        </p>
+
+        <h2>Blockquotes</h2>
+
         <blockquote>
-          <p>Blockquote uses muted token color.</p>
+          <p>
+            The best interface is no interface. The best system is one that recedes so
+            completely that the human forgets it is there.
+          </p>
         </blockquote>
-        <pre><code>{`const x = 1;
-console.log(x);`}</code></pre>
+
+        <p>
+          The blockquote above uses a thin left border, italic style, and slightly
+          dimmed colour. No background, no box — just the left rule.
+        </p>
+
+        <h2>Code</h2>
+
+        <p>
+          Inline code like <code>const x = 42</code> should blend into the paragraph
+          without calling excessive attention to itself. It gets a subtle background
+          and slightly smaller font size (<code>0.875em</code>).
+        </p>
+
+        <pre><code>{`function greet(name: string): string {
+  // A simple greeting function to test code block rendering
+  const greeting = \`Hello, \${name}!\`;
+  console.log(greeting);
+  return greeting;
+}
+
+// Call it
+greet("world");`}</code></pre>
+
+        <p>
+          Code blocks get more padding (<code>--space-6</code>), a wider max-width
+          (<code>--measure-wide</code>), and horizontal scroll when lines overflow. No
+          border, no shadow.
+        </p>
+
+        <h2>Lists</h2>
+
+        <p>An unordered list:</p>
+
+        <ul>
+          <li>Design tokens define the visual language</li>
+          <li>Components consume tokens, never raw values</li>
+          <li>
+            Layouts compose components into pages
+            <ul>
+              <li>Nested items reduce spacing slightly</li>
+              <li>This tests the nested list treatment</li>
+            </ul>
+          </li>
+          <li>The system stays coherent at every level</li>
+        </ul>
+
+        <p>An ordered list:</p>
+
+        <ol>
+          <li>Read the design spec carefully</li>
+          <li>Map spec tokens to existing CSS custom properties</li>
+          <li>Implement the stylesheet element by element</li>
+          <li>Build a specimen page to verify the result</li>
+        </ol>
+
+        <h2>Horizontal rule</h2>
+
+        <p>
+          A horizontal rule below separates thematic sections. It uses a single-pixel
+          border in the border colour token with generous vertical margin.
+        </p>
+
         <hr />
-        <p>Horizontal rule above.</p>
+
+        <p>
+          Content resumes after the rule. The spacing above and below should feel
+          balanced — <code>--space-12</code> on each side.
+        </p>
+
+        <h2>Links and emphasis together</h2>
+
+        <p>
+          You can combine <strong><a href="#">bold links</a></strong> and
+          <em><a href="#">italic links</a></em> and even
+          <strong><em>bold italic text</em></strong> within the same paragraph. The
+          prose should remain readable and the rhythm unbroken regardless of how many
+          inline styles overlap.
+        </p>
+
+        <h3>Final subsection</h3>
+
+        <p>
+          This specimen is intentionally long enough to read as a real article. Scroll
+          through it. Does the spacing feel consistent? Do the headings create a clear
+          hierarchy? Does the overall texture feel settled and calm? If so, the prose
+          stylesheet is doing its job.
+        </p>
       </article>
     )
   }
