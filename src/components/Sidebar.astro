@@ -1,0 +1,97 @@
+---
+import { articleSlug, type ArticleEntry } from '../lib/articles.ts';
+
+interface Props {
+  articles: ArticleEntry[];
+  currentPath?: string;
+}
+
+const { articles, currentPath = '' } = Astro.props;
+---
+
+<nav class="sidebar" aria-label="Site navigation">
+  <a class="sidebar__site-name" href="/">HAS Design</a>
+
+  <hr class="sidebar__rule" />
+
+  <p class="sidebar__label">Articles</p>
+  <ul class="sidebar__list">
+    {
+      articles.map((a) => {
+        const href = `/${articleSlug(a.id)}`;
+        const isActive = currentPath === href;
+        return (
+          <li>
+            <a
+              class:list={['sidebar__link', { 'sidebar__link--active': isActive }]}
+              href={href}
+              aria-current={isActive ? 'page' : undefined}
+            >
+              {a.data.title}
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>
+
+<style>
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar__site-name {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .sidebar__site-name:hover {
+    color: var(--color-text-primary);
+  }
+
+  .sidebar__rule {
+    height: 0;
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: var(--space-4) 0;
+  }
+
+  .sidebar__label {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .sidebar__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sidebar__link {
+    display: block;
+    padding: var(--space-1) 0;
+    font-family: var(--font-prose);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .sidebar__link:hover {
+    color: var(--color-text-primary);
+  }
+
+  .sidebar__link--active {
+    color: var(--color-text-primary);
+  }
+</style>
