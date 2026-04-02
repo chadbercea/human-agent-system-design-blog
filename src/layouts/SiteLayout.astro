@@ -1,7 +1,6 @@
 ---
 import '../styles/global.css';
-import Sidebar from '../components/Sidebar.astro';
-import { type ArticleEntry } from '../lib/articles.ts';
+import { articleSlug, type ArticleEntry } from '../lib/articles.ts';
 
 interface Props {
   title: string;
@@ -24,11 +23,22 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href :
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
   </head>
   <body>
-    <div class="layout">
-      <aside class="layout__sidebar">
-        <Sidebar articles={articles} currentPath={Astro.url.pathname} />
+    <div class="shell">
+      <aside class="sidebar" aria-label="Site">
+        <p class="sidebar__title">
+          <a href="/">HAS Design</a>
+        </p>
+        <ul class="sidebar__nav">
+          {
+            articles.map((a) => (
+              <li>
+                <a href={`/${articleSlug(a.id)}`}>{a.data.title}</a>
+              </li>
+            ))
+          }
+        </ul>
       </aside>
-      <div class="layout__content">
+      <div class="content">
         <slot />
       </div>
     </div>

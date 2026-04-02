@@ -32,16 +32,20 @@ ol {
   list-style: none;
 }
 
+::selection {
+  background: var(--color-selection);
+}
+
 a {
-  color: var(--color-link);
+  color: var(--color-accent);
   text-decoration: none;
 }
 
 a:hover {
-  color: var(--color-link-hover);
+  color: var(--color-accent-hover);
   text-decoration: underline;
 }
 
 a:visited {
-  color: var(--color-link);
+  color: var(--color-accent);
 }

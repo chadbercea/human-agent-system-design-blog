@@ -15,16 +15,126 @@ const title = tool === 'prose' ? 'Dev — Prose specimen' : 'Dev — Type specim
 <SiteLayout title={title} articles={articles}>
   {
     tool === 'type' ? (
-      <div class="prose">
-        <h1>Type specimen</h1>
-        <p class="article-header__meta">Mono · body · headings (dev only)</p>
-        <h2>Heading two</h2>
-        <p>
-          Body text uses <strong>serif prose</strong> with <span class="specimen-mono">mono labels</span>.
+      <div class="specimen">
+        {/* ── Font stack overview ─────────────────────────── */}
+        <div class="specimen__eyebrow">The Font Stack</div>
+        <h1 class="specimen__title">Four Fonts, One System</h1>
+        <p class="specimen__subtitle">Display + UI + Prose + Mono</p>
+
+        <hr class="specimen__rule" />
+
+        {/* ── Display: Lato Black ─────────────────────────── */}
+        <div class="specimen__eyebrow">Display — Lato Black 900</div>
+        <h1 class="specimen__title">Big Blocky Thicc Titles</h1>
+        <p class="specimen__body">
+          Lato Black at 2rem. Built for impact. The kind of heading you feel
+          in your chest before you read the words.
         </p>
-        <h3>Heading three</h3>
-        <p>
-          <a href="#">Link accent</a> — check hover and visited against tokens.
+
+        <hr class="specimen__rule" />
+
+        {/* ── UI: Montserrat ──────────────────────────────── */}
+        <div class="specimen__eyebrow">UI — Montserrat Bold 700</div>
+        <p class="specimen__subtitle">All Caps Subtitles In Montserrat ExtraBold</p>
+        <p class="specimen__body">
+          Montserrat handles eyebrows (the tiny labels above titles) and
+          subtitles. Always uppercase, always tracked out, always bold.
+        </p>
+
+        <hr class="specimen__rule" />
+
+        {/* ── Prose: Source Serif 4 ───────────────────────── */}
+        <div class="specimen__eyebrow">Prose — Source Serif 4</div>
+        <h1 class="specimen__title">Long-Form Reading</h1>
+        <p class="specimen__body">
+          Source Serif 4 is the workhorse. Neutral, screen-optimized, designed for
+          long paragraphs at 18px on dark backgrounds. It doesn't try to be literary
+          or editorial — it just gets out of the way and lets you read. The rhythm is
+          steady, the x-height is generous, and the contrast is tuned for backlit screens.
+        </p>
+        <p class="specimen__body">
+          Here's a second paragraph to feel the cadence. Good body type
+          disappears. You stop noticing the font and start noticing the ideas.
+          That's <em>exactly</em> what Source Serif does. It pairs with <strong>bold
+          emphasis</strong> naturally and handles <a href="#">inline links</a> without
+          breaking the texture of the paragraph.
+        </p>
+
+        <hr class="specimen__rule" />
+
+        {/* ── Mono: JetBrains Mono ────────────────────────── */}
+        <div class="specimen__eyebrow">Code — JetBrains Mono</div>
+        <h1 class="specimen__title">Terminal Vibes</h1>
+        <p class="specimen__body">
+          Inline code like <code>const vibe = "immaculate"</code> gets the pill
+          treatment. Ligatures are on: <code>=&gt;</code> <code>!==</code> <code>-&gt;</code> <code>&lt;=</code>.
+        </p>
+        <pre class="specimen__code"><code>{`// JetBrains Mono in a code block
+function deploy(config) {
+  const { target, env } = config;
+  if (env !== "production") return;
+
+  console.log(\`deploying to \${target}...\`);
+  return fetch(target, {
+    method: "POST",
+    headers: { "x-deploy-key": process.env.KEY },
+    body: JSON.stringify({ ts: Date.now() }),
+  });
+}`}</code></pre>
+
+        <hr class="specimen__rule" />
+
+        {/* ── Metadata specimen ───────────────────────────── */}
+        <div class="specimen__eyebrow">Metadata — Mono + UI Together</div>
+        <h1 class="specimen__title">How It All Plays Together</h1>
+        <div class="specimen__meta-row">
+          <span class="specimen__meta-date">2026-04-02</span>
+          <span class="specimen__meta-tag">DESIGN SYSTEMS</span>
+          <span class="specimen__meta-tag">TYPOGRAPHY</span>
+          <span class="specimen__meta-reading">6 min read</span>
+        </div>
+        <p class="specimen__body">
+          Dates and reading time in JetBrains Mono with tabular figures.
+          Tags in Montserrat all-caps. The two "system" fonts share the same
+          visual register without competing.
+        </p>
+
+        <hr class="specimen__rule" />
+
+        {/* ── Full article simulation ─────────────────────── */}
+        <div class="specimen__eyebrow">Full Article Preview</div>
+        <h1 class="specimen__title">Why Agents Need Feedback Loops</h1>
+        <p class="specimen__subtitle">Building Adaptive Systems That Learn</p>
+        <div class="specimen__meta-row">
+          <span class="specimen__meta-date">2026-03-28</span>
+          <span class="specimen__meta-tag">AGENT DESIGN</span>
+          <span class="specimen__meta-reading">8 min read</span>
+        </div>
+        <p class="specimen__body">
+          An autonomous agent without a feedback loop is a missile — it commits
+          fully to its initial trajectory and can't correct course. The most capable
+          agents aren't the ones with the biggest context windows or the most tools.
+          They're the ones that <em>notice when something isn't working</em> and
+          adjust before the damage compounds.
+        </p>
+        <p class="specimen__body">
+          This is the fundamental tension in agent design: you want the system to be
+          autonomous enough to handle multi-step tasks without hand-holding, but
+          self-aware enough to recognize when its plan has gone sideways. The sweet
+          spot is <strong>structured reflection</strong> — checkpoints where the agent
+          evaluates its own progress against the original intent.
+        </p>
+        <pre class="specimen__code"><code>{`interface FeedbackLoop {
+  observe(): Observation;
+  evaluate(obs: Observation): Score;
+  adjust(score: Score): Action;
+  threshold: number; // below this => escalate to human
+}`}</code></pre>
+        <p class="specimen__body">
+          The <code>threshold</code> parameter is where the magic happens. Set it
+          too low and the agent never asks for help. Too high and it's just a
+          chatbot with extra steps. The right value depends on the domain, the
+          stakes, and how much you trust the agent's self-evaluation.
         </p>
       </div>
     ) : (
@@ -175,3 +285,142 @@ greet("world");`}</code></pre>
     )
   }
 </SiteLayout>
+
+<style>
+  .specimen {
+    max-width: var(--measure);
+  }
+
+  /* ── Eyebrow ──────────────────────────────────────────── */
+  .specimen__eyebrow {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-link);
+    margin-bottom: var(--space-2);
+  }
+
+  /* ── Title: Lato Black ────────────────────────────────── */
+  .specimen__title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 2.5rem;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin: 0 0 var(--space-3);
+    color: var(--color-text);
+  }
+
+  /* ── Subtitle: Montserrat ExtraBold all-caps ──────────── */
+  .specimen__subtitle {
+    font-family: var(--font-ui);
+    font-weight: 800;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-4);
+  }
+
+  /* ── Body: Source Serif 4 ─────────────────────────────── */
+  .specimen__body {
+    font-family: var(--font-prose);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+    color: var(--color-text);
+    margin: 0 0 var(--space-4);
+  }
+
+  .specimen__body em {
+    font-style: italic;
+  }
+
+  .specimen__body strong {
+    font-weight: 700;
+  }
+
+  .specimen__body a {
+    color: var(--color-link);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  /* ── Inline code pills ────────────────────────────────── */
+  .specimen__body code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    font-variant-ligatures: contextual;
+    background: var(--color-surface);
+    border: 1px solid var(--color-rule);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+  }
+
+  /* ── Code blocks ──────────────────────────────────────── */
+  .specimen__code {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    font-variant-ligatures: contextual;
+    background: var(--color-surface);
+    border: 1px solid var(--color-rule);
+    border-left: 3px solid var(--color-link);
+    border-radius: 2px;
+    padding: var(--space-4);
+    margin: var(--space-4) 0;
+    overflow-x: auto;
+  }
+
+  .specimen__code code {
+    font-family: inherit;
+    font-size: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  /* ── Metadata row ─────────────────────────────────────── */
+  .specimen__meta-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  .specimen__meta-date {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+
+  .specimen__meta-tag {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-link);
+    background: color-mix(in srgb, var(--color-link) 12%, transparent);
+    border-radius: 3px;
+    padding: 0.15em 0.5em;
+  }
+
+  .specimen__meta-reading {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+
+  /* ── Rule ─────────────────────────────────────────────── */
+  .specimen__rule {
+    border: none;
+    border-top: 1px solid var(--color-rule);
+    margin: var(--space-8) 0;
+  }
+</style>
