@@ -4,25 +4,92 @@ import { articleSlug, getSortedArticles } from '../lib/articles.ts';
 
 const articles = await getSortedArticles();
 const title = 'HAS Design — Articles';
+
+function shortDate(date: Date): string {
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
 ---
 
 <SiteLayout title={title} description="Human–agent system design writing." articles={articles}>
+  <header class="index-header">
+    <p class="index-header__title">HAS Design</p>
+    <p class="index-header__tagline">Human · Agent · System</p>
+    <hr class="index-header__rule" />
+  </header>
+
   <ul class="index-list">
     {
       articles.map((a) => (
-        <li>
-          <a href={`/${articleSlug(a.id)}`}>
-            <span class="index-list__title">{a.data.title}</span>
-            <time class="index-list__date" datetime={a.data.date.toISOString()}>
-              {a.data.date.toLocaleDateString('en-CA', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
-            </time>
+        <li class="index-list__item">
+          <a class="index-list__link" href={`/${articleSlug(a.id)}`}>
+            {a.data.title}
           </a>
+          <time class="index-list__date" datetime={a.data.date.toISOString()}>
+            {shortDate(a.data.date)}
+          </time>
         </li>
       ))
     }
   </ul>
 </SiteLayout>
+
+<style>
+  .index-header {
+    margin-block-end: var(--space-8);
+  }
+
+  .index-header__title {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .index-header__tagline {
+    font-family: var(--font-prose);
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  .index-header__rule {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin-block-start: var(--space-4);
+  }
+
+  .index-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: var(--measure-wide);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .index-list__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .index-list__link {
+    font-family: var(--font-prose);
+    font-size: var(--text-lg);
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .index-list__link:hover {
+    color: var(--color-accent);
+  }
+
+  .index-list__date {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+</style>
