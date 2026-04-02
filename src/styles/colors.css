@@ -8,6 +8,14 @@
   --color-rule: #2a2a2a;
   --color-link: #6eb3ff;
   --color-link-hover: #9dccff;
+
+  /* Semantic aliases */
+  --color-text-primary: var(--color-text);
+  --color-text-secondary: var(--color-text-muted);
+  --color-accent: var(--color-link);
+  --color-accent-hover: var(--color-link-hover);
+  --color-border: var(--color-rule);
+  --color-code-bg: var(--color-surface);
 }
 
 @media (prefers-color-scheme: light) {
@@ -19,5 +27,12 @@
     --color-rule: #d4d4d4;
     --color-link: #0b5cad;
     --color-link-hover: #084a8f;
+
+    --color-text-primary: var(--color-text);
+    --color-text-secondary: var(--color-text-muted);
+    --color-accent: var(--color-link);
+    --color-accent-hover: var(--color-link-hover);
+    --color-border: var(--color-rule);
+    --color-code-bg: var(--color-surface);
   }
 }
