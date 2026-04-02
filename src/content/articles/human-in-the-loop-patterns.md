@@ -4,7 +4,6 @@ date: 2025-02-12
 description: "When to ask for approval, when to notify, and when to let the agent run autonomously."
 ---
 
-# Human-in-the-Loop Patterns
 
 Not every step needs a click. This post compares approval gates, notifications, and autonomous runs.
 

@@ -4,7 +4,6 @@ date: 2025-02-10
 description: "Coordinating multiple agents and assigning roles so the system behaves predictably."
 ---
 
-# Multi-Agent Orchestration
 
 When more than one agent is in play, orchestration—who does what and in what order—becomes critical.
 

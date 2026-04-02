@@ -4,7 +4,6 @@ date: 2025-02-21
 description: "Clear handoff points between humans and agents reduce confusion and rework."
 ---
 
-# Defining Handoff Protocols
 
 Placeholder content to expose blockquotes and multiple heading levels.
 

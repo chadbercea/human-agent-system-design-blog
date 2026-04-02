@@ -63,7 +63,7 @@
   color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: rgba(74, 158, 255, 0.4);
+  text-decoration-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
 }
 
 .prose a:hover {
@@ -83,6 +83,10 @@
 
 .prose blockquote p {
   margin: 0;
+}
+
+.prose blockquote p + p {
+  margin-top: var(--space-4);
 }
 
 /* --- Inline code --- */

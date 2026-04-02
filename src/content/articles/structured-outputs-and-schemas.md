@@ -4,7 +4,6 @@ date: 2025-02-02
 description: "Getting agents to return JSON or other structured data that your app can rely on."
 ---
 
-# Structured Outputs and Schemas
 
 Free-form text is hard to integrate. This post covers how to get and validate structured output from agents.
 

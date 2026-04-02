@@ -4,7 +4,6 @@ date: 2025-01-28
 description: "What to log when humans and agents collaborate, and how to retain and query it."
 ---
 
-# Audit Logs and Compliance
 
 For regulated or high-stakes domains, audit trails are non-negotiable. This post covers what to capture and how.
 

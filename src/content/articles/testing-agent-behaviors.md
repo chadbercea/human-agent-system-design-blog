@@ -4,7 +4,6 @@ date: 2025-01-12
 description: "How to test non-deterministic systems: golden runs, regression sets, and human review."
 ---
 
-# Testing Agent Behaviors
 
 Agents are non-deterministic, but that doesn't mean untestable. This post outlines practical testing strategies.
 

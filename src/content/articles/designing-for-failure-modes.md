@@ -4,7 +4,6 @@ date: 2025-02-20
 description: "When human-agent systems break, clear failure modes keep users in control and reduce confusion."
 ---
 
-# Designing for Failure Modes
 
 Systems that assume success tend to fail badly. This post outlines how to design for graceful degradation and clear recovery paths.
 

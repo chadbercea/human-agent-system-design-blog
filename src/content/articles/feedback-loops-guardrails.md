@@ -4,7 +4,6 @@ date: 2025-02-22
 description: "How to design feedback mechanisms and guardrails so human-agent systems stay safe and aligned."
 ---
 
-# Feedback Loops and Guardrails
 
 Placeholder content to expose list and heading styles in the UI.
 

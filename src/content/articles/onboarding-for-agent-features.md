@@ -4,7 +4,6 @@ date: 2025-01-18
 description: "Introducing users to agent-driven flows without overwhelming them or promising too much."
 ---
 
-# Onboarding for Agent Features
 
 First impressions set expectations. This post outlines how to onboard users to agent-powered features.
 

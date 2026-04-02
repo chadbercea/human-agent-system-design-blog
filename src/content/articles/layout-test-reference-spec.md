@@ -5,7 +5,6 @@ description: "A reference specification for defining, validating, and routing ag
 draft: true
 ---
 
-# Agent Action Schema Specification
 
 This document defines a schema for agent actions — the discrete operations an agent can perform within a human-agent system. The schema provides a consistent structure for declaring actions, validating inputs, enforcing permissions, and routing actions to the correct handler.
 

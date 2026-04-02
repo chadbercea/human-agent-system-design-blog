@@ -4,7 +4,6 @@ date: 2025-02-20
 description: "A practical pattern for approval steps in human-agent pipelines."
 ---
 
-# Implementing Approval Workflows
 
 Placeholder content to expose code blocks and inline `code` in the UI.
 

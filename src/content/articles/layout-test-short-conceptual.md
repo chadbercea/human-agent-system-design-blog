@@ -5,7 +5,6 @@ description: "Why the most dangerous agent failures are the ones nobody notices.
 draft: true
 ---
 
-# The Quiet Failure Mode
 
 There is a category of failure in human-agent systems that does not trigger alerts, does not throw errors, and does not show up in dashboards. The agent produces output that looks correct, passes every automated check, and gets approved by a human who has no reason to suspect anything is wrong. But the output is subtly, consequentially wrong.
 

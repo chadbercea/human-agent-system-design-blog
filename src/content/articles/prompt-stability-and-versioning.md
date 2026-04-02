@@ -4,7 +4,6 @@ date: 2025-02-15
 description: "Treat prompts as code: version them, test them, and track which version produced which output."
 ---
 
-# Prompt Stability and Versioning
 
 Prompts drift over time. Without versioning, you cannot reliably reproduce or debug behavior.
 

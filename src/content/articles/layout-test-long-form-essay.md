@@ -5,7 +5,6 @@ description: "A deep exploration of how trust is established, maintained, and re
 draft: true
 ---
 
-# The Architecture of Trust in Human-Agent Systems
 
 Trust is not a feature you ship. It is an emergent property of a system that behaves predictably, communicates honestly, and fails gracefully. When we design human-agent systems, we are not just designing software — we are designing a relationship between a person and a process that acts on their behalf.
 

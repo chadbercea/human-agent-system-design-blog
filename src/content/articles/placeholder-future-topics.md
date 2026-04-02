@@ -4,7 +4,6 @@ date: 2025-02-18
 description: "A short placeholder post with many tags to stress-test the tag UI and listing."
 ---
 
-# Placeholder: Future Topics
 
 Short post so the card and list layout stay compact. Many tags above to exercise the tag index and per-tag pages.
 

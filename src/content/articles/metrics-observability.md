@@ -4,7 +4,6 @@ date: 2025-02-19
 description: "What to measure and expose when humans and agents work together."
 ---
 
-# Metrics and Observability
 
 Placeholder content mixing lists, code, and blockquotes so the full prose UI is visible.
 

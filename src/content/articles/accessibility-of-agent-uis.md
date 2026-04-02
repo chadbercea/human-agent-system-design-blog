@@ -4,7 +4,6 @@ date: 2025-02-08
 description: "Making agent-driven interfaces usable for keyboard, screen readers, and reduced motion."
 ---
 
-# Accessibility of Agent UIs
 
 Agent outputs can be long, dynamic, and time-sensitive. This post covers accessibility considerations for such interfaces.
 

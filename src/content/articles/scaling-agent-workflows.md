@@ -4,7 +4,6 @@ date: 2025-01-22
 description: "From one-off tasks to high-throughput pipelines: design choices that scale."
 ---
 
-# Scaling Agent Workflows
 
 As usage grows, latency, cost, and failure modes multiply. This post outlines scaling strategies for agent-backed workflows.
 

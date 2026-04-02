@@ -4,7 +4,6 @@ date: 2025-01-20
 description: "Helping users understand what the agent did and why, so they can trust and correct it."
 ---
 
-# Trust and Transparency
 
 Users who don’t understand the system won’t trust it. This post covers how to expose agent behavior without overwhelming.
 

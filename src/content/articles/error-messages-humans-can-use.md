@@ -4,7 +4,6 @@ date: 2025-01-25
 description: "Agent and system errors should point the user to a clear next step, not a stack trace."
 ---
 
-# Error Messages Humans Can Use
 
 When something goes wrong, the human needs to know what happened and what they can do. This post focuses on error copy and recovery.
 

@@ -4,7 +4,6 @@ date: 2025-02-05
 description: "Balancing token cost, response time, and quality when designing agent-backed features."
 ---
 
-# Cost and Latency Tradeoffs
 
 Agents are not free and not instant. This post outlines how to make tradeoffs visible and configurable.
 

@@ -4,7 +4,6 @@ date: 2025-01-15
 description: "Taking agent features from prototype to production: reliability, observability, and iteration."
 ---
 
-# Beyond the Demo
 
 Demos are convincing; production is unforgiving. This post covers what changes when you ship agent features for real.
 

@@ -4,7 +4,6 @@ date: 2025-02-18
 description: "How to work within limited context and when to persist state across sessions."
 ---
 
-# Context Windows and Memory
 
 Agents operate with bounded context. This post explores strategies for staying within limits while keeping the human's intent clear.
 

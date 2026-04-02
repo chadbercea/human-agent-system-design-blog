@@ -4,7 +4,6 @@ date: 2025-01-30
 description: "Designing interfaces for streaming agent output so users feel progress and can act early."
 ---
 
-# Streaming UX
 
 When agent output streams in, the UI must feel responsive and predictable. This post outlines patterns that work.
 

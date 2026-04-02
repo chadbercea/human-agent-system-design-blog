@@ -4,7 +4,6 @@ date: 2025-02-23
 description: "A brief overview of designing systems where humans and AI agents collaborate effectively."
 ---
 
-# Human-Agent System Design: An Introduction
 
 Effective systems increasingly depend on clear boundaries and handoffs between people and software agents. This post outlines core ideas for designing such systems without prescribing implementation details.
 
