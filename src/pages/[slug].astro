@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { getCollection } from 'astro:content';
-import SiteLayout from '../layouts/SiteLayout.astro';
+import ArticleLayout from '../layouts/ArticleLayout.astro';
 import { articleSlug, getSortedArticles, readingTimeMinutes } from '../lib/articles.ts';
 
 export async function getStaticPaths() {
@@ -22,30 +22,16 @@ const mdPath = path.join(process.cwd(), 'src/content/articles', mdName);
 const raw = readFileSync(mdPath, 'utf8');
 const bodyMd = raw.replace(/^---[\s\S]*?---\s*/, '');
 const minutes = readingTimeMinutes(bodyMd);
-
-const dateLabel = post.data.date.toLocaleDateString('en-CA', {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-});
-const desc = post.data.description ?? '';
 ---
 
-<SiteLayout title={post.data.title} description={desc} articles={articles}>
-  <header class="article-header">
-    <h1>{post.data.title}</h1>
-    <hr class="article-header__rule" />
-    <p class="article-header__meta">
-      {dateLabel}
-      <span aria-hidden="true"> · </span>
-      {minutes} min read
-    </p>
-  </header>
-  {post.data.description && <p class="article-lede">{post.data.description}</p>}
+<ArticleLayout
+  title={post.data.title}
+  date={post.data.date}
+  description={post.data.description}
+  readingTime={minutes}
+  articles={articles}
+>
   <article class="prose">
     <Content />
   </article>
-  <footer class="article-footer">
-    <a href="/">← All articles</a>
-  </footer>
-</SiteLayout>
+</ArticleLayout>
