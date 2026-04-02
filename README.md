@@ -1,5 +1,9 @@
 # human-agent-system-design-blog
 
+HAS Design blog (Human–Agent–System Design): **direction and Definition of Done live in Linear**, not in this README.
+
+**[CLAUDE.md — HAS Design Blog Agent Briefing](https://linear.app/iliketobuild/document/claudemd-has-design-blog-agent-briefing-5f16dbea3f75)** — source of truth for stack, routes, CSS architecture, and what to remove (e.g. Three.js / diorama). Work issues in **HAS-D Blog** from **ILI-561** onward.
+
 ## Setup
 
 ```bash
@@ -24,31 +28,24 @@ npm run build
 npm run check
 ```
 
-Deploy the `dist` output to Vercel (default Astro adapter; no config required).
+## Deploy
 
-## Docker
+**Vercel** builds from GitHub. Production branch: **`main`**. Static output is `dist/` (see `vercel.json`).
 
-Everything runs inside Docker (Node 20). **Do not run npm/node on the host** for this project.
+## Docker (optional)
 
-**Run the blog (dev, live reload):**
+Docker Compose is available for local dev if you prefer containers; it is **not** required.
+
+**Dev (live reload):**
 
 ```bash
 ./run-dev.sh
 ```
 
-Or manually:
+Or: `docker compose up --build dev` — then http://localhost:4321
 
-```bash
-docker compose down
-docker compose up --build dev
-```
-
-Then open **http://localhost:4321** in your browser. The container must stay running (foreground); you should see `Local http://localhost:4321/` in the logs. Port **4321** is mapped host:container.
-
-**Production (build + preview):**
+**Production preview in container:**
 
 ```bash
 docker compose up --build prod
 ```
-
-Open http://localhost:4321

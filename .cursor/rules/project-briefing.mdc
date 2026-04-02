@@ -11,6 +11,20 @@ Product and architecture for this repo are defined in Linear:
 
 Follow that document for what to build, what to remove, routes, content, CSS architecture, and constraints. Work the **HAS-D Blog** backlog in dependency order (starting with **ILI-561**) and satisfy each issue’s **Definition of Done** before marking it complete.
 
+## Non-negotiables (must match Linear)
+
+Do not contradict the briefing:
+
+- **Text-only Astro blog.** Typography is the design (Gwern-like: minimal chrome, reading-first serif prose, monochrome + one link accent). No decorative UI.
+- **No Three.js / WebGL / canvas / diorama** — remove all of it; do not preserve or extend.
+- **No Tailwind** (remove integration). **Vanilla CSS only**, tokenized under `src/styles/` (`fonts.css`, `colors.css`, `typography.css`, `spacing.css`, `base.css`, `prose.css`) — no hardcoded colors/font sizes outside tokens.
+- **No React, Vue, animation libraries, or third-party UI kits.** Astro components, static HTML, vanilla CSS.
+- **No extra client JS** beyond what Astro’s build needs.
+- **v1:** no images (text-only); self-hosted fonts in `public/fonts/` (no Google Fonts CDN). Two fonts max after ILI-561.
+- **Routes (target):** `/` index, `/[slug]` articles, `/dev/type` and `/dev/prose` for dev tooling — plus excluding drafts from published queries as specified.
+
+If repo files or `docs/` disagree with the above, **the Linear briefing wins**; update or remove stale files.
+
 ## Deployments
 
 Production deploys via **Vercel** (GitHub integration). Treat **`main`** as the production branch: merge PRs to **`main`** to ship.
