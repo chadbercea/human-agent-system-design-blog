@@ -78,14 +78,28 @@
 /* --- Blockquote --- */
 
 .prose blockquote {
-  margin: var(--space-5) 0;
-  padding-left: var(--space-4);
-  border-left: 1px solid var(--color-border);
+  border-left: none;
+  padding-left: 0;
+  margin: var(--space-8) 0;
+  font-style: italic;
   color: var(--color-text-secondary);
+  position: relative;
 }
 
 .prose blockquote p {
-  margin: 0;
+  padding-left: var(--space-6);
+  position: relative;
+  margin-top: 0;
+}
+
+.prose blockquote p::before {
+  content: '▌';
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+  position: absolute;
+  left: 0;
+  top: 0;
+  line-height: var(--leading-normal);
 }
 
 .prose blockquote p + p {
