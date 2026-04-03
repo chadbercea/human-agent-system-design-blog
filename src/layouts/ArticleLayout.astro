@@ -12,64 +12,61 @@ interface Props {
 
 const { title, date, description, readingTime, articles } = Astro.props;
 
-const dateLabel = date.toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-});
+const year = date.getFullYear();
+const month = String(date.getMonth() + 1).padStart(2, '0');
+const day = String(date.getDate()).padStart(2, '0');
+const formattedDate = `${year}.${month}.${day}`;
 ---
 
 <SiteLayout title={title} description={description} articles={articles}>
-  <header class="article-header">
-    <h1>{title}</h1>
-    <hr class="article-header__rule" />
-    <p class="article-header__meta">
-      {dateLabel}
-      <span aria-hidden="true"> &middot; </span>
-      {readingTime} min read
-    </p>
+  <header class="tx-header">
+    <div class="tx-header__status sys">TRANSMISSION // OPEN</div>
+    <hr class="tx-rule" />
+    <div class="tx-header__meta sys">
+      {formattedDate} · 0847 HRS · EST. {readingTime} MIN
+    </div>
+    <hr class="tx-rule" />
+    <h1 class="tx-header__title">{title}</h1>
+    {description && (
+      <p class="tx-header__lede">{description}</p>
+    )}
   </header>
-  {description && <p class="article-lede">{description}</p>}
   <div class="article__body">
     <slot />
   </div>
   <footer class="article-footer">
-    <a href="/">&larr; All articles</a>
+    <a href="/">◀ END TRANSMISSION</a>
   </footer>
 </SiteLayout>
 
 <style>
-  .article-header {
+  .tx-header {
     max-width: var(--measure-prose);
     margin-bottom: var(--space-8);
   }
 
-  .article-header h1 {
-    margin: 0 0 var(--space-4);
+  .tx-header__status {
+    margin-bottom: var(--space-3);
+  }
+
+  .tx-header__meta {
+    margin: var(--space-3) 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tx-header__title {
+    margin: var(--space-6) 0 0;
     font-family: var(--font-display);
     font-size: var(--text-3xl);
     font-weight: 900;
     line-height: var(--leading-tight);
     letter-spacing: -0.03em;
+    color: var(--color-text-primary);
   }
 
-  .article-header__rule {
-    height: 0;
-    border: none;
-    border-top: 1px solid var(--color-border);
-    margin: 0 0 var(--space-3);
-  }
-
-  .article-header__meta {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    font-variant-numeric: tabular-nums;
-    color: var(--color-text-muted);
-  }
-
-  .article-lede {
+  .tx-header__lede {
     max-width: var(--measure-prose);
-    margin: 0 0 var(--space-8);
+    margin: var(--space-4) 0 0;
     color: var(--color-text-secondary);
     font-size: var(--text-lg);
     line-height: var(--leading-loose);
@@ -89,6 +86,12 @@ const dateLabel = date.toLocaleDateString('en-US', {
   .article-footer a {
     font-family: var(--font-mono);
     font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
     color: var(--color-text-secondary);
+  }
+
+  .article-footer a:hover {
+    color: var(--color-accent);
   }
 </style>
