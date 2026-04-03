@@ -3,96 +3,90 @@ import SiteLayout from '../layouts/SiteLayout.astro';
 import { articleSlug, getSortedArticles } from '../lib/articles.ts';
 
 const articles = await getSortedArticles();
-const title = 'HAS Design — Articles';
+const title = 'HAS-DESIGN';
 
-function shortDate(date: Date): string {
-  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+function formatDate(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}.${m}.${d}`;
 }
 ---
 
 <SiteLayout title={title} description="Human–agent system design writing." articles={articles}>
-  <header class="index-header">
-    <p class="index-header__title">HAS Design</p>
-    <p class="index-header__tagline">Human · Agent · System</p>
-    <hr class="index-header__rule" />
-  </header>
-
-  <ul class="index-list">
-    {
-      articles.map((a) => (
-        <li class="index-list__item">
-          <a class="index-list__link" href={`/${articleSlug(a.id)}`}>
-            {a.data.title}
-          </a>
-          <time class="index-list__date" datetime={a.data.date.toISOString()}>
-            {shortDate(a.data.date)}
-          </time>
-        </li>
-      ))
-    }
-  </ul>
+  <div class="freq-log">
+    <div class="freq-log__header">
+      <div class="sys">FREQ ░░ 140.85 // HAS-DESIGN</div>
+      <p class="freq-log__tagline">Human · Agent · System</p>
+    </div>
+    <hr class="tx-rule" />
+    <div class="sys freq-log__label">TRANSMISSION LOG</div>
+    <hr class="tx-rule" />
+    <ul class="freq-log__list">
+      {
+        articles.map((a) => (
+          <li class="freq-log__item">
+            <a href={`/${articleSlug(a.id)}`} class="freq-log__title">
+              {a.data.title}
+            </a>
+            <time class="freq-log__date sys" datetime={a.data.date.toISOString()}>
+              {formatDate(a.data.date)}
+            </time>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 </SiteLayout>
 
 <style>
-  .index-header {
-    margin-block-end: var(--space-8);
+  .freq-log {
+    max-width: var(--measure-wide);
   }
 
-  .index-header__title {
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    font-weight: 900;
-    letter-spacing: -0.03em;
+  .freq-log__header {
+    margin-block-end: var(--space-4);
+  }
+
+  .freq-log__tagline {
+    font-family: var(--font-prose);
+    font-size: var(--text-sm);
     color: var(--color-text-primary);
-    margin: 0;
+    margin: var(--space-2) 0 0;
   }
 
-  .index-header__tagline {
-    font-family: var(--font-ui);
-    font-size: var(--text-xs);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--color-text-secondary);
-    margin: var(--space-1) 0 0;
+  .freq-log__label {
+    margin-block: var(--space-3);
   }
 
-  .index-header__rule {
-    border: none;
-    border-top: 1px solid var(--color-border);
-    margin-block-start: var(--space-4);
-  }
-
-  .index-list {
+  .freq-log__list {
     list-style: none;
     padding: 0;
-    margin: 0;
-    max-width: var(--measure-wide);
+    margin: var(--space-6) 0 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
+    gap: var(--space-5);
   }
 
-  .index-list__item {
+  .freq-log__item {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-4);
   }
 
-  .index-list__link {
+  .freq-log__title {
     font-family: var(--font-prose);
-    font-size: var(--text-lg);
+    font-size: var(--text-base);
     color: var(--color-text-primary);
     text-decoration: none;
   }
 
-  .index-list__link:hover {
+  .freq-log__title:hover {
     color: var(--color-accent);
   }
 
-  .index-list__date {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
+  .freq-log__date {
+    flex-shrink: 0;
   }
 </style>
