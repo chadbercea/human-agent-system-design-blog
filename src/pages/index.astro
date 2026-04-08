@@ -62,11 +62,12 @@ function formatDate(d: Date): string {
   /* ── Layer system ── */
   .layer {
     position: absolute;
-    inset: 0;
+    top: 0;
+    bottom: 0;
     overflow-y: auto;
-    transition: transform 480ms var(--ease), filter 480ms var(--ease), opacity 480ms var(--ease);
+    transition: transform var(--dur) var(--ease), filter var(--dur) var(--ease), opacity calc(var(--dur) * 0.75) var(--ease);
     will-change: transform, filter, opacity;
-    padding: var(--content-padding-y) var(--content-padding-x);
+    padding: clamp(2rem, 4vh, 4rem) clamp(1.5rem, 3vw, 3rem);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -76,35 +77,36 @@ function formatDate(d: Date): string {
   }
 
   .z-front {
-    transform: scale(1) translateZ(0);
+    transform: none;
     filter: blur(0);
     opacity: 1;
-    pointer-events: auto;
-    z-index: 2;
+    pointer-events: all;
+    z-index: 10;
   }
 
   .z-back {
-    transform: scale(0.96) translateZ(0);
-    filter: blur(2px);
-    opacity: 0.4;
+    transform: translateX(-20vw) scale(0.72);
+    transform-origin: left center;
+    filter: blur(8px);
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  .z-gone {
+    transform: perspective(1400px) translateZ(-220px) scale(0.86);
+    filter: blur(18px);
+    opacity: 0;
     pointer-events: none;
     z-index: 1;
   }
 
-  .z-gone {
-    transform: scale(0.92) translateZ(0);
-    filter: blur(6px);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 0;
-  }
-
   .z-ef {
-    transform: scale(1.05) translateZ(0);
-    filter: blur(3px);
+    transform: perspective(1400px) translateZ(160px) scale(1.08);
+    filter: blur(14px);
     opacity: 0;
     pointer-events: none;
-    z-index: 3;
+    z-index: 10;
   }
 
   .z-crisp {
@@ -124,15 +126,22 @@ function formatDate(d: Date): string {
     z-index: 10;
   }
 
+  /* ── Layer content area — offset to leave room for sidebar strip ── */
+  .layer,
+  .layer-meta {
+    left: 20vw;
+    right: 6vw;
+  }
+
   /* ── Hit zone ── */
   .hit-zone {
     display: none;
     position: absolute;
     top: 0;
     left: 0;
-    width: var(--space-16);
+    width: 20vw;
     height: 100%;
-    z-index: 10;
+    z-index: 30;
     cursor: pointer;
   }
 
@@ -200,30 +209,35 @@ function formatDate(d: Date): string {
 
   /* ── Article list ── */
   .alist {
-    max-width: var(--measure-prose);
-    margin: 0 auto;
-    display: flex;
+    list-style: none;
+    display: inline-flex;
     flex-direction: column;
-    gap: var(--space-4);
   }
 
   .ali {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
     align-items: baseline;
-    gap: var(--space-4);
+    gap: 0.75rem;
+    padding: 0.5rem 0;
     cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.18s var(--ease);
   }
 
   .alt {
     font-family: var(--font-prose);
-    font-size: var(--text-base);
-    color: var(--color-text-primary);
+    font-size: clamp(1.8rem, 3.5vw, 3.2rem);
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.66);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    transition: color 0.15s;
   }
 
   .ali:hover .alt,
   .ali.hi .alt {
-    color: var(--color-accent);
+    color: var(--color-text-primary);
   }
 
   .ali.hi,
@@ -240,16 +254,28 @@ function formatDate(d: Date): string {
 
   .ald {
     font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-secondary);
+    font-size: 0.48rem;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.08em;
+    transition: color 0.15s;
     flex-shrink: 0;
+  }
+
+  .ali:hover .ald,
+  .ali.hi .ald {
+    color: rgba(255, 255, 255, 0.8);
   }
 
   /* ── Mobile article list ── */
   @media (max-width: 768px) {
+    .layer,
+    .layer-meta {
+      left: 0;
+      right: 0;
+    }
+
     .ali {
-      flex-direction: column;
-      gap: var(--space-1);
+      white-space: normal;
     }
   }
 
@@ -276,11 +302,15 @@ function formatDate(d: Date): string {
   }
 
   .art-lede {
-    max-width: clamp(45ch, 60vw, 75ch);
-    margin: var(--space-4) 0 0;
-    color: var(--color-text-secondary);
-    font-size: var(--text-base);
-    line-height: var(--leading-normal);
+    max-width: 54ch;
+    margin: var(--space-4) 0 var(--space-8);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-family: var(--font-prose);
+    font-size: clamp(0.9rem, 1.35vw, 1.05rem);
+    font-style: italic;
+    line-height: 1.68;
   }
 
   .art-lede:empty {

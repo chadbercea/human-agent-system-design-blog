@@ -42,16 +42,6 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href :
     syncStageTop();
     window.addEventListener('resize', syncStageTop, { passive: true });
 
-    // Hide header on scroll-down in article view, show on scroll-up
-    let lastY = 0;
-    stage.addEventListener('scroll', () => {
-      const y = stage.scrollTop;
-      if (y > lastY && y > 60) {
-        hdr.classList.add('away');
-      } else {
-        hdr.classList.remove('away');
-      }
-      lastY = y;
-    }, { passive: true });
+    // Header scroll hide/show is handled by nav.js on the article layer
   })();
 </script>
