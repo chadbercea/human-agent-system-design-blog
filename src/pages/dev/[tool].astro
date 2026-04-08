@@ -1,6 +1,5 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro';
-import { getSortedArticles } from '../../lib/articles.ts';
 
 export async function getStaticPaths() {
   if (import.meta.env.PROD) return [];
@@ -8,11 +7,10 @@ export async function getStaticPaths() {
 }
 
 const { tool } = Astro.params;
-const articles = await getSortedArticles();
 const title = tool === 'prose' ? 'Dev — Prose specimen' : 'Dev — Type specimen';
 ---
 
-<SiteLayout title={title} articles={articles}>
+<SiteLayout title={title}>
   {
     tool === 'type' ? (
       <div class="specimen">
