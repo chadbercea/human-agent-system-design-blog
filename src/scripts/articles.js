@@ -47,6 +47,7 @@
       setTimeout(function () {
         loadArticle(item);
         nav.zz(A, 'z-front');
+        if (nav.syncHeaderScrollState) nav.syncHeaderScrollState();
         history.pushState({ view: 'reading' }, '', '/' + slug);
         setTimeout(function () { swapping = false; }, 480);
       }, 300);

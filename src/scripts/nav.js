@@ -55,6 +55,7 @@
     ALL.forEach(function (el) { zz(el, restClass(el, s)); });
     hz.classList.toggle('on', s === 'reading');
     updateNavDots(navKey(s));
+    syncHeaderScrollState();
   }
 
   function navigate(next, pushUrl) {
@@ -79,6 +80,7 @@
       hz.classList.toggle('on', next === 'reading');
       updateNavDots(navKey(next));
       state = next;
+      syncHeaderScrollState();
     }, 60);
 
     // Step 3: after transition completes, settle old layer and unlock
@@ -106,15 +108,30 @@
     });
   }
 
-  // Header scroll hide/show on article layer scroll
+  // Header scroll hide/show follows whichever layer is z-front
   var lastY = 0;
-  if (A) {
-    A.addEventListener('scroll', function () {
-      var y = A.scrollTop;
-      hdr.classList.toggle('away', y > lastY && y > 80);
-      lastY = y;
-    }, { passive: true });
+
+  function syncHeaderScrollState() {
+    var front = ALL.find(function (el) {
+      return el && el.classList.contains('z-front');
+    });
+    if (!front || !hdr) return;
+    lastY = front.scrollTop;
+    hdr.classList.remove('away');
   }
+
+  function onLayerScroll(e) {
+    var el = e.currentTarget;
+    if (!el.classList.contains('z-front')) return;
+    var y = el.scrollTop;
+    hdr.classList.toggle('away', y > lastY && y > 80);
+    lastY = y;
+  }
+
+  ALL.forEach(function (el) {
+    if (!el) return;
+    el.addEventListener('scroll', onLayerScroll, { passive: true });
+  });
 
   // Browser back/forward
   window.addEventListener('popstate', function (e) {
@@ -150,5 +167,6 @@
     busy: function () { return busy; },
     zz: zz,
     ZC: ZC,
+    syncHeaderScrollState: syncHeaderScrollState,
   };
 })();

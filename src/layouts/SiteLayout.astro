@@ -37,6 +37,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href :
 
     // Sync stage top with actual header height (needed for mobile stacked header)
     function syncStageTop() {
+      if (!hdr || !stage) return;
       stage.style.top = hdr.offsetHeight + 'px';
     }
     syncStageTop();

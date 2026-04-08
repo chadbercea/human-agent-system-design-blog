@@ -77,7 +77,7 @@
   opacity: 1;
 }
 
-/* ── Stage shell ── */
+/* ── Stage shell (clips layer transforms; inner layers handle scroll) ── */
 .stage {
   position: fixed;
   top: var(--hh);
@@ -85,6 +85,7 @@
   right: 0;
   bottom: 0;
   overflow: hidden;
+  isolation: isolate;
 }
 
 /* ── Mobile: stack header vertically ── */
