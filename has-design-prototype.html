@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAS Design</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d0d0d; --text: #d8d8d8; --sub: #484848; --dim: #1e1e1e;
+  --hh: 48px; --ease: cubic-bezier(0.4,0,0.2,1); --dur: 460ms;
+  --pl: 20vw; --pr: 6vw;
+}
+html,body { height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:Georgia,serif; }
+.hdr { position:fixed; top:0; left:0; right:0; height:var(--hh); display:flex; align-items:center; justify-content:space-between; padding:0 clamp(1.5rem,3vw,3rem); background:var(--bg); border-bottom:1px solid var(--dim); z-index:100; transition:transform 240ms var(--ease); }
+.hdr.away { transform:translateY(-100%); }
+.brand { font-family:'Courier New',monospace; font-size:clamp(0.54rem,0.82vw,0.68rem); letter-spacing:0.16em; text-transform:uppercase; color:var(--text); cursor:pointer; user-select:none; }
+.hnav { display:flex; gap:2rem; }
+.hn { font-family:'Courier New',monospace; font-size:clamp(0.5rem,0.72vw,0.6rem); letter-spacing:0.1em; text-transform:uppercase; color:var(--sub); cursor:pointer; transition:color 0.18s; user-select:none; display:flex; align-items:center; gap:0.3rem; }
+.hn:hover { color:#888; } .hn.on { color:var(--text); }
+.dot { width:3px; height:3px; border-radius:50%; background:var(--text); opacity:0; transition:opacity 0.18s; } .hn.on .dot { opacity:1; }
+.stage { position:fixed; top:var(--hh); left:0; right:0; bottom:0; overflow:hidden; }
+.layer { position:absolute; top:0; bottom:0; left:var(--pl); right:var(--pr); overflow-y:auto; padding:clamp(2rem,4vh,4rem) clamp(1.5rem,3vw,3rem); transition: transform var(--dur) var(--ease), filter var(--dur) var(--ease), opacity calc(var(--dur)*0.75) var(--ease); will-change:transform,filter,opacity; }
+.layer-meta { position:absolute; top:0; bottom:0; left:var(--pl); right:var(--pr); overflow-y:auto; padding:clamp(2rem,4vh,4rem) clamp(1.5rem,3vw,3rem); transition: transform var(--dur) var(--ease), filter var(--dur) var(--ease), opacity calc(var(--dur)*0.75) var(--ease); will-change:transform,filter,opacity; }
+.z-front { transform:none; filter:blur(0); opacity:1; pointer-events:all; z-index:10; }
+.z-ef    { transform:perspective(1400px) translateZ(160px) scale(1.08); filter:blur(14px); opacity:0; pointer-events:none; z-index:10; }
+.z-gone  { transform:perspective(1400px) translateZ(-220px) scale(0.86); filter:blur(18px); opacity:0; pointer-events:none; z-index:1; }
+.z-back  { transform:translateX(-20vw) scale(0.72); transform-origin:left center; filter:blur(8px); opacity:0.25; pointer-events:none; z-index:20; }
+.z-crisp { transform:translateX(-20vw) scale(0.72); transform-origin:left center; filter:blur(0); opacity:1; pointer-events:none; z-index:20; }
+.z-dim   { transform:none; filter:blur(14px); opacity:0.25; pointer-events:none; z-index:10; }
+.hz { position:absolute; top:0; bottom:0; left:0; width:var(--pl); z-index:30; cursor:pointer; display:none; } .hz.on { display:block; }
+.alist { list-style:none; display:inline-flex; flex-direction:column; }
+.ali { display:flex; flex-direction:row; align-items:baseline; gap:0.75rem; padding:0.5rem 0; cursor:pointer; white-space:nowrap; transition:transform 0.18s var(--ease); }
+.ali:hover, .ali.hi { transform:translateX(6px); }
+.alt { font-family:Georgia,serif; font-size:clamp(1.8rem,3.5vw,3.2rem); color:rgba(255,255,255,0.66); font-weight:bold; transition:color 0.15s; line-height:1.1; letter-spacing:-0.02em; }
+.ald { font-family:'Courier New',monospace; font-size:0.48rem; color:rgba(255,255,255,0.5); letter-spacing:0.08em; transition:color 0.15s; }
+.ali:hover .alt, .ali.hi .alt { color:var(--text); } .ali:hover .ald, .ali.hi .ald { color:rgba(255,255,255,0.8); }
+.art-title { font-family:Georgia,serif; font-size:clamp(2rem,5vw,4.5rem); font-weight:bold; line-height:1.02; letter-spacing:-0.03em; margin-bottom:0.8rem; max-width:20ch; }
+.art-meta { font-family:'Courier New',monospace; font-size:0.52rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--sub); margin-bottom:2rem; display:flex; gap:1.5rem; }
+.art-lede { font-family:Georgia,serif; font-size:clamp(0.9rem,1.35vw,1.05rem); line-height:1.68; color:#555; font-style:italic; max-width:54ch; margin-bottom:2rem; padding-bottom:2rem; border-bottom:1px solid var(--dim); }
+.prose { max-width:58ch; } .pl { height:1px; background:var(--dim); margin-bottom:0.48rem; } .pl.f{width:100%}.pl.m{width:76%}.pl.s{width:50%} .pg { height:1rem; }
+.ph { font-family:Georgia,serif; font-size:clamp(0.92rem,1.5vw,1.18rem); font-weight:bold; margin:1.8rem 0 0.7rem; color:var(--text); }
+.pg-title { font-family:Georgia,serif; font-size:clamp(2.4rem,5.5vw,4.8rem); font-weight:bold; line-height:0.97; letter-spacing:-0.03em; margin-bottom:1rem; }
+.pg-sub { font-family:Georgia,serif; font-size:clamp(0.85rem,1.25vw,1rem); color:var(--sub); font-style:italic; margin-bottom:2.5rem; line-height:1.65; max-width:42ch; }
+.field { border-bottom:1px solid var(--dim); padding:0.55rem 0; display:flex; justify-content:space-between; max-width:320px; margin-bottom:1px; }
+.fk { font-family:'Courier New',monospace; font-size:0.5rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--sub); }
+.fv { font-family:Georgia,serif; font-size:0.76rem; color:#4a4a4a; font-style:italic; }
+</style>
+</head>
+<body>
+<header class="hdr" id="hdr">
+  <span class="brand" id="brandBtn">Human Agent System Design</span>
+  <nav class="hnav">
+    <span class="hn on" id="hn-articles">Articles</span>
+    <span class="hn"    id="hn-about">About</span>
+    <span class="hn"    id="hn-contact">Contact</span>
+  </nav>
+</header>
+<div class="stage">
+  <div class="hz" id="hz"></div>
+  <div class="layer z-front" id="L"><ul class="alist" id="ul"></ul></div>
+  <div class="layer z-gone" id="A">
+    <h1 class="art-title" id="aT"></h1>
+    <div class="art-meta"><span id="aD"></span><span id="aR"></span></div>
+    <p class="art-lede" id="aL"></p>
+    <div class="prose">
+      <div class="pl f"></div><div class="pl f"></div><div class="pl f"></div><div class="pl m"></div>
+      <div class="pg"></div><div class="pl f"></div><div class="pl f"></div><div class="pl s"></div>
+      <div class="ph" id="aH1"></div>
+      <div class="pl f"></div><div class="pl f"></div><div class="pl f"></div><div class="pl m"></div>
+      <div class="pg"></div><div class="pl f"></div><div class="pl f"></div><div class="pl s"></div>
+      <div class="ph" id="aH2"></div>
+      <div class="pl f"></div><div class="pl f"></div><div class="pl f"></div><div class="pl m"></div>
+    </div>
+  </div>
+  <div class="layer-meta z-gone" id="AB">
+    <h1 class="pg-title">About</h1>
+    <p class="pg-sub">Chad Bercea is Lead Product Designer for AI Dev Tools at Atlassian. HAS Design is a framework for systems where humans, agents, and software coordinate autonomously.</p>
+    <div class="field"><span class="fk">Role</span><span class="fv">Lead Product Designer, AI Dev Tools</span></div>
+    <div class="field"><span class="fk">Company</span><span class="fv">Atlassian</span></div>
+    <div class="field"><span class="fk">Location</span><span class="fv">Rural Idaho</span></div>
+  </div>
+  <div class="layer-meta z-gone" id="CO">
+    <h1 class="pg-title">Contact</h1>
+    <p class="pg-sub">No forms. Just reach out directly.</p>
+    <div class="field"><span class="fk">Email</span><span class="fv">chad [at] hasdesign.io</span></div>
+    <div class="field"><span class="fk">LinkedIn</span><span class="fv">/in/chadbercea</span></div>
+  </div>
+</div>
+<script>
+(function() {
+  var ARTS = [
+    {t:"The ROI You're Chasing Doesn't Exist",d:"2026.03.15",r:"8 min",l:"Executives keep asking about ROI on AI adoption while dismantling every process that would generate the data needed to answer the question.",h1:"The Measurement Problem",h2:"What Actually Generates ROI"},
+    {t:"The Arm Is Not The Story",d:"2026.02.08",r:"5 min",l:"Everyone is writing about the mechanism. Nobody is writing about the outcome. The arm is not the story — the reach is.",h1:"Mechanism vs Output",h2:"What Matters"},
+    {t:"Feedback Loops and Guardrails",d:"2026.02.22",r:"7 min",l:"How you build correction into an agent system determines whether it scales or collapses.",h1:"Designing Feedback",h2:"Guardrail Architecture"},
+    {t:"Defining Handoff Protocols",d:"2026.02.21",r:"6 min",l:"The seam between human and agent is the most important design surface in the system.",h1:"The Handoff Problem",h2:"Protocol Design"},
+    {t:"Designing for Failure Modes",d:"2026.02.20",r:"9 min",l:"Most systems are designed for the happy path. The interesting design is what happens when things go wrong.",h1:"Failure Taxonomy",h2:"Recovery Patterns"},
+    {t:"Implementing Approval Workflows",d:"2026.02.19",r:"6 min",l:"Approval is a designed checkpoint that keeps humans in the loop at the right moments.",h1:"When to Gate",h2:"Implementation"},
+    {t:"Metrics and Observability",d:"2026.02.18",r:"7 min",l:"You cannot improve what you cannot see. Agent observability is a first-class design problem.",h1:"What to Measure",h2:"Observability Patterns"},
+    {t:"Context Windows and Memory",d:"2026.02.17",r:"8 min",l:"An agent's context window is its working memory. Designing around its limits is not optional.",h1:"Context as Resource",h2:"Memory Strategies"},
+    {t:"Human-in-the-Loop Patterns",d:"2026.02.12",r:"10 min",l:"HITL is not a single pattern. It is a family of patterns with different cost-benefit profiles.",h1:"Pattern Taxonomy",h2:"Selection Criteria"},
+    {t:"Multi-Agent Orchestration",d:"2026.02.10",r:"8 min",l:"When one agent is not enough, the question becomes how to coordinate many without losing coherence.",h1:"Orchestration Models",h2:"Coordination Failure"},
+    {t:"Cost and Latency Tradeoffs",d:"2026.02.05",r:"6 min",l:"Every agent call is a cost decision. Designing for efficiency matters as much as quality.",h1:"The Cost Equation",h2:"Optimization"},
+    {t:"Trust and Transparency",d:"2026.01.20",r:"7 min",l:"Users trust systems they understand. Transparency is not a feature — it is a foundation.",h1:"Building Trust",h2:"Transparency Patterns"}
+  ];
+  var SEQ={list:0,reading:1,about:2,contact:3};
+  var ZC=['z-front','z-back','z-crisp','z-dim','z-gone','z-ef'];
+  var L=document.getElementById('L'),A=document.getElementById('A'),AB=document.getElementById('AB'),CO=document.getElementById('CO'),hz=document.getElementById('hz'),hdr=document.getElementById('hdr');
+  var state='list',busy=false;
+  function zz(el,cls){el.classList.remove.apply(el.classList,ZC);el.classList.add(cls);}
+  function dot(key){['articles','about','contact'].forEach(function(k){document.getElementById('hn-'+k).classList.toggle('on',k===key);});}
+  function elFor(s){if(s==='list')return L;if(s==='reading')return A;if(s==='about')return AB;if(s==='contact')return CO;}
+  function applyState(s){
+    if(s==='list'){zz(L,'z-front');zz(A,'z-gone');zz(AB,'z-gone');zz(CO,'z-gone');hz.classList.remove('on');dot('articles');}
+    else if(s==='reading'){zz(A,'z-front');zz(L,'z-back');zz(AB,'z-gone');zz(CO,'z-gone');hz.classList.add('on');dot('articles');}
+    else if(s==='about'){zz(AB,'z-front');zz(L,'z-gone');zz(A,'z-gone');zz(CO,'z-gone');hz.classList.remove('on');dot('about');}
+    else if(s==='contact'){zz(CO,'z-front');zz(L,'z-gone');zz(A,'z-gone');zz(AB,'z-gone');hz.classList.remove('on');dot('contact');}
+  }
+  function navigate(next){
+    if(next===state||busy)return;busy=true;
+    var fwd=SEQ[next]>SEQ[state],old=elFor(state);
+    if(old)zz(old,fwd?'z-ef':'z-gone');
+    setTimeout(function(){applyState(next);state=next;setTimeout(function(){busy=false;},400);},60);
+  }
+  function loadArticle(a){document.getElementById('aT').textContent=a.t;document.getElementById('aD').textContent=a.d;document.getElementById('aR').textContent=a.r+' read';document.getElementById('aL').textContent=a.l;document.getElementById('aH1').textContent=a.h1;document.getElementById('aH2').textContent=a.h2;A.scrollTop=0;}
+  function openArticle(a){
+    if(busy)return;
+    if(state==='reading'){busy=true;clearHi();zz(L,'z-back');zz(A,'z-gone');setTimeout(function(){loadArticle(a);zz(A,'z-front');setTimeout(function(){busy=false;},400);},320);}
+    else{loadArticle(a);navigate('reading');}
+  }
+  var ul=document.getElementById('ul'),items=[];
+  ARTS.forEach(function(a){var li=document.createElement('li');li.className='ali';li.innerHTML='<span class="alt">'+a.t+'</span><span class="ald">'+a.d+'</span>';li.addEventListener('click',function(e){e.stopPropagation();if(!busy)openArticle(a);});ul.appendChild(li);});
+  items=Array.prototype.slice.call(ul.querySelectorAll('.ali'));
+  function clearHi(){items.forEach(function(li){li.classList.remove('hi');});}
+  function itemAt(y){for(var i=0;i<items.length;i++){var r=items[i].getBoundingClientRect();if(y>=r.top&&y<=r.bottom)return items[i];}return null;}
+  hz.addEventListener('mouseenter',function(){if(state!=='reading')return;zz(L,'z-crisp');zz(A,'z-front');});
+  hz.addEventListener('mousemove',function(e){if(state!=='reading')return;clearHi();var li=itemAt(e.clientY);if(li){li.classList.add('hi');zz(A,'z-dim');}else{zz(A,'z-front');}});
+  hz.addEventListener('mouseleave',function(){if(state!=='reading')return;clearHi();zz(L,'z-back');zz(A,'z-front');});
+  hz.addEventListener('click',function(e){if(state!=='reading'||busy)return;var li=itemAt(e.clientY);if(li){var idx=items.indexOf(li);if(idx!==-1){openArticle(ARTS[idx]);return;}}navigate('list');});
+  document.getElementById('brandBtn').addEventListener('click',function(){navigate('list');});
+  document.getElementById('hn-articles').addEventListener('click',function(){navigate('list');});
+  document.getElementById('hn-about').addEventListener('click',function(){navigate('about');});
+  document.getElementById('hn-contact').addEventListener('click',function(){navigate('contact');});
+  var lastY=0;A.addEventListener('scroll',function(){var y=A.scrollTop;hdr.classList.toggle('away',y>lastY&&y>80);lastY=y;},{passive:true});
+  applyState('list');
+})();
+</script>
+</body>
+</html>
