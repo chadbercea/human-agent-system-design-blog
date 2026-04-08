@@ -1,53 +1,48 @@
 ---
-import { articleSlug, type ArticleEntry } from '../lib/articles.ts';
-
 interface Props {
-  articles: ArticleEntry[];
   currentPath?: string;
 }
 
-const { articles, currentPath = '' } = Astro.props;
+const { currentPath = '' } = Astro.props;
+
+const links = [
+  { href: '/', label: 'Articles' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
 ---
 
-<nav class="codec-panel" aria-label="Site navigation">
-  <div class="codec-panel__freq sys">FREQ ░░ 140.85</div>
-  <a href="/" class="codec-panel__site sys">HAS-DESIGN</a>
-  <hr class="tx-rule codec-panel__rule" />
-  <div class="codec-panel__label sys">Transmissions</div>
-  <ul class="codec-panel__list">
+<nav aria-label="Site navigation">
+  <a href="/" class="nav__site">HAS-DESIGN</a>
+  <ul class="nav__list">
     {
-      articles.map((a) => {
-        const href = `/${articleSlug(a.id)}`;
+      links.map(({ href, label }) => {
         const isActive = currentPath === href;
         return (
-          <li class:list={[{ 'active-marker': isActive }]}>
+          <li>
             <a
-              class:list={['codec-panel__link', { 'codec-panel__link--active': isActive }]}
+              class:list={['nav__link', { 'nav__link--active': isActive }]}
               href={href}
               aria-current={isActive ? 'page' : undefined}
             >
-              {a.data.title}
+              {label}
             </a>
           </li>
         );
       })
     }
   </ul>
-  <hr class="tx-rule codec-panel__rule" />
-  <div class="codec-panel__operator sys">OPERATOR // CHAD B</div>
 </nav>
 
 <style>
-  .codec-panel {
+  nav {
     display: flex;
-    flex-direction: column;
+    align-items: baseline;
+    gap: var(--space-6);
+    padding: var(--space-4) var(--space-6);
   }
 
-  .codec-panel__freq {
-    margin-bottom: var(--space-1);
-  }
-
-  .codec-panel__site {
+  .nav__site {
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     font-weight: var(--weight-medium);
@@ -57,42 +52,30 @@ const { articles, currentPath = '' } = Astro.props;
     text-decoration: none;
   }
 
-  .codec-panel__site:hover {
+  .nav__site:hover {
     color: var(--color-accent);
   }
 
-  .codec-panel__rule {
-    margin: var(--space-4) 0;
-  }
-
-  .codec-panel__label {
-    margin-bottom: var(--space-2);
-  }
-
-  .codec-panel__list {
+  .nav__list {
+    display: flex;
+    gap: var(--space-4);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .codec-panel__link {
-    display: block;
-    padding: var(--space-1) 0;
-    font-family: var(--font-prose);
-    font-size: var(--text-sm);
+  .nav__link {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
     color: var(--color-text-secondary);
     text-decoration: none;
   }
 
-  .codec-panel__link:hover {
-    color: var(--color-text-primary);
+  .nav__link:hover {
+    color: var(--color-accent);
   }
 
-  .codec-panel__link--active {
+  .nav__link--active {
     color: var(--color-text-primary);
-  }
-
-  .codec-panel__operator {
-    margin-top: auto;
   }
 </style>

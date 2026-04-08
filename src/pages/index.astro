@@ -13,80 +13,64 @@ function formatDate(date: Date): string {
 }
 ---
 
-<SiteLayout title={title} description="Human–agent system design writing." articles={articles}>
-  <div class="freq-log">
-    <div class="freq-log__header">
-      <div class="sys">FREQ ░░ 140.85 // HAS-DESIGN</div>
-      <p class="freq-log__tagline">Human · Agent · System</p>
-    </div>
-    <hr class="tx-rule" />
-    <div class="sys freq-log__label">TRANSMISSION LOG</div>
-    <hr class="tx-rule" />
-    <ul class="freq-log__list">
-      {
-        articles.map((a) => (
-          <li class="freq-log__item">
-            <a href={`/${articleSlug(a.id)}`} class="freq-log__title">
-              {a.data.title}
-            </a>
-            <time class="freq-log__date sys" datetime={a.data.date.toISOString()}>
-              {formatDate(a.data.date)}
-            </time>
-          </li>
-        ))
-      }
-    </ul>
-  </div>
+<SiteLayout title={title} description="Human–agent system design writing.">
+  <h1 class="page-title">Human · Agent · System</h1>
+  <ul class="article-list">
+    {
+      articles.map((a) => (
+        <li class="article-list__item">
+          <a href={`/${articleSlug(a.id)}`} class="article-list__title">
+            {a.data.title}
+          </a>
+          <time class="article-list__date" datetime={a.data.date.toISOString()}>
+            {formatDate(a.data.date)}
+          </time>
+        </li>
+      ))
+    }
+  </ul>
 </SiteLayout>
 
 <style>
-  .freq-log {
-    max-width: var(--measure-wide);
-  }
-
-  .freq-log__header {
-    margin-block-end: var(--space-4);
-  }
-
-  .freq-log__tagline {
+  .page-title {
     font-family: var(--font-prose);
-    font-size: var(--text-sm);
-    color: var(--color-text-primary);
-    margin: var(--space-2) 0 0;
+    font-size: var(--text-lg);
+    font-weight: 400;
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-8);
   }
 
-  .freq-log__label {
-    margin-block: var(--space-3);
-  }
-
-  .freq-log__list {
+  .article-list {
     list-style: none;
     padding: 0;
-    margin: var(--space-6) 0 0;
+    margin: 0;
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
   }
 
-  .freq-log__item {
+  .article-list__item {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     gap: var(--space-4);
   }
 
-  .freq-log__title {
+  .article-list__title {
     font-family: var(--font-prose);
     font-size: var(--text-base);
     color: var(--color-text-primary);
     text-decoration: none;
   }
 
-  .freq-log__title:hover {
+  .article-list__title:hover {
     color: var(--color-accent);
   }
 
-  .freq-log__date {
+  .article-list__date {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
     flex-shrink: 0;
   }
 </style>

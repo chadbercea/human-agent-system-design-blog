@@ -1,11 +1,8 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
-import { getSortedArticles } from '../lib/articles.ts';
-
-const articles = await getSortedArticles();
 ---
 
-<SiteLayout title="404 — Not found" description="Page not found." articles={articles}>
+<SiteLayout title="404 — Not found" description="Page not found.">
   <div class="prose">
     <h1>404 — Page not found</h1>
     <p>The page does not exist or has been moved.</p>

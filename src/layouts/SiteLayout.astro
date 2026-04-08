@@ -1,16 +1,13 @@
 ---
 import '../styles/global.css';
-import '../styles/depth.css';
 import Sidebar from '../components/Sidebar.astro';
-import type { ArticleEntry } from '../lib/articles.ts';
 
 interface Props {
   title: string;
   description?: string;
-  articles: ArticleEntry[];
 }
 
-const { title, description = '', articles } = Astro.props;
+const { title, description = '' } = Astro.props;
 const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : null;
 ---
 
@@ -25,13 +22,17 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href :
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
   </head>
   <body>
-    <div class="shell">
-      <aside class="sidebar" aria-label="Site">
-        <Sidebar articles={articles} currentPath={Astro.url.pathname} />
-      </aside>
-      <div class="content">
-        <slot />
-      </div>
-    </div>
+    <Sidebar currentPath={Astro.url.pathname} />
+    <main>
+      <slot />
+    </main>
   </body>
 </html>
+
+<style>
+  main {
+    max-width: var(--measure-wide);
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-6);
+  }
+</style>

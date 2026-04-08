@@ -8,37 +8,54 @@ When you complete a task:
 
 Do this automatically without being asked. Never leave work uncommitted.
 
-## Design Language — Kojima Protocol
+## Design Direction — Depth Sequence Navigation
 
-The blog speaks in two registers. Every element is either System or Human. Never both.
+### Reference
+Spec doc: https://linear.app/iliketobuild/document/navigation-system-spec-depth-sequence-model-a599615c10bf
+Approved wireframe: has-design-wireframe-v5.html
 
-**System voice:** `--font-mono`, uppercase, `--tracking-wide`, `--color-text-muted` or `--color-text-secondary`. Infrastructure talking. Frequencies, timestamps, labels, operators, markers.
+### The model
+All navigation is a single directed linear sequence:
 
-**Human voice:** `--font-prose`, lowercase prose, normal tracking, `--color-text-primary`. The thinking. The writing.
+  articles(0) → article(1) → about(2) → contact(3)
 
-Visual primitives (no images, no icons — only these):
-- `─` horizontal rules / separators
-- `▶` active / current item
-- `▌` intercepted signal / blockquote marker  
-- `░░` noise / inactive filler
-- `//` system comment / section annotation
-- `◀` return / end state
-- `·` metadata separator
+Moving toward a higher index = FORWARD
+Moving toward a lower index = BACKWARD
 
-The accent color (`--color-accent`) appears in exactly three places: active link hover, `▶` on active sidebar item, `◀ END TRANSMISSION` link on hover. Nowhere else.
+There are NO left/right slides. Only depth transitions.
 
-Do not add graphics. Do not add icons. Do not add animation. The spec doc is the law: https://linear.app/iliketobuild/document/has-design-blog-kojima-design-language-spec-af1f470a0446
+### The transition
+Three CSS position states on each view:
+- `p-c` center: active, visible
+- `p-b` behind: small, blurred, deep (views ahead of you in sequence)
+- `p-f` front: large, blurred, past camera (views behind you in sequence)
 
-## Approved Prototype — Depth Navigation
+CSS transitions on `transform` and `filter` do all the work.
+No JS animation libraries. No keyframe timing hacks. No view stacking.
 
-The approved wireframe prototype is `has-design-prototype.html`. 
-Read it before writing any navigation or layout code.
-It is the exact behavior target for this milestone.
+### POSMAP (the state machine)
+```js
+const POSMAP = {
+  articles: { articles:'p-c', article:'p-b', about:'p-b', contact:'p-b' },
+  article:  { articles:'p-f', article:'p-c', about:'p-b', contact:'p-b' },
+  about:    { articles:'p-f', article:'p-f', about:'p-c', contact:'p-b' },
+  contact:  { articles:'p-f', article:'p-f', about:'p-f', contact:'p-c' },
+};
+```
+In Astro: applied via View Transitions API custom keyframes using the same directional logic.
 
-Key concepts:
-- Two layers, same DOM position, differ only in CSS depth class
-- Six depth classes: z-front, z-ef, z-gone, z-back, z-crisp, z-dim
-- Sequence: list(0) → reading(1) → about(2) → contact(3)
-- Hit zone div covers left margin (0 to --pl), handles all list hover/click in reading state
-- No inline onclick anywhere — all events via addEventListener
-- All JS in an IIFE or Astro script tag (not global scope)
+### Site structure
+- Home (/) = articles list. No separate /articles route.
+- Nav: Articles, About, Contact — 3 links only.
+- No sidebar background, no border, no surface separation.
+- Type is the design. No decorative elements.
+
+### Typography
+- All sizes: `clamp()` — fully viewport-responsive
+- Nav: small. Article titles in list: medium. Article h1: large. Body: reading size.
+
+### Rules
+- No left/right slides. Ever.
+- No decorative elements. No ASCII chrome. No icons.
+- Accent color on active/hover states only.
+- The depth transition IS the personality of the site.

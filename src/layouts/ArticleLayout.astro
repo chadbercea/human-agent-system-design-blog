@@ -1,16 +1,14 @@
 ---
 import SiteLayout from './SiteLayout.astro';
-import { type ArticleEntry } from '../lib/articles.ts';
 
 interface Props {
   title: string;
   date: Date;
   description?: string;
   readingTime: number;
-  articles: ArticleEntry[];
 }
 
-const { title, date, description, readingTime, articles } = Astro.props;
+const { title, date, description, readingTime } = Astro.props;
 
 const year = date.getFullYear();
 const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -18,45 +16,39 @@ const day = String(date.getDate()).padStart(2, '0');
 const formattedDate = `${year}.${month}.${day}`;
 ---
 
-<SiteLayout title={title} description={description} articles={articles}>
-  <header class="tx-header">
-    <div class="tx-header__status sys">TRANSMISSION // OPEN</div>
-    <hr class="tx-rule" />
-    <div class="tx-header__meta sys">
-      {formattedDate} · 0847 HRS · EST. {readingTime} MIN
+<SiteLayout title={title} description={description}>
+  <header class="article-header">
+    <div class="article-header__meta">
+      {formattedDate} · {readingTime} min read
     </div>
-    <hr class="tx-rule" />
-    <h1 class="tx-header__title">{title}</h1>
+    <h1 class="article-header__title">{title}</h1>
     {description && (
-      <p class="tx-header__lede">{description}</p>
+      <p class="article-header__lede">{description}</p>
     )}
   </header>
-  <div class="article__body">
+  <article class="prose">
     <slot />
-  </div>
-  <footer class="tx-footer">
-    <hr class="tx-rule" />
-    <a href="/" class="tx-footer__end sys">◀ END TRANSMISSION · RETURN TO FREQ</a>
+  </article>
+  <footer class="article-footer">
+    <a href="/">← Back to articles</a>
   </footer>
 </SiteLayout>
 
 <style>
-  .tx-header {
+  .article-header {
     max-width: var(--measure-prose);
     margin-bottom: var(--space-8);
   }
 
-  .tx-header__status {
+  .article-header__meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
     margin-bottom: var(--space-3);
   }
 
-  .tx-header__meta {
-    margin: var(--space-3) 0;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .tx-header__title {
-    margin: var(--space-6) 0 0;
+  .article-header__title {
+    margin: 0;
     font-family: var(--font-display);
     font-size: var(--text-3xl);
     font-weight: 900;
@@ -65,7 +57,7 @@ const formattedDate = `${year}.${month}.${day}`;
     color: var(--color-text-primary);
   }
 
-  .tx-header__lede {
+  .article-header__lede {
     max-width: var(--measure-prose);
     margin: var(--space-4) 0 0;
     color: var(--color-text-secondary);
@@ -73,28 +65,19 @@ const formattedDate = `${year}.${month}.${day}`;
     line-height: var(--leading-loose);
   }
 
-  .article__body {
-    max-width: var(--measure-prose);
-  }
-
-  .tx-footer {
+  .article-footer {
     max-width: var(--measure-prose);
     margin-top: var(--space-16);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
   }
 
-  .tx-footer__end {
+  .article-footer a {
     font-family: var(--font-mono);
     font-size: var(--text-xs);
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
-    color: var(--color-text-muted);
+    color: var(--color-text-secondary);
     text-decoration: none;
   }
 
-  .tx-footer__end:hover {
+  .article-footer a:hover {
     color: var(--color-accent);
   }
 </style>
