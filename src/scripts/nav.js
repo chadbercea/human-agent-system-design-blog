@@ -79,13 +79,13 @@
       hz.classList.toggle('on', next === 'reading');
       updateNavDots(navKey(next));
       state = next;
-    }, 100);
+    }, 60);
 
     // Step 3: after transition completes, settle old layer and unlock
     setTimeout(function () {
       if (old) zz(old, restClass(old, next));
       busy = false;
-    }, 560);
+    }, 460);
   }
 
   // Nav links

@@ -16,8 +16,8 @@
 
 .brand {
   font-family: var(--font-mono);
-  font-size: clamp(0.58rem, 0.5rem + 0.4vw, 0.68rem);
-  letter-spacing: 0.08em;
+  font-size: clamp(0.54rem, 0.82vw, 0.68rem);
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-text-primary);
   text-decoration: none;
@@ -34,23 +34,23 @@
 /* ── Nav ── */
 .hnav {
   display: flex;
-  gap: clamp(0.75rem, 2vw, 2rem);
+  gap: 2rem;
 }
 
 .hn {
   font-family: var(--font-mono);
-  font-size: clamp(0.56rem, 0.48rem + 0.35vw, 0.62rem);
-  letter-spacing: 0.04em;
+  font-size: clamp(0.5rem, 0.72vw, 0.6rem);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 0.4em;
-  transition: color 160ms var(--ease);
+  gap: 0.3rem;
+  transition: color 0.18s;
 }
 .hn:hover {
-  color: var(--color-accent);
+  color: #888;
   text-decoration: none;
 }
 .hn:visited {
@@ -66,14 +66,15 @@
 /* ── Active dot ── */
 .dot {
   display: inline-block;
-  width: 0.35em;
-  height: 0.35em;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
-  background: transparent;
-  transition: background 160ms var(--ease);
+  background: var(--color-text-primary);
+  opacity: 0;
+  transition: opacity 0.18s;
 }
 .hn.on .dot {
-  background: var(--color-accent);
+  opacity: 1;
 }
 
 /* ── Stage shell ── */
