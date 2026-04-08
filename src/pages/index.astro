@@ -52,7 +52,13 @@ function formatDate(d: Date): string {
     overflow-y: auto;
     transition: transform 0.5s ease, filter 0.5s ease, opacity 0.5s ease;
     will-change: transform, filter, opacity;
-    padding: var(--space-12) var(--space-8);
+    padding: var(--content-padding-y) var(--content-padding-x);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .layer {
+      transition: none;
+    }
   }
 
   .z-front {
@@ -120,6 +126,14 @@ function formatDate(d: Date): string {
     display: block;
   }
 
+  /* Hit zone is mouse-only; disable on touch devices */
+  @media (hover: none) {
+    .hit-zone,
+    .hit-zone.on {
+      display: none;
+    }
+  }
+
   /* ── Article list ── */
   .alist {
     max-width: var(--measure-prose);
@@ -153,11 +167,26 @@ function formatDate(d: Date): string {
     transform: translateX(6px);
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .ali.hi,
+    .ali:hover {
+      transform: none;
+    }
+  }
+
   .ald {
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     color: var(--color-text-secondary);
     flex-shrink: 0;
+  }
+
+  /* ── Mobile article list ── */
+  @media (max-width: 768px) {
+    .ali {
+      flex-direction: column;
+      gap: var(--space-1);
+    }
   }
 
   /* ── Article layer ── */

@@ -30,14 +30,20 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href :
 </html>
 
 <script>
-  // Hide header on scroll-down in article view, show on scroll-up
   (() => {
     const hdr = document.getElementById('hdr');
     const stage = document.getElementById('stage');
     if (!hdr || !stage) return;
 
-    let lastY = 0;
+    // Sync stage top with actual header height (needed for mobile stacked header)
+    function syncStageTop() {
+      stage.style.top = hdr.offsetHeight + 'px';
+    }
+    syncStageTop();
+    window.addEventListener('resize', syncStageTop, { passive: true });
 
+    // Hide header on scroll-down in article view, show on scroll-up
+    let lastY = 0;
     stage.addEventListener('scroll', () => {
       const y = stage.scrollTop;
       if (y > lastY && y > 60) {
