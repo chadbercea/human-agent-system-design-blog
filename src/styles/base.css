@@ -5,9 +5,12 @@
 }
 
 html {
-  min-width: 1280px;
-  font-size: 18px;
+  font-size: clamp(16px, 1.125vw, 18px);
   scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }
 
 body {
