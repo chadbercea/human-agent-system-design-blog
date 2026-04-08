@@ -1,96 +1,151 @@
 (function () {
-  var VIEWS = ['articles', 'article', 'about', 'contact'];
-  var POS   = ['p-c', 'p-b', 'p-f'];
+  var SEQ = { list: 0, reading: 1, about: 2, contact: 3 };
+  var ZC  = ['z-front', 'z-back', 'z-crisp', 'z-dim', 'z-gone', 'z-ef'];
 
-  var POSMAP = {
-    articles: { articles: 'p-c', article: 'p-b', about: 'p-b', contact: 'p-b' },
-    article:  { articles: 'p-f', article: 'p-c', about: 'p-b', contact: 'p-b' },
-    about:    { articles: 'p-f', article: 'p-f', about: 'p-c', contact: 'p-b' },
-    contact:  { articles: 'p-f', article: 'p-f', about: 'p-f', contact: 'p-c' },
-  };
+  var L   = document.getElementById('layer-list');
+  var A   = document.getElementById('layer-article');
+  var AB  = document.getElementById('layer-about');
+  var CO  = document.getElementById('layer-contact');
+  var hz  = document.getElementById('hit-zone');
+  var hdr = document.getElementById('hdr');
 
-  var layers = {
-    articles: document.getElementById('layer-articles'),
-    article:  document.getElementById('layer-article'),
-    about:    document.getElementById('layer-about'),
-    contact:  document.getElementById('layer-contact'),
-  };
+  var state = 'list';
+  var busy  = false;
 
-  var state = 'articles';
+  function zz(el, cls) {
+    el.classList.remove.apply(el.classList, ZC);
+    el.classList.add(cls);
+  }
 
-  function apply(next) {
-    var map = POSMAP[next];
-    if (!map) return;
-    state = next;
-    for (var i = 0; i < VIEWS.length; i++) {
-      var view = VIEWS[i];
-      var el = layers[view];
-      if (!el) continue;
-      for (var j = 0; j < POS.length; j++) {
-        el.classList.remove(POS[j]);
-      }
-      el.classList.add(map[view]);
+  function updateNavDots(key) {
+    document.querySelectorAll('.hn').forEach(function (el) {
+      var matches = el.dataset.nav === key;
+      el.classList.toggle('on', matches);
+    });
+  }
+
+  function elFor(s) {
+    if (s === 'list')    return L;
+    if (s === 'reading') return A;
+    if (s === 'about')   return AB;
+    if (s === 'contact') return CO;
+  }
+
+  function urlFor(s) {
+    if (s === 'list')    return '/';
+    if (s === 'about')   return '/about';
+    if (s === 'contact') return '/contact';
+    return '/';
+  }
+
+  function applyState(s) {
+    if (s === 'list') {
+      zz(L, 'z-front'); zz(A, 'z-gone'); zz(AB, 'z-gone'); zz(CO, 'z-gone');
+      hz.classList.remove('on');
+      updateNavDots('articles');
+    } else if (s === 'reading') {
+      zz(A, 'z-front'); zz(L, 'z-back'); zz(AB, 'z-gone'); zz(CO, 'z-gone');
+      hz.classList.add('on');
+      updateNavDots('articles');
+    } else if (s === 'about') {
+      zz(AB, 'z-front'); zz(L, 'z-gone'); zz(A, 'z-gone'); zz(CO, 'z-gone');
+      hz.classList.remove('on');
+      updateNavDots('about');
+    } else if (s === 'contact') {
+      zz(CO, 'z-front'); zz(L, 'z-gone'); zz(A, 'z-gone'); zz(AB, 'z-gone');
+      hz.classList.remove('on');
+      updateNavDots('contact');
     }
   }
 
-  function navigate(next, url, push) {
-    if (state === next) return;
-    apply(next);
-    if (push !== false) {
-      history.pushState({ view: next }, '', url);
-    }
+  function navigate(next, pushUrl) {
+    if (next === state || busy) return;
+    busy = true;
+    var fwd = SEQ[next] > SEQ[state];
+    var old = elFor(state);
+    if (old) zz(old, fwd ? 'z-ef' : 'z-gone');
+
+    var url = pushUrl || urlFor(next);
+    history.pushState({ view: next }, '', url);
+
+    setTimeout(function () {
+      applyState(next);
+      state = next;
+      setTimeout(function () { busy = false; }, 400);
+    }, 60);
   }
 
-  function detectState() {
-    var path = location.pathname.replace(/\/+$/, '') || '/';
-    if (path === '/' || path === '/articles') return { view: 'articles', url: '/' };
-    if (path === '/about') return { view: 'about', url: '/about' };
-    if (path === '/contact') return { view: 'contact', url: '/contact' };
-    if (path.indexOf('/') === 0) return { view: 'article', url: path };
-    return { view: 'articles', url: '/' };
-  }
-
-  // Nav link clicks (Articles, About, Contact)
-  document.addEventListener('click', function (e) {
-    var link = e.target.closest('[data-nav]');
-    if (link) {
+  // Nav links — event delegation, no inline onclick
+  document.querySelectorAll('.hn').forEach(function (el) {
+    el.addEventListener('click', function (e) {
       e.preventDefault();
-      var target = link.getAttribute('data-nav');
-      var url = link.getAttribute('href') || '/';
-      navigate(target, url);
-      return;
-    }
-
-    // Article list item clicks
-    var item = e.target.closest('[data-slug]');
-    if (item) {
-      e.preventDefault();
-      var slug = item.getAttribute('data-slug');
-      navigate('article', '/' + slug);
-      return;
-    }
-
-    // Back-to-list from article view
-    var back = e.target.closest('[data-back]');
-    if (back) {
-      e.preventDefault();
-      navigate('articles', '/');
-      return;
-    }
+      var target = el.dataset.nav;
+      if (target === 'articles') navigate('list');
+      else navigate(target);
+    });
   });
+
+  var brand = document.querySelector('.brand');
+  if (brand) {
+    brand.addEventListener('click', function (e) {
+      e.preventDefault();
+      navigate('list');
+    });
+  }
+
+  // Article list items — read slugs from data-slug attributes
+  document.querySelectorAll('[data-slug]').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var slug = el.getAttribute('data-slug');
+      navigate('reading', '/' + slug);
+    });
+  });
+
+  // Header scroll hide/show on article layer scroll
+  var lastY = 0;
+  if (A) {
+    A.addEventListener('scroll', function () {
+      var y = A.scrollTop;
+      hdr.classList.toggle('away', y > lastY && y > 80);
+      lastY = y;
+    }, { passive: true });
+  }
 
   // Browser back/forward
   window.addEventListener('popstate', function (e) {
+    if (busy) return;
     if (e.state && e.state.view) {
-      apply(e.state.view);
+      busy = true;
+      applyState(e.state.view);
+      state = e.state.view;
+      setTimeout(function () { busy = false; }, 400);
     } else {
-      var detected = detectState();
-      apply(detected.view);
+      var detected = detectFromUrl();
+      applyState(detected);
+      state = detected;
     }
   });
 
-  // Initialize on load
-  var initial = detectState();
-  apply(initial.view);
-  history.replaceState({ view: initial.view }, '', initial.url);
+  function detectFromUrl() {
+    var path = location.pathname.replace(/\/+$/, '') || '/';
+    if (path === '/')        return 'list';
+    if (path === '/about')   return 'about';
+    if (path === '/contact') return 'contact';
+    return 'reading';
+  }
+
+  // Init: detect state from current URL
+  state = detectFromUrl();
+  applyState(state);
+  history.replaceState({ view: state }, '', location.pathname);
+
+  // Expose for other scripts (e.g. hit-zone, article loader)
+  window.__nav = {
+    navigate: navigate,
+    getState: function () { return state; },
+    busy: function () { return busy; },
+    zz: zz,
+    ZC: ZC,
+  };
 })();
