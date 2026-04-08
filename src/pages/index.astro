@@ -34,13 +34,15 @@ function formatDate(d: Date): string {
 
   <!-- ARTICLE LAYER (empty shell, filled by JS) -->
   <div class="layer z-gone" id="layer-article">
-    <h1 class="art-title" id="art-title"></h1>
-    <div class="art-meta">
-      <span id="art-date"></span>
-      <span id="art-read"></span>
-    </div>
-    <p class="art-lede" id="art-lede"></p>
-    <div class="art-body" id="art-body"></div>
+    <header class="art-header">
+      <h1 class="art-title" id="art-title"></h1>
+      <div class="art-date" id="art-date"></div>
+      <p class="art-lede" id="art-lede"></p>
+    </header>
+    <div class="art-body prose" id="art-body"></div>
+    <footer class="art-footer">
+      <a href="/" id="art-back">&larr; Back</a>
+    </footer>
   </div>
 </SiteLayout>
 
@@ -190,35 +192,56 @@ function formatDate(d: Date): string {
   }
 
   /* ── Article layer ── */
-  .art-title {
-    font-family: var(--font-prose);
-    font-size: var(--text-3xl);
-    font-weight: var(--weight-bold);
-    line-height: var(--leading-tight);
-    margin: 0 0 var(--space-4);
-    max-width: var(--measure-prose);
+  .art-header {
+    margin-bottom: clamp(2rem, 4vw, 4rem);
   }
 
-  .art-meta {
+  .art-title {
+    font-family: var(--font-prose);
+    font-size: var(--text-title);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  .art-date {
     font-family: var(--font-mono);
     font-size: var(--text-xs);
-    color: var(--color-text-secondary);
-    display: flex;
-    gap: var(--space-4);
-    margin-bottom: var(--space-8);
+    color: var(--color-text-muted);
+    margin-top: var(--space-3);
   }
 
   .art-lede {
-    font-family: var(--font-prose);
-    font-size: var(--text-lg);
+    max-width: clamp(45ch, 60vw, 75ch);
+    margin: var(--space-4) 0 0;
     color: var(--color-text-secondary);
+    font-size: var(--text-base);
     line-height: var(--leading-normal);
-    margin: 0 0 var(--space-8);
-    max-width: var(--measure-prose);
+  }
+
+  .art-lede:empty {
+    display: none;
   }
 
   .art-body {
-    max-width: var(--measure-prose);
+    max-width: clamp(45ch, 60vw, 75ch);
+  }
+
+  .art-footer {
+    margin-top: clamp(3rem, 6vw, 6rem);
+  }
+
+  .art-footer a {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .art-footer a:hover {
+    color: var(--color-accent);
   }
 </style>
 

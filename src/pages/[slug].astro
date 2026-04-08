@@ -1,9 +1,7 @@
 ---
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
 import { getCollection } from 'astro:content';
 import ArticleLayout from '../layouts/ArticleLayout.astro';
-import { articleSlug, readingTimeMinutes } from '../lib/articles.ts';
+import { articleSlug } from '../lib/articles.ts';
 
 export async function getStaticPaths() {
   const posts = await getCollection('articles', ({ data }) => !data.draft);
@@ -15,21 +13,12 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await post.render();
-
-const mdName = post.id.endsWith('.md') ? post.id : `${post.id}.md`;
-const mdPath = path.join(process.cwd(), 'src/content/articles', mdName);
-const raw = readFileSync(mdPath, 'utf8');
-const bodyMd = raw.replace(/^---[\s\S]*?---\s*/, '');
-const minutes = readingTimeMinutes(bodyMd);
 ---
 
 <ArticleLayout
   title={post.data.title}
   date={post.data.date}
   description={post.data.description}
-  readingTime={minutes}
 >
-  <article class="prose">
-    <Content />
-  </article>
+  <Content />
 </ArticleLayout>

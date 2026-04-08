@@ -30,14 +30,6 @@
         var doc = new DOMParser().parseFromString(html, 'text/html');
         var prose = doc.querySelector('.prose');
         if (prose) body.innerHTML = prose.innerHTML;
-
-        var meta = doc.querySelector('.article-header__meta');
-        if (meta) {
-          var match = meta.textContent.match(/(\d+)\s*min/);
-          if (match) {
-            document.getElementById('art-read').textContent = match[1] + ' min read';
-          }
-        }
       });
   }
 
