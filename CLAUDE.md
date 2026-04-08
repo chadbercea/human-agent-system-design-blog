@@ -28,3 +28,17 @@ Visual primitives (no images, no icons — only these):
 The accent color (`--color-accent`) appears in exactly three places: active link hover, `▶` on active sidebar item, `◀ END TRANSMISSION` link on hover. Nowhere else.
 
 Do not add graphics. Do not add icons. Do not add animation. The spec doc is the law: https://linear.app/iliketobuild/document/has-design-blog-kojima-design-language-spec-af1f470a0446
+
+## Approved Prototype — Depth Navigation
+
+The approved wireframe prototype is `has-design-prototype.html`. 
+Read it before writing any navigation or layout code.
+It is the exact behavior target for this milestone.
+
+Key concepts:
+- Two layers, same DOM position, differ only in CSS depth class
+- Six depth classes: z-front, z-ef, z-gone, z-back, z-crisp, z-dim
+- Sequence: list(0) → reading(1) → about(2) → contact(3)
+- Hit zone div covers left margin (0 to --pl), handles all list hover/click in reading state
+- No inline onclick anywhere — all events via addEventListener
+- All JS in an IIFE or Astro script tag (not global scope)
