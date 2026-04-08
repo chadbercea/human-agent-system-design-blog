@@ -87,6 +87,23 @@ function formatDate(d: Date): string {
     z-index: 0;
   }
 
+  .z-crisp {
+    transform: translateX(-20vw) scale(0.72);
+    transform-origin: left center;
+    filter: blur(0);
+    opacity: 1;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  .z-dim {
+    transform: none;
+    filter: blur(14px);
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 10;
+  }
+
   /* ── Hit zone ── */
   .hit-zone {
     display: none;
@@ -126,8 +143,14 @@ function formatDate(d: Date): string {
     color: var(--color-text-primary);
   }
 
-  .ali:hover .alt {
+  .ali:hover .alt,
+  .ali.hi .alt {
     color: var(--color-accent);
+  }
+
+  .ali.hi,
+  .ali:hover {
+    transform: translateX(6px);
   }
 
   .ald {
@@ -169,3 +192,8 @@ function formatDate(d: Date): string {
     max-width: var(--measure-prose);
   }
 </style>
+
+<script>
+  import '../scripts/nav.js';
+  import '../scripts/articles.js';
+</script>

@@ -93,15 +93,6 @@
     });
   }
 
-  // Article list items — read slugs from data-slug attributes
-  document.querySelectorAll('[data-slug]').forEach(function (el) {
-    el.addEventListener('click', function (e) {
-      e.preventDefault();
-      var slug = el.getAttribute('data-slug');
-      navigate('reading', '/' + slug);
-    });
-  });
-
   // Header scroll hide/show on article layer scroll
   var lastY = 0;
   if (A) {
