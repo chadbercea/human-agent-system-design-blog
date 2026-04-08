@@ -64,7 +64,7 @@ function formatDate(d: Date): string {
     position: absolute;
     inset: 0;
     overflow-y: auto;
-    transition: transform 0.5s ease, filter 0.5s ease, opacity 0.5s ease;
+    transition: transform 480ms var(--ease), filter 480ms var(--ease), opacity 480ms var(--ease);
     will-change: transform, filter, opacity;
     padding: var(--content-padding-y) var(--content-padding-x);
   }
@@ -84,27 +84,27 @@ function formatDate(d: Date): string {
   }
 
   .z-back {
-    transform: scale(0.92) translateZ(0);
-    filter: blur(4px);
-    opacity: 0.5;
+    transform: scale(0.96) translateZ(0);
+    filter: blur(2px);
+    opacity: 0.4;
     pointer-events: none;
     z-index: 1;
   }
 
   .z-gone {
-    transform: scale(0.85) translateZ(0);
-    filter: blur(8px);
+    transform: scale(0.92) translateZ(0);
+    filter: blur(6px);
     opacity: 0;
     pointer-events: none;
     z-index: 0;
   }
 
   .z-ef {
-    transform: scale(1.1) translateZ(0);
-    filter: blur(6px);
+    transform: scale(1.05) translateZ(0);
+    filter: blur(3px);
     opacity: 0;
     pointer-events: none;
-    z-index: 0;
+    z-index: 3;
   }
 
   .z-crisp {

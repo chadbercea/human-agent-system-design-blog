@@ -8,6 +8,7 @@
   var CO  = document.getElementById('layer-contact');
   var hz  = document.getElementById('hit-zone');
   var hdr = document.getElementById('hdr');
+  var ALL = [L, A, AB, CO];
 
   var state = 'list';
   var busy  = false;
@@ -24,6 +25,10 @@
     });
   }
 
+  function navKey(s) {
+    return (s === 'list' || s === 'reading') ? 'articles' : s;
+  }
+
   function elFor(s) {
     if (s === 'list')    return L;
     if (s === 'reading') return A;
@@ -38,24 +43,18 @@
     return '/';
   }
 
+  // What class should a layer have at rest for a given active state?
+  function restClass(el, forState) {
+    if (el === elFor(forState)) return 'z-front';
+    if (forState === 'reading' && el === L) return 'z-back';
+    return 'z-gone';
+  }
+
+  // Instant state application (init, popstate)
   function applyState(s) {
-    if (s === 'list') {
-      zz(L, 'z-front'); zz(A, 'z-gone'); zz(AB, 'z-gone'); zz(CO, 'z-gone');
-      hz.classList.remove('on');
-      updateNavDots('articles');
-    } else if (s === 'reading') {
-      zz(A, 'z-front'); zz(L, 'z-back'); zz(AB, 'z-gone'); zz(CO, 'z-gone');
-      hz.classList.add('on');
-      updateNavDots('articles');
-    } else if (s === 'about') {
-      zz(AB, 'z-front'); zz(L, 'z-gone'); zz(A, 'z-gone'); zz(CO, 'z-gone');
-      hz.classList.remove('on');
-      updateNavDots('about');
-    } else if (s === 'contact') {
-      zz(CO, 'z-front'); zz(L, 'z-gone'); zz(A, 'z-gone'); zz(AB, 'z-gone');
-      hz.classList.remove('on');
-      updateNavDots('contact');
-    }
+    ALL.forEach(function (el) { zz(el, restClass(el, s)); });
+    hz.classList.toggle('on', s === 'reading');
+    updateNavDots(navKey(s));
   }
 
   function navigate(next, pushUrl) {
@@ -63,19 +62,33 @@
     busy = true;
     var fwd = SEQ[next] > SEQ[state];
     var old = elFor(state);
+    var entering = elFor(next);
+
+    // Step 1: exit animation on old layer
     if (old) zz(old, fwd ? 'z-ef' : 'z-gone');
 
     var url = pushUrl || urlFor(next);
     history.pushState({ view: next }, '', url);
 
+    // Step 2: stagger — bring new layer in without touching old
     setTimeout(function () {
-      applyState(next);
+      if (entering) zz(entering, 'z-front');
+      ALL.forEach(function (el) {
+        if (el !== old && el !== entering) zz(el, restClass(el, next));
+      });
+      hz.classList.toggle('on', next === 'reading');
+      updateNavDots(navKey(next));
       state = next;
-      setTimeout(function () { busy = false; }, 400);
-    }, 60);
+    }, 100);
+
+    // Step 3: after transition completes, settle old layer and unlock
+    setTimeout(function () {
+      if (old) zz(old, restClass(old, next));
+      busy = false;
+    }, 560);
   }
 
-  // Nav links — event delegation, no inline onclick
+  // Nav links
   document.querySelectorAll('.hn').forEach(function (el) {
     el.addEventListener('click', function (e) {
       e.preventDefault();
@@ -110,7 +123,7 @@
       busy = true;
       applyState(e.state.view);
       state = e.state.view;
-      setTimeout(function () { busy = false; }, 400);
+      setTimeout(function () { busy = false; }, 480);
     } else {
       var detected = detectFromUrl();
       applyState(detected);
@@ -126,12 +139,11 @@
     return 'reading';
   }
 
-  // Init: detect state from current URL
+  // Init
   state = detectFromUrl();
   applyState(state);
   history.replaceState({ view: state }, '', location.pathname);
 
-  // Expose for other scripts (e.g. hit-zone, article loader)
   window.__nav = {
     navigate: navigate,
     getState: function () { return state; },

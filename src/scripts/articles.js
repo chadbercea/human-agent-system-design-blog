@@ -48,8 +48,8 @@
         loadArticle(item);
         nav.zz(A, 'z-front');
         history.pushState({ view: 'reading' }, '', '/' + slug);
-        setTimeout(function () { swapping = false; }, 400);
-      }, 320);
+        setTimeout(function () { swapping = false; }, 480);
+      }, 300);
     } else {
       loadArticle(item);
       nav.navigate('reading', '/' + slug);
