@@ -1,0 +1,86 @@
+/* ── Fixed header ── */
+.hdr {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--hh);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(1.5rem, 3vw, 3rem);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  z-index: 100;
+  transition: transform 240ms var(--ease);
+}
+.hdr.away { transform: translateY(-100%); }
+
+.brand {
+  font-family: var(--font-mono);
+  font-size: clamp(0.54rem, 0.82vw, 0.68rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+.brand:hover {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.brand:visited {
+  color: var(--color-text-primary);
+}
+
+/* ── Nav ── */
+.hnav {
+  display: flex;
+  gap: clamp(1rem, 2vw, 2rem);
+}
+
+.hn {
+  font-family: var(--font-mono);
+  font-size: clamp(0.52rem, 0.72vw, 0.62rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  transition: color 160ms var(--ease);
+}
+.hn:hover {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.hn:visited {
+  color: var(--color-text-secondary);
+}
+.hn.on {
+  color: var(--color-text-primary);
+}
+.hn.on:visited {
+  color: var(--color-text-primary);
+}
+
+/* ── Active dot ── */
+.dot {
+  display: inline-block;
+  width: 0.35em;
+  height: 0.35em;
+  border-radius: 50%;
+  background: transparent;
+  transition: background 160ms var(--ease);
+}
+.hn.on .dot {
+  background: var(--color-accent);
+}
+
+/* ── Stage shell ── */
+.stage {
+  position: fixed;
+  top: var(--hh);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
