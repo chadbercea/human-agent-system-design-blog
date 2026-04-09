@@ -58,6 +58,37 @@
     syncHeaderScrollState();
   }
 
+  // Snap old layer to its rest class once the exit transition ends.
+  // Uses transitionend for frame-accurate timing with a safety fallback.
+  function snapAfterTransition(el, next) {
+    if (!el) { busy = false; return; }
+    var done = false;
+
+    function snap() {
+      el.style.transition = 'none';
+      zz(el, restClass(el, next));
+      void el.offsetHeight;           // force reflow
+      el.style.transition = '';
+      busy = false;
+    }
+
+    function onEnd(e) {
+      if (done || e.target !== el || e.propertyName !== 'transform') return;
+      done = true;
+      el.removeEventListener('transitionend', onEnd);
+      snap();
+    }
+
+    el.addEventListener('transitionend', onEnd);
+    // Safety fallback if transitionend never fires (reduced-motion, display:none)
+    setTimeout(function () {
+      if (done) return;
+      done = true;
+      el.removeEventListener('transitionend', onEnd);
+      snap();
+    }, 500);
+  }
+
   function navigate(next, pushUrl) {
     if (next === state || busy) return;
     busy = true;
@@ -83,17 +114,8 @@
       syncHeaderScrollState();
     }, 60);
 
-    // Step 3: after transition completes, snap old layer to rest (no animation)
-    setTimeout(function () {
-      if (old) {
-        old.style.transition = 'none';
-        zz(old, restClass(old, next));
-        // Force reflow, then re-enable transitions
-        void old.offsetHeight;
-        old.style.transition = '';
-      }
-      busy = false;
-    }, 460);
+    // Step 3: snap old layer to rest when its exit transition completes
+    snapAfterTransition(old, next);
   }
 
   // Nav links
@@ -144,7 +166,6 @@
     if (busy) return;
     var next = (e.state && e.state.view) ? e.state.view : detectFromUrl();
     if (next === state) return;
-    // Use navigate without pushState (popstate already changed the URL)
     busy = true;
     var fwd = SEQ[next] > SEQ[state];
     var old = elFor(state);
@@ -163,15 +184,7 @@
       syncHeaderScrollState();
     }, 60);
 
-    setTimeout(function () {
-      if (old) {
-        old.style.transition = 'none';
-        zz(old, restClass(old, next));
-        void old.offsetHeight;
-        old.style.transition = '';
-      }
-      busy = false;
-    }, 460);
+    snapAfterTransition(old, next);
   });
 
   function detectFromUrl() {
