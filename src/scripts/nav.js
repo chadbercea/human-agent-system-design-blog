@@ -83,9 +83,15 @@
       syncHeaderScrollState();
     }, 60);
 
-    // Step 3: after transition completes, settle old layer and unlock
+    // Step 3: after transition completes, snap old layer to rest (no animation)
     setTimeout(function () {
-      if (old) zz(old, restClass(old, next));
+      if (old) {
+        old.style.transition = 'none';
+        zz(old, restClass(old, next));
+        // Force reflow, then re-enable transitions
+        void old.offsetHeight;
+        old.style.transition = '';
+      }
       busy = false;
     }, 460);
   }
