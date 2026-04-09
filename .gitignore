@@ -6,3 +6,7 @@ node_modules
 .env.*
 *.log
 .DS_Store
+
+# Editor / tool configs (local-only)
+.cursor/
+.emdash.json
