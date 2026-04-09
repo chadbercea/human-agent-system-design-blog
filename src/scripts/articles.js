@@ -105,6 +105,15 @@
     }
   }
 
+  // ── BACK LINK (SPA nav, no full reload) ──
+  var back = document.getElementById('art-back');
+  if (back) {
+    back.addEventListener('click', function (e) {
+      e.preventDefault();
+      nav.navigate('list');
+    });
+  }
+
   // ── ARTICLE LIST CLICK HANDLERS ──
   items.forEach(function (item) {
     item.addEventListener('click', function (e) {
