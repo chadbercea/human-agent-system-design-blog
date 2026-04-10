@@ -53,7 +53,7 @@ function formatDate(d: Date): string {
     </header>
     <div class="art-body prose" id="art-body"></div>
     <footer class="art-footer">
-      <a href="/" id="art-back">&larr; Back</a>
+      <a href="/" id="art-back" class="art-back">&larr; Back</a>
     </footer>
   </div>
 </SiteLayout>
@@ -136,6 +136,18 @@ function formatDate(d: Date): string {
     opacity: 0.25;
     pointer-events: none;
     z-index: 10;
+  }
+
+  /*
+   * Article layer at rest when not reading: invisible on the same plane (no negative Z).
+   * Generic .z-gone uses translateZ(-120px) — that made the article “come from behind” into focus.
+   */
+  #layer-article.z-gone {
+    transform: none;
+    opacity: 0;
+    filter: none;
+    pointer-events: none;
+    z-index: 1;
   }
 
   /* ── Layer content area — offset to leave room for sidebar strip ── */

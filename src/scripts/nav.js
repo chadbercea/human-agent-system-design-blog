@@ -65,8 +65,13 @@
     var done = false;
 
     function snap() {
+      var rest = restClass(el, next);
+      if (el.classList.contains(rest)) {
+        busy = false;
+        return;
+      }
       el.style.transition = 'none';
-      zz(el, restClass(el, next));
+      zz(el, rest);
       void el.offsetHeight;           // force reflow
       el.style.transition = '';
       busy = false;
@@ -97,7 +102,15 @@
     var entering = elFor(next);
 
     // Step 1: exit animation on old layer
-    if (old) zz(old, fwd ? 'z-ef' : 'z-eb');
+    // List → article: list must RECEDE (z-back), not z-ef (positive Z toward camera).
+    // Other forward exits: z-ef. Backward exits: z-eb (see docs/z-layer-audit.md).
+    if (old) {
+      if (fwd && next === 'reading' && old === L) {
+        zz(old, 'z-back');
+      } else {
+        zz(old, fwd ? 'z-ef' : 'z-eb');
+      }
+    }
 
     var url = pushUrl || urlFor(next);
     history.pushState({ view: next }, '', url);
@@ -171,7 +184,13 @@
     var old = elFor(state);
     var entering = elFor(next);
 
-    if (old) zz(old, fwd ? 'z-ef' : 'z-eb');
+    if (old) {
+      if (fwd && next === 'reading' && old === L) {
+        zz(old, 'z-back');
+      } else {
+        zz(old, fwd ? 'z-ef' : 'z-eb');
+      }
+    }
 
     setTimeout(function () {
       if (entering) zz(entering, 'z-front');

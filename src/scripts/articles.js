@@ -123,6 +123,16 @@
     });
   });
 
+  // ── Back to transmission log (SPA — no full reload) ──
+  var back = document.getElementById('art-back');
+  if (back) {
+    back.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (nav.busy()) return;
+      if (nav.getState() === 'reading') nav.navigate('list');
+    });
+  }
+
   // ── HIT-ZONE HELPERS ──
   function clearHi() {
     items.forEach(function (li) { li.classList.remove('hi'); });
