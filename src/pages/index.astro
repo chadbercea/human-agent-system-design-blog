@@ -68,7 +68,13 @@ function formatDate(d: Date): string {
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
-    transition: transform var(--dur) var(--ease), filter var(--dur) var(--ease), opacity calc(var(--dur) * 0.75) var(--ease);
+    /* padding-left in the same transition as transform — z-back adds +2vw inset; without this,
+       padding jumps on a frame while transform eases (list “jumps right then settles”). */
+    transition:
+      transform var(--dur) var(--ease),
+      filter var(--dur) var(--ease),
+      opacity calc(var(--dur) * 0.75) var(--ease),
+      padding-left var(--dur) var(--ease);
     will-change: transform, filter, opacity;
     padding: clamp(2rem, 4vh, 4rem) clamp(1.5rem, 3vw, 3rem);
   }
@@ -121,6 +127,8 @@ function formatDate(d: Date): string {
     z-index: 10;
   }
 
+  /* Same geometry as z-back (docs: “same position”), including padding — omitting it caused a
+     horizontal snap whenever hit-zone swapped z-back ↔ z-crisp. */
   .z-crisp {
     transform: translateX(-12vw) scale(0.8);
     transform-origin: left center;
@@ -128,6 +136,7 @@ function formatDate(d: Date): string {
     opacity: 1;
     pointer-events: none;
     z-index: 20;
+    padding-left: calc(clamp(1.5rem, 3vw, 3rem) + 2vw);
   }
 
   .z-dim {
