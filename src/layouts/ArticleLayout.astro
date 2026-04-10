@@ -16,22 +16,35 @@ const formattedDate = `${year}.${month}.${day}`;
 ---
 
 <SiteLayout title={title} description={description}>
-  <header class="article-header">
-    <h1 class="article-header__title">{title}</h1>
-    <div class="article-header__date">{formattedDate}</div>
-    {description && (
-      <p class="article-header__lede">{description}</p>
-    )}
-  </header>
-  <article class="prose">
-    <slot />
-  </article>
-  <footer class="article-footer">
-    <a href="/">&larr; Back</a>
-  </footer>
+  <div class="page-scroll">
+    <header class="article-header">
+      <h1 class="article-header__title">{title}</h1>
+      <div class="article-header__date">{formattedDate}</div>
+      {description && (
+        <p class="article-header__lede">{description}</p>
+      )}
+    </header>
+    <article class="prose">
+      <slot />
+    </article>
+    <footer class="article-footer">
+      <a href="/">&larr; Back</a>
+    </footer>
+  </div>
 </SiteLayout>
 
 <style>
+  .page-scroll {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: clamp(2rem, 4vh, 4rem) clamp(1.5rem, 3vw, 3rem);
+  }
+
   .article-header {
     margin-bottom: clamp(2rem, 4vw, 4rem);
   }

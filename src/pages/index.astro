@@ -70,7 +70,8 @@ function formatDate(d: Date): string {
     overscroll-behavior: contain;
     transition: transform var(--dur) var(--ease), filter var(--dur) var(--ease), opacity calc(var(--dur) * 0.75) var(--ease);
     will-change: transform, filter, opacity;
-    padding: clamp(2rem, 4vh, 4rem) clamp(1.5rem, 3vw, 3rem);
+    padding-top: clamp(2rem, 4vh, 4rem);
+    padding-bottom: clamp(2rem, 4vh, 4rem);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -94,7 +95,6 @@ function formatDate(d: Date): string {
     opacity: 0.28;
     pointer-events: none;
     z-index: 20;
-    padding-left: calc(clamp(1.5rem, 3vw, 3rem) + 2vw);
   }
 
   .z-gone {
@@ -150,11 +150,12 @@ function formatDate(d: Date): string {
     z-index: 1;
   }
 
-  /* ── Layer content area — offset to leave room for sidebar strip ── */
-  .layer,
-  .layer-meta {
-    left: 20vw;
-    right: 6vw;
+  /* ── Layer content area — full-width so scrollbar sits at browser edge ── */
+  .layer {
+    left: 0;
+    right: 0;
+    padding-left: 20vw;
+    padding-right: clamp(1.5rem, 3vw, 3rem);
   }
 
   /* ── Hit zone ── */
@@ -301,10 +302,8 @@ function formatDate(d: Date): string {
 
   /* ── Mobile article list ── */
   @media (max-width: 768px) {
-    .layer,
-    .layer-meta {
-      left: 0;
-      right: 0;
+    .layer {
+      padding-left: clamp(1.5rem, 3vw, 3rem);
     }
 
     .ali {
