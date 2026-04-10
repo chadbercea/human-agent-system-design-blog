@@ -27,8 +27,7 @@ function formatDate(d: Date): string {
           data-date={formatDate(article.data.date)}
           data-description={article.data.description || ''}
         >
-          <span class="alt">{article.data.title}</span>
-          <span class="ald">{formatDate(article.data.date)}</span>
+          <span class="alt">{article.data.title} <span class="ald">{formatDate(article.data.date)}</span></span>
         </li>
       ))}
     </ul>
@@ -243,12 +242,6 @@ function formatDate(d: Date): string {
   }
 
   .ali {
-    display: flex;
-    flex-direction: row;
-    align-items: baseline;
-    gap: 0.75rem;
-    width: 100%;
-    min-width: 0;
     padding: 0.5rem 0;
     cursor: pointer;
     transition: transform 0.18s var(--ease);
@@ -283,14 +276,13 @@ function formatDate(d: Date): string {
   }
 
   .ald {
-    flex-shrink: 0;
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     color: var(--color-text-muted);
     letter-spacing: 0.08em;
-    text-align: right;
     white-space: nowrap;
     transition: color 0.15s;
+    margin-left: 0.5em;
   }
 
   .ali:hover .ald,
@@ -302,10 +294,6 @@ function formatDate(d: Date): string {
   @media (max-width: 768px) {
     .layer {
       padding-left: clamp(1.5rem, 3vw, 3rem);
-    }
-
-    .ald {
-      text-align: right;
     }
   }
 
