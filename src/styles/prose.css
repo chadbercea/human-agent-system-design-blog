@@ -28,9 +28,9 @@
 }
 
 .prose h1 {
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: var(--text-3xl);
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: -0.03em;
   margin: 0 0 var(--space-8);
 }
