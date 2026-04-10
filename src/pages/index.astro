@@ -240,6 +240,7 @@ function formatDate(d: Date): string {
     min-width: 0;
   }
 
+  /* No translate/transform on hover — stacks with #layer-list depth transforms and causes subpixel jitter. */
   .ali {
     display: flex;
     flex-direction: row;
@@ -250,7 +251,6 @@ function formatDate(d: Date): string {
     min-width: 0;
     padding: 0.5rem 0;
     cursor: pointer;
-    transition: transform 0.18s var(--ease);
   }
 
   .alt {
@@ -269,18 +269,6 @@ function formatDate(d: Date): string {
   .ali:hover .alt,
   .ali.hi .alt {
     color: var(--color-text-primary);
-  }
-
-  .ali.hi,
-  .ali:hover {
-    transform: translateX(6px);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .ali.hi,
-    .ali:hover {
-      transform: none;
-    }
   }
 
   .ald {
