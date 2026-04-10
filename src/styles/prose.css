@@ -28,9 +28,9 @@
 }
 
 .prose h1 {
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: var(--text-3xl);
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: -0.03em;
   margin: 0 0 var(--space-8);
 }
@@ -154,6 +154,7 @@
 .prose ol {
   margin: var(--space-6) 0;
   padding-left: var(--space-6);
+  list-style: revert;
 }
 
 .prose li + li {
