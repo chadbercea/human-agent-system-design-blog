@@ -64,8 +64,7 @@ function formatDate(d: Date): string {
     top: 0;
     bottom: 0;
     min-width: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden;
     overscroll-behavior: contain;
     transition: transform var(--dur) var(--ease), filter var(--dur) var(--ease), opacity calc(var(--dur) * 0.75) var(--ease);
     will-change: transform, filter, opacity;
@@ -85,6 +84,8 @@ function formatDate(d: Date): string {
     opacity: 1;
     pointer-events: all;
     z-index: 10;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .z-back {
