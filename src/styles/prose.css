@@ -154,6 +154,7 @@
 .prose ol {
   margin: var(--space-6) 0;
   padding-left: var(--space-6);
+  list-style: revert;
 }
 
 .prose li + li {
