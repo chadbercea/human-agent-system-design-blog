@@ -172,6 +172,12 @@
     nav.zz(A, 'z-front');
   });
 
+  hz.addEventListener('wheel', function (e) {
+    if (nav.getState() !== 'reading') return;
+    L.scrollTop += e.deltaY;
+    e.preventDefault();
+  }, { passive: false });
+
   hz.addEventListener('click', function (e) {
     if (nav.getState() !== 'reading' || nav.busy() || swapping) return;
     var li = itemAt(e.clientY);
