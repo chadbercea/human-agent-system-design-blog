@@ -139,13 +139,14 @@ function formatDate(d: Date): string {
   }
 
   /*
-   * Article layer at rest when not reading: invisible on the same plane (no negative Z).
-   * Generic .z-gone uses translateZ(-120px) — that made the article “come from behind” into focus.
+   * Article layer at rest: starts FORWARD of the focal plane (positive Z)
+   * so the z-gone → z-front transition pulls it back into focus.
+   * Generic .z-gone uses negative Z (behind camera) — wrong direction for articles.
    */
   #layer-article.z-gone {
-    transform: none;
+    transform: perspective(1200px) translateZ(60px) scale(1.03);
+    filter: blur(10px);
     opacity: 0;
-    filter: none;
     pointer-events: none;
     z-index: 1;
   }
