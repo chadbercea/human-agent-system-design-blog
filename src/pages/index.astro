@@ -128,6 +128,12 @@ function formatDate(d: Date): string {
     opacity: 1;
     pointer-events: none;
     z-index: 20;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+  }
+  .z-crisp::-webkit-scrollbar {
+    display: none;
   }
 
   .z-dim {
