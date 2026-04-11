@@ -1,7 +1,7 @@
 ---
 title: "Why HCI Needs a Child: The Case for Human-Agent-System Design"
 date: 2026-02-20
-description: "A structured case for why HCI has reached the boundary of its explanatory power in the age of autonomous agents — and why that boundary demands a new sub-discipline."
+description: "This is a foundational argument."
 ---
 
 ## What This Document Is

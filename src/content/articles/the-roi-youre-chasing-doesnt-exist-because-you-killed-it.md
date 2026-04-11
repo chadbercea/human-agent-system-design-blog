@@ -1,7 +1,7 @@
 ---
 title: "The ROI You're Chasing Doesn't Exist Because You Killed It"
 date: 2026-03-31
-description: "You built the wrong thing in the wrong way for the wrong reasons, and the people who could have told you that were either laid off or ignored."
+description: "Let's start with the numbers, because you love numbers."
 ---
 
 Let's start with the numbers, because you love numbers.

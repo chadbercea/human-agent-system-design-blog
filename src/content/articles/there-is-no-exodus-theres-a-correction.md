@@ -1,7 +1,7 @@
 ---
 title: "There Is No Exodus. There's a Correction."
 date: 2026-02-19
-description: "The system didn't change. Your position in it did."
+description: "A very specific story is making the rounds right now."
 ---
 
 A very specific story is making the rounds right now. You've seen it. Hell, you've probably liked it. Designers are leaving tech. Not getting laid off. *Leaving*. On principle. Because the industry "lost its conscience." Because AI is being "forced" on them. Because companies stopped caring about people. Because the hiring market is "fucking insane."

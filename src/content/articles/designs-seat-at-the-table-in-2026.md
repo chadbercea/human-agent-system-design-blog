@@ -1,7 +1,7 @@
 ---
 title: "Design's Seat At The Table in 2026"
 date: 2025-12-11
-description: "Design didn't lose relevance. Everyone else just optimized themselves into replaceability."
+description: "For years, design was told to fight for a seat at the table."
 ---
 
 ## Design Was Right. You Just Didn't Know Why.

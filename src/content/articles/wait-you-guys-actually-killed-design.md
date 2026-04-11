@@ -1,7 +1,7 @@
 ---
 title: "Wait, You Guys Actually Killed Design"
 date: 2026-03-22
-description: "How PE/VC/Corporate America turned your bonsai into toothpicks — and why most of you are fine with it."
+description: "There's a chart making the rounds on LinkedIn."
 draft: true
 ---
 
