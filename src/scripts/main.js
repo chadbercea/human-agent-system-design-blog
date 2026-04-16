@@ -15,6 +15,13 @@
   var artBody = document.getElementById('article-body');
   var artFooter = document.getElementById('article-footer');
   var sidebarItems = Array.prototype.slice.call(document.querySelectorAll('.sidebar-item'));
+  var aboutView = document.getElementById('about-view');
+  var contactView = document.getElementById('contact-view');
+  var hnArticles = document.getElementById('hn-articles');
+  var hnAbout = document.getElementById('hn-about');
+  var hnContact = document.getElementById('hn-contact');
+  var brandBtn = document.getElementById('brandBtn');
+  var backBtn = document.getElementById('back-btn');
 
   var metaScript = document.getElementById('article-meta');
   var articleData = [];
@@ -26,6 +33,13 @@
 
   function center(rect) {
     return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  }
+
+  function setActiveNav(key) {
+    ['articles', 'about', 'contact'].forEach(function (k) {
+      var el = document.getElementById('hn-' + k);
+      if (el) el.classList.toggle('on', k === key);
+    });
   }
 
   function repel(source, distance) {
@@ -42,20 +56,22 @@
       var dx = c.x - src.x;
       var dy = c.y - src.y;
       var mag = Math.sqrt(dx * dx + dy * dy) || 1;
-      var nx = dx / mag;
-      var ny = dy / mag;
-      card.style.transform = 'translate(' + (nx * distance) + 'px, ' + (ny * distance) + 'px)';
+      card.style.transform = 'translate(' + (dx / mag * distance) + 'px, ' + (dy / mag * distance) + 'px)';
       card.classList.add('repelled');
     });
   }
 
   function resetCards() {
     cards.forEach(function (card) {
+      card.classList.remove('repelled');
       card.style.transform = '';
       card.style.opacity = '';
-      card.classList.remove('repelled');
-      card.classList.remove('exiting');
     });
+    setTimeout(function () {
+      if (state === 'grid') {
+        cards.forEach(function (card) { card.classList.remove('exiting'); });
+      }
+    }, 720);
   }
 
   function exitOtherCards(card) {
@@ -81,6 +97,22 @@
       other.style.transform = 'translate(' + ((dx / mag) * distance) + 'px, ' + ((dy / mag) * distance) + 'px)';
       other.style.opacity = '0';
       other.classList.remove('repelled');
+    });
+  }
+
+  function exitCardsFromPoint(srcX, srcY) {
+    var viewport = Math.max(window.innerWidth, window.innerHeight);
+    var distance = 1.8 * viewport;
+    cards.forEach(function (card) { card.classList.add('exiting'); });
+    cards.forEach(function (card) {
+      var r = card.getBoundingClientRect();
+      var cc = center(r);
+      var dx = cc.x - srcX;
+      var dy = cc.y - srcY;
+      var mag = Math.sqrt(dx * dx + dy * dy) || 1;
+      card.style.transform = 'translate(' + ((dx / mag) * distance) + 'px, ' + ((dy / mag) * distance) + 'px)';
+      card.style.opacity = '0';
+      card.classList.remove('repelled');
     });
   }
 
@@ -143,9 +175,15 @@
     sidebarItems.forEach(function (li) { li.classList.remove('visible'); });
   }
 
+  function resetHeaderFlip() {
+    headerImg.style.transition = 'none';
+    headerImg.style.transform = '';
+  }
+
   function openArticle(card) {
     if (state !== 'grid') return;
     state = 'busy';
+    setActiveNav('articles');
 
     var graphicEl = card.querySelector('.graphic');
     var index = parseInt(card.dataset.index, 10);
@@ -153,13 +191,11 @@
 
     exitOtherCards(card);
 
-    // FLIP: first position = card graphic
     var first = graphicEl.getBoundingClientRect();
 
     articleView.classList.add('visible');
     loadArticle(slug, index);
 
-    // FLIP: last position = header image at natural size
     var last = headerImg.getBoundingClientRect();
     var scaleX = first.width / last.width;
     var scaleY = first.height / last.height;
@@ -170,7 +206,6 @@
     headerImg.style.transformOrigin = 'top left';
     headerImg.style.transform =
       'translate(' + tx + 'px, ' + ty + 'px) scale(' + scaleX + ', ' + scaleY + ')';
-    // Force reflow so the above applies before the transition is re-enabled
     void headerImg.getBoundingClientRect();
     headerImg.style.transition = 'transform var(--dur) var(--ease)';
     headerImg.style.transform = '';
@@ -208,18 +243,63 @@
     }, 210);
   }
 
-  function backToGrid() {
+  function goBack() {
     if (state === 'grid' || state === 'busy') return;
+    var prev = state;
     state = 'busy';
-    gridView.classList.remove('hidden');
-    articleView.classList.remove('visible', 'sidebar-in', 'meta-in', 'body-in');
-    clearSidebarStagger();
-    headerImg.style.transition = 'none';
-    headerImg.style.transform = '';
-    resetCards();
-    setTimeout(function () {
-      state = 'grid';
-    }, 300);
+    setActiveNav('articles');
+
+    aboutView.classList.remove('visible');
+    contactView.classList.remove('visible');
+
+    if (prev === 'article') {
+      articleView.classList.remove('body-in', 'meta-in');
+      setTimeout(function () {
+        articleView.classList.remove('sidebar-in');
+        clearSidebarStagger();
+      }, 60);
+      setTimeout(function () {
+        articleView.classList.remove('visible');
+        resetHeaderFlip();
+        gridView.classList.remove('hidden');
+        resetCards();
+      }, 280);
+      setTimeout(function () { state = 'grid'; }, 1000);
+    } else {
+      gridView.classList.remove('hidden');
+      resetCards();
+      setTimeout(function () { state = 'grid'; }, 900);
+    }
+  }
+
+  function openMeta(which, navEl) {
+    if (state === which || state === 'busy') return;
+    var prev = state;
+    state = 'busy';
+    setActiveNav(which);
+
+    if (prev === 'article') {
+      articleView.classList.remove('body-in', 'meta-in', 'sidebar-in');
+      clearSidebarStagger();
+      setTimeout(function () {
+        articleView.classList.remove('visible');
+        resetHeaderFlip();
+      }, 260);
+    }
+
+    var navRect = navEl.getBoundingClientRect();
+    var c = center(navRect);
+    exitCardsFromPoint(c.x, c.y);
+
+    if (which === 'about') {
+      contactView.classList.remove('visible');
+      aboutView.classList.add('visible');
+    } else {
+      aboutView.classList.remove('visible');
+      contactView.classList.add('visible');
+    }
+
+    setTimeout(function () { state = which; }, 600);
   }
 
   cards.forEach(function (card) {
@@ -232,7 +312,7 @@
       resetCards();
     });
     card.addEventListener('click', function () {
-      openArticle(card);
+      if (state === 'grid') openArticle(card);
     });
   });
 
@@ -250,18 +330,25 @@
     switchArticle(item.dataset.slug, idx);
   });
 
-  var backBtn = document.getElementById('back-btn');
-  if (backBtn) backBtn.addEventListener('click', backToGrid);
+  if (backBtn) backBtn.addEventListener('click', goBack);
 
-  var brandBtn = document.getElementById('brandBtn');
   if (brandBtn) brandBtn.addEventListener('click', function (e) {
     e.preventDefault();
-    backToGrid();
+    goBack();
   });
 
-  var hnArticles = document.getElementById('hn-articles');
   if (hnArticles) hnArticles.addEventListener('click', function (e) {
     e.preventDefault();
-    backToGrid();
+    goBack();
+  });
+
+  if (hnAbout) hnAbout.addEventListener('click', function (e) {
+    e.preventDefault();
+    openMeta('about', hnAbout);
+  });
+
+  if (hnContact) hnContact.addEventListener('click', function (e) {
+    e.preventDefault();
+    openMeta('contact', hnContact);
   });
 })();
