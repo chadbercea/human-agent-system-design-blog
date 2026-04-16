@@ -22,6 +22,21 @@
     ? Array.prototype.slice.call(aboutView.querySelectorAll('.meta-field'))
     : [];
   var aboutTimers = [];
+  var contactStage = contactView ? contactView.querySelector('.meta-stage') : null;
+  var contactCols = contactView
+    ? Array.prototype.slice.call(contactView.querySelectorAll('.contact-col'))
+    : [];
+  var contactTimers = [];
+  var cfForm = document.getElementById('cf-form');
+  var cfSubject = document.getElementById('cf-subject');
+  var cfMessage = document.getElementById('cf-message');
+  var cfReply = document.getElementById('cf-reply');
+  var cfSubmit = document.getElementById('cf-submit');
+  var cfSuccess = document.getElementById('cf-success');
+  var cfBook = document.getElementById('cf-book');
+  var schedSlotsEl = document.getElementById('sched-slots');
+  var schedEmail = document.getElementById('sched-email');
+  var selectedSlot = null;
   var hnArticles = document.getElementById('hn-articles');
   var hnAbout = document.getElementById('hn-about');
   var hnContact = document.getElementById('hn-contact');
@@ -257,6 +272,8 @@
     aboutView.classList.remove('visible');
     contactView.classList.remove('visible');
     clearAboutStagger();
+    clearContactStagger();
+    resetContactForm();
 
     if (prev === 'article') {
       articleView.classList.remove('body-in', 'meta-in');
@@ -316,15 +333,144 @@
 
     if (which === 'about') {
       contactView.classList.remove('visible');
+      clearContactStagger();
+      resetContactForm();
       aboutView.classList.add('visible');
       staggerAboutIn();
     } else {
       aboutView.classList.remove('visible');
-      contactView.classList.add('visible');
       clearAboutStagger();
+      buildSlots();
+      contactView.classList.add('visible');
+      staggerContactIn();
     }
 
     setTimeout(function () { state = which; }, 600);
+  }
+
+  function staggerContactIn() {
+    clearContactStagger();
+    if (contactStage) contactStage.classList.add('in');
+    contactCols.forEach(function (col, i) {
+      var t = setTimeout(function () { col.classList.add('in'); }, 120 + i * 120);
+      contactTimers.push(t);
+    });
+  }
+
+  function clearContactStagger() {
+    contactTimers.forEach(function (t) { clearTimeout(t); });
+    contactTimers = [];
+    if (contactStage) contactStage.classList.remove('in');
+    contactCols.forEach(function (col) { col.classList.remove('in'); });
+  }
+
+  function formatSlotLabel(d) {
+    var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate() + ' \u2014 10:00 AM MT';
+  }
+
+  function computeSlots() {
+    var SLOT_UTC_HOUR = 16; // 10am MT (MDT) = 16:00 UTC
+    var result = [];
+    var now = new Date();
+    var d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var guard = 0;
+    while (result.length < 6 && guard++ < 60) {
+      var dow = d.getDay();
+      if (dow === 2 || dow === 4) {
+        var startUTC = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), SLOT_UTC_HOUR, 0, 0));
+        if (startUTC.getTime() > now.getTime()) {
+          result.push({ start: startUTC, label: formatSlotLabel(d) });
+        }
+      }
+      d.setDate(d.getDate() + 1);
+    }
+    return result;
+  }
+
+  function buildSlots() {
+    if (!schedSlotsEl) return;
+    schedSlotsEl.innerHTML = '';
+    selectedSlot = null;
+    var slots = computeSlots();
+    slots.forEach(function (slot) {
+      var el = document.createElement('div');
+      el.className = 'sched-slot';
+      el.setAttribute('role', 'radio');
+      el.setAttribute('aria-checked', 'false');
+      el.innerHTML = '<span class="slot-radio"></span><span class="slot-label">' + slot.label + '</span>';
+      el.addEventListener('click', function () { selectSlot(el, slot); });
+      schedSlotsEl.appendChild(el);
+    });
+  }
+
+  function selectSlot(el, slot) {
+    if (!schedSlotsEl) return;
+    Array.prototype.forEach.call(schedSlotsEl.querySelectorAll('.sched-slot'), function (s) {
+      s.classList.remove('selected');
+      s.setAttribute('aria-checked', 'false');
+    });
+    el.classList.add('selected');
+    el.setAttribute('aria-checked', 'true');
+    selectedSlot = slot;
+  }
+
+  function gcalStamp(d) {
+    return d.toISOString().replace(/[-:]|\.\d{3}/g, '');
+  }
+
+  function buildCalendarURL(slot, inviteeEmail) {
+    var start = slot.start;
+    var end = new Date(start.getTime() + 30 * 60 * 1000);
+    var params = [
+      'action=TEMPLATE',
+      'text=' + encodeURIComponent('30-Minute Call with Chad Bercea'),
+      'dates=' + gcalStamp(start) + '/' + gcalStamp(end),
+      'details=' + encodeURIComponent('30-minute conversation. Video call link will be shared in the invite.'),
+      'location=' + encodeURIComponent('Google Meet')
+    ];
+    if (inviteeEmail) params.push('add=' + encodeURIComponent(inviteeEmail));
+    return 'https://calendar.google.com/calendar/render?' + params.join('&');
+  }
+
+  function resetContactForm() {
+    if (cfForm) cfForm.reset();
+    if (schedEmail) schedEmail.value = '';
+    if (cfSubmit) cfSubmit.classList.remove('hidden');
+    if (cfSuccess) cfSuccess.classList.remove('in');
+    if (schedSlotsEl) {
+      Array.prototype.forEach.call(schedSlotsEl.querySelectorAll('.sched-slot'), function (s) {
+        s.classList.remove('selected');
+        s.setAttribute('aria-checked', 'false');
+      });
+    }
+    selectedSlot = null;
+  }
+
+  if (cfForm) {
+    cfForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var subject = (cfSubject.value || '').trim();
+      var message = (cfMessage.value || '').trim();
+      var reply = (cfReply.value || '').trim();
+      if (!subject || !message || !reply) return;
+      var body = message + '\n\n\u2014\nReply to: ' + reply;
+      var href = 'mailto:chad@hasdesign.io?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      window.location.href = href;
+      cfSubmit.classList.add('hidden');
+      cfSuccess.classList.add('in');
+    });
+  }
+
+  if (cfBook) {
+    cfBook.addEventListener('click', function () {
+      if (!selectedSlot) return;
+      var email = (schedEmail.value || '').trim();
+      if (!email) return;
+      var url = buildCalendarURL(selectedSlot, email);
+      window.open(url, '_blank', 'noopener');
+    });
   }
 
   cards.forEach(function (card) {

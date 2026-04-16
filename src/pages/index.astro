@@ -122,11 +122,39 @@ const articleMeta = articles.map((a, i) => ({
   </div>
 
   <div id="contact-view" class="meta-view">
-    <div class="meta-inner">
-      <h1 class="pg-title">Contact</h1>
-      <p class="pg-sub">No forms. Just reach out directly.</p>
-      <div class="field"><span class="fk">Email</span><span class="fv">chad [at] hasdesign.io</span></div>
-      <div class="field"><span class="fk">LinkedIn</span><span class="fv">/in/chadbercea</span></div>
+    <div class="meta-stage">
+      <div class="meta-eyebrow">Reach Out</div>
+      <h1 class="meta-title">Contact</h1>
+      <div class="contact-grid">
+        <div class="contact-col" data-col="form">
+          <div class="contact-col-label">Send a message</div>
+          <form class="cf-form" id="cf-form" novalidate>
+            <div class="cf-group">
+              <label class="cf-label" for="cf-subject">Subject</label>
+              <input class="cf-input" id="cf-subject" name="subject" type="text" autocomplete="off" required />
+            </div>
+            <div class="cf-group">
+              <label class="cf-label" for="cf-message">Message</label>
+              <textarea class="cf-textarea" id="cf-message" name="message" rows="6" required></textarea>
+            </div>
+            <div class="cf-group">
+              <label class="cf-label" for="cf-reply">Reply email</label>
+              <input class="cf-input" id="cf-reply" name="reply" type="email" autocomplete="off" required />
+            </div>
+            <button class="cf-submit" id="cf-submit" type="submit">Send</button>
+            <div class="cf-success" id="cf-success">Message sent. Your mail client should be open.</div>
+          </form>
+        </div>
+        <div class="contact-col" data-col="sched">
+          <div class="contact-col-label">Book a 30-minute call</div>
+          <div class="sched-slots" id="sched-slots" role="radiogroup" aria-label="Available time slots"></div>
+          <div class="cf-group">
+            <label class="cf-label" for="sched-email">Your email</label>
+            <input class="cf-input" id="sched-email" name="invitee" type="email" autocomplete="off" required />
+          </div>
+          <button class="cf-book" id="cf-book" type="button">Book</button>
+        </div>
+      </div>
     </div>
   </div>
 
