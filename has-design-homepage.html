@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAS Design — Homepage</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a; --border: #1c1c1c; --t1: #111111;
+    --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --idle-fill: rgba(200,200,200,0.04);
+    --idle-stroke: rgba(200,200,200,0.14);
+    --idle-dot: rgba(200,200,200,0.18);
+    --hot-fill: rgba(200,200,200,0.10);
+    --hot-stroke: rgba(200,200,200,0.72);
+    --hot-dot: rgba(200,200,200,0.85);
+    --hot-dim: rgba(200,200,200,0.30);
+    --card-w: 260px;
+    --card-gap: 2rem;
+  }
+
+  html, body { background: var(--bg); color: #c8c8c8; font-family: Georgia, serif; height: 100%; overflow: hidden; }
+
+  /* ── HEADER ── */
+  .hdr {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 3rem; height: 52px;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+  }
+  .brand { font-family: 'Courier New', monospace; font-size: 0.56rem; letter-spacing: 0.2em; text-transform: uppercase; color: #c8c8c8; text-decoration: none; }
+  .hnav { display: flex; gap: 2.5rem; }
+  .hn { font-family: 'Courier New', monospace; font-size: 0.52rem; letter-spacing: 0.14em; text-transform: uppercase; color: #3a3a3a; text-decoration: none; transition: color 0.18s; }
+  .hn:hover { color: #888; }
+  .hn.on { color: #c8c8c8; }
+  .hn.on::before { content: "• "; }
+
+  /* ── STAGE ── */
+  .stage {
+    position: fixed;
+    top: 52px; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── TRACK WRAPPER — clips horizontal overflow ── */
+  .track-wrap {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  /* ── TRACK — the scrollable row of cards ── */
+  .track {
+    display: flex;
+    flex-direction: row;
+    gap: var(--card-gap);
+    padding: 4rem 3rem 4rem;
+    /* will be transformed by JS */
+    transform: translateX(0);
+    transition: transform 0.55s var(--ease);
+    will-change: transform;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .track.dragging { transition: none; cursor: grabbing; }
+
+  /* ── CARD ── */
+  .card {
+    flex-shrink: 0;
+    width: var(--card-w);
+    display: flex;
+    flex-direction: column;
+    padding-top: 3rem;
+    transition: transform 0.42s var(--ease), opacity 0.42s ease;
+    will-change: transform, opacity;
+    cursor: pointer;
+  }
+  .card.repelled { opacity: 0.45; }
+
+  /* 9:16 graphic */
+  .graphic { position: relative; width: var(--card-w); height: calc(var(--card-w) * 16 / 9); flex-shrink: 0; overflow: visible; }
+
+  .num {
+    position: absolute; top: 0; left: 0.4rem;
+    transform: translateY(-50%);
+    font-family: Georgia, serif; font-size: 6rem; font-weight: bold;
+    line-height: 1; letter-spacing: -0.05em;
+    z-index: 2; pointer-events: none; user-select: none;
+  }
+  .thumb {
+    position: absolute; inset: 0; z-index: 1;
+    background: var(--t1);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+  .card:hover .thumb { border-color: #2e2e2e; }
+  .thumb svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* card 1 numbers graduated to match prototype */
+  .c1 .num { color: rgba(218,218,218,0.86); }
+  .c2 .num { color: rgba(215,215,215,0.83); }
+  .c3 .num { color: rgba(210,210,210,0.80); }
+  .c4 .num { color: rgba(205,205,205,0.76); }
+  .c5 .num { color: rgba(195,195,195,0.72); }
+  .c6 .num { color: rgba(180,180,180,0.68); }
+
+  .content { display: flex; flex-direction: column; margin-top: 1.25rem; }
+  .tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.65rem; }
+  .tag { font-family: 'Courier New', monospace; font-size: 0.4rem; letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid #1e1e1e; color: #3a3a3a; padding: 0.18rem 0.5rem; }
+  .title { font-family: Georgia, serif; font-size: 1rem; font-weight: bold; line-height: 1.25; letter-spacing: -0.015em; color: #a0a0a0; margin-bottom: 0.55rem; transition: color 0.2s; }
+  .card:hover .title { color: #d4d4d4; }
+  .desc { font-family: Georgia, serif; font-size: 0.72rem; line-height: 1.65; color: #303030; margin-bottom: 0.6rem; font-style: italic; transition: color 0.2s; }
+  .card:hover .desc { color: #404040; }
+  .date { font-family: 'Courier New', monospace; font-size: 0.4rem; letter-spacing: 0.12em; color: #1e1e1e; transition: color 0.2s; }
+  .card:hover .date { color: #2e2e2e; }
+
+  /* ── NAV ARROWS + DOTS ── */
+  .nav-bar {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3rem;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .nav-arrows { display: flex; gap: 1rem; }
+  .arrow-btn {
+    font-family: 'Courier New', monospace;
+    font-size: 0.52rem; letter-spacing: 0.12em;
+    color: #2a2a2a; background: none; border: 1px solid #1e1e1e;
+    padding: 0.4rem 0.9rem; cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .arrow-btn:hover { color: #888; border-color: #333; }
+  .arrow-btn:disabled { opacity: 0.2; cursor: default; }
+
+  .dots { display: flex; gap: 0.5rem; align-items: center; }
+  .dot {
+    width: 4px; height: 4px; border-radius: 50%;
+    background: #1e1e1e;
+    transition: background 0.25s, transform 0.25s;
+    cursor: pointer;
+  }
+  .dot.on { background: #555; transform: scale(1.5); }
+
+  .nav-hint {
+    font-family: 'Courier New', monospace;
+    font-size: 0.4rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #1e1e1e;
+  }
+
+  /* ── SVG IDLE STYLES ── */
+  .g-fill  { fill: var(--idle-fill); stroke: var(--idle-stroke); stroke-width: 0.7; }
+  .g-line  { fill: none; stroke: var(--idle-stroke); stroke-width: 0.7; }
+  .g-dot   { fill: var(--idle-dot); }
+  .g-text  { fill: var(--idle-stroke); font-family: 'Courier New', monospace; }
+  .g-fill, .g-line, .g-dot { transition: fill 0.4s ease, stroke 0.4s ease; }
+
+  /* ── ART 01 ── */
+  .c1 .thumb:hover .persona { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: pulse-ring 0.9s ease-in-out infinite alternate; }
+  .c1 .thumb:hover .spec    { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: vibrate 0.15s ease-in-out infinite alternate; transform-origin: 62px 89px; }
+  .c1 .thumb:hover .reject  { stroke: var(--hot-stroke); stroke-dashoffset: 0; transition: stroke-dashoffset 0.35s ease, stroke 0.3s; }
+  .reject { stroke-dasharray: 14; stroke-dashoffset: 14; transition: stroke 0.3s; }
+  @keyframes pulse-ring { from { stroke-width: 0.7; } to { stroke-width: 2.8; stroke: var(--hot-dim); } }
+  @keyframes vibrate    { from { transform: translateX(0); } to { transform: translateX(5px); } }
+
+  /* ── ART 02 ── */
+  .edge-active { stroke-dasharray: 120; stroke-dashoffset: 120; transition: stroke-dashoffset 0s; }
+  .c2 .thumb:hover .edge-active { stroke: var(--hot-stroke); stroke-dashoffset: 0; }
+  .c2 .thumb:hover .ea1 { transition: stroke-dashoffset 0.55s ease 0s, stroke 0.2s; }
+  .c2 .thumb:hover .ea2 { transition: stroke-dashoffset 0.55s ease 0.45s, stroke 0.2s; }
+  .c2 .thumb:hover .ea3 { transition: stroke-dashoffset 0.55s ease 0.9s, stroke 0.2s; }
+  .c2 .thumb:hover .node-dot { fill: var(--hot-dot); }
+
+  /* ── ART 03 ── */
+  .c3 .thumb:hover .net-node { stroke: var(--hot-dim); fill: var(--hot-fill); }
+  .c3 .thumb:hover .net-edge { stroke: var(--hot-dim); }
+  .pkt { fill: var(--hot-dot); opacity: 0; }
+  .c3 .thumb:hover .pkt { opacity: 1; }
+
+  /* ── ART 04 ── */
+  .c4 .thumb:hover .conv-a { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: drift-a 1.4s ease-in-out infinite alternate; }
+  .c4 .thumb:hover .conv-b { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: drift-b 1.4s ease-in-out infinite alternate; }
+  .c4 .thumb:hover .conv-c { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: drift-c 1.4s ease-in-out infinite alternate; }
+  .c4 .thumb:hover .conv-center { fill: var(--hot-fill); stroke: var(--hot-stroke); }
+  @keyframes drift-a { from { transform: translate(0,0); } to { transform: translate(-8px,-10px); } }
+  @keyframes drift-b { from { transform: translate(0,0); } to { transform: translate(10px, 4px); } }
+  @keyframes drift-c { from { transform: translate(0,0); } to { transform: translate(-5px, 9px); } }
+
+  /* ── ART 05 ── */
+  .c5 .thumb:hover .lane   { stroke: var(--hot-dim); fill: var(--hot-fill); }
+  .c5 .thumb:hover .signal { stroke: var(--hot-stroke); animation: flow-down 0.65s linear infinite; }
+  .c5 .thumb:hover .sig2   { animation-delay: 0.22s; }
+  .c5 .thumb:hover .sig3   { animation-delay: 0.44s; }
+  .c5 .thumb:hover .sig4   { animation-delay: 0.11s; }
+  .signal { stroke-dasharray: 5 5; }
+  @keyframes flow-down { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 20; } }
+
+  /* ── ART 06 ── */
+  .c6 .thumb:hover .path-line { stroke: var(--hot-dim); }
+  .c6 .thumb:hover .waypoint  { fill: var(--hot-dot); }
+  .c6 .thumb:hover .wp2 { animation: wp-light 0.3s ease 0.3s both; }
+  .c6 .thumb:hover .wp3 { animation: wp-light 0.3s ease 0.6s both; }
+  .c6 .thumb:hover .wp4 { animation: wp-light 0.3s ease 0.9s both; }
+  .c6 .thumb:hover .wp5 { animation: wp-light 0.3s ease 1.2s both; }
+  .tracer { fill: var(--hot-dot); opacity: 0; }
+  .c6 .thumb:hover .tracer { opacity: 1; }
+  @keyframes wp-light {
+    0%   { r: 2.5; fill: var(--idle-dot); }
+    50%  { r: 5;   fill: var(--hot-dot); }
+    100% { r: 3;   fill: var(--hot-dot); }
+  }
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a class="brand" href="/">Human Agent System Design</a>
+  <nav class="hnav">
+    <a class="hn on" href="/">Articles</a>
+    <a class="hn" href="/about">About</a>
+    <a class="hn" href="/contact">Contact</a>
+  </nav>
+</header>
+
+<div class="stage">
+  <div class="track-wrap" id="track-wrap">
+    <div class="track" id="track">
+
+      <!-- CARD 1 -->
+      <div class="card c1" data-index="0">
+        <div class="graphic">
+          <div class="num">01</div>
+          <div class="thumb">
+            <svg viewBox="0 0 100 178" xmlns="http://www.w3.org/2000/svg">
+              <line class="g-line" x1="50" y1="0" x2="50" y2="178" stroke-opacity="0.04"/>
+              <line class="g-line" x1="0" y1="89" x2="100" y2="89" stroke-opacity="0.04"/>
+              <circle class="persona g-fill" cx="38" cy="78" r="48"/>
+              <polygon class="spec g-fill" points="62,32 96,89 62,146 28,89" style="transform-origin:62px 89px"/>
+              <line class="reject g-line" x1="52" y1="76" x2="66" y2="90" stroke-width="1.2"/>
+              <line class="reject g-line" x1="66" y1="76" x2="52" y2="90" stroke-width="1.2" style="transition-delay:0.08s"/>
+              <circle class="g-dot" cx="8" cy="8" r="2"/>
+              <circle class="g-dot" cx="92" cy="8" r="2"/>
+              <circle class="g-dot" cx="8" cy="170" r="2"/>
+              <circle class="g-dot" cx="92" cy="170" r="2"/>
+            </svg>
+          </div>
+        </div>
+        <div class="content">
+          <div class="tags"><span class="tag">Methodology</span><span class="tag">Agents</span></div>
+          <div class="title">Agents Aren't Personas</div>
+          <div class="desc">Calling agents a "persona" is a category error that leads designers to build the wrong things.</div>
+          <div class="date">2025.12.22</div>
+        </div>
+      </div>
+
+      <!-- CARD 2 -->
+      <div class="card c2" data-index="1">
+        <div class="graphic">
+          <div class="num">02</div>
+          <div class="thumb">
+            <svg viewBox="0 0 100 178" xmlns="http://www.w3.org/2000/svg">
+              <polygon class="g-fill" points="50,14 88,152 12,152" fill="none"/>
+              <line class="edge-active ea1 g-line" x1="50" y1="14" x2="12" y2="152" stroke-dasharray="160" stroke-dashoffset="160"/>
+              <line class="edge-active ea2 g-line" x1="12" y1="152" x2="88" y2="152" stroke-dasharray="80" stroke-dashoffset="80"/>
+              <line class="edge-active ea3 g-line" x1="88" y1="152" x2="50" y2="14" stroke-dasharray="160" stroke-dashoffset="160"/>
+              <circle class="node-dot g-dot" cx="50" cy="14" r="7"/>
+              <circle class="g-fill" cx="50" cy="14" r="13" fill="none"/>
+              <polygon class="node-dot g-dot" points="12,142 20,152 12,162 4,152"/>
+              <polygon class="g-fill" points="12,138 23,152 12,166 1,152" fill="none"/>
+              <rect class="node-dot g-dot" x="80" y="145" width="16" height="14"/>
+              <rect class="g-fill" x="77" y="142" width="22" height="20" fill="none"/>
+              <circle class="g-dot" cx="50" cy="106" r="2.5"/>
+            </svg>
+          </div>
+        </div>
+        <div class="content">
+          <div class="tags"><span class="tag">Framework</span><span class="tag">Actors</span></div>
+          <div class="title">The Three Actors: Humans, Agents, Systems</div>
+          <div class="desc">Designing multi-actor orchestrations requires understanding three distinct actor types.</div>
+          <div class="date">2025.12.29</div>
+        </div>
+      </div>
+
+      <!-- CARD 3 -->
+      <div class="card c3" data-index="2">
+        <div class="graphic">
+          <div class="num">03</div>
+          <div class="thumb">
+            <svg viewBox="0 0 100 178" id="svg03" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <path id="p3a" d="M50,20 L16,55 L50,89 L84,123 L50,158"/>
+                <path id="p3b" d="M50,20 L84,55 L50,89 L16,123 L50,158"/>
+                <path id="p3c" d="M16,55 L16,123 L50,158"/>
+                <path id="p3d" d="M84,55 L84,123 L50,158"/>
+              </defs>
+              <line class="net-edge g-line" x1="50" y1="20" x2="16" y2="55"/>
+              <line class="net-edge g-line" x1="50" y1="20" x2="84" y2="55"/>
+              <line class="net-edge g-line" x1="16" y1="55" x2="50" y2="89"/>
+              <line class="net-edge g-line" x1="84" y1="55" x2="50" y2="89"/>
+              <line class="net-edge g-line" x1="16" y1="55" x2="16" y2="123"/>
+              <line class="net-edge g-line" x1="84" y1="55" x2="84" y2="123"/>
+              <line class="net-edge g-line" x1="50" y1="89" x2="16" y2="123"/>
+              <line class="net-edge g-line" x1="50" y1="89" x2="84" y2="123"/>
+              <line class="net-edge g-line" x1="16" y1="123" x2="50" y2="158"/>
+              <line class="net-edge g-line" x1="84" y1="123" x2="50" y2="158"/>
+              <line class="net-edge g-line" x1="16" y1="55" x2="84" y2="55"/>
+              <line class="net-edge g-line" x1="16" y1="123" x2="84" y2="123"/>
+              <polygon class="net-node g-fill" points="50,12 58,20 50,28 42,20"/>
+              <rect class="net-node g-fill" x="9" y="48" width="14" height="14"/>
+              <rect class="net-node g-fill" x="77" y="48" width="14" height="14"/>
+              <polygon class="net-node g-fill" points="50,81 58,89 50,97 42,89"/>
+              <rect class="net-node g-fill" x="9" y="116" width="14" height="14"/>
+              <rect class="net-node g-fill" x="77" y="116" width="14" height="14"/>
+              <polygon class="net-node g-fill" points="50,150 58,158 50,166 42,158"/>
+              <circle class="pkt" r="2.2"><animateMotion id="pkt1" begin="indefinite" dur="1.2s" repeatCount="indefinite" calcMode="linear"><mpath href="#p3a"/></animateMotion></circle>
+              <circle class="pkt" r="2.2"><animateMotion id="pkt2" begin="indefinite" dur="1.0s" repeatCount="indefinite" calcMode="linear"><mpath href="#p3b"/></animateMotion></circle>
+              <circle class="pkt" r="2.2"><animateMotion id="pkt3" begin="indefinite" dur="1.4s" repeatCount="indefinite" calcMode="linear"><mpath href="#p3c"/></animateMotion></circle>
+              <circle class="pkt" r="2.2"><animateMotion id="pkt4" begin="indefinite" dur="0.9s" repeatCount="indefinite" calcMode="linear"><mpath href="#p3d"/></animateMotion></circle>
+            </svg>
+          </div>
+        </div>
+        <div class="content">
+          <div class="tags"><span class="tag">ACI</span><span class="tag">Discipline</span></div>
+          <div class="title">ACI: Agent-Computer Interaction</div>
+          <div class="desc">Agent-to-agent interactions are not HCI with extra steps — they're a distinct discipline.</div>
+          <div class="date">2026.01.05</div>
+        </div>
+      </div>
+
+      <!-- CARD 4 -->
+      <div class="card c4" data-index="3">
+        <div class="graphic">
+          <div class="num">04</div>
+          <div class="thumb">
+            <svg viewBox="0 0 100 178" xmlns="http://www.w3.org/2000/svg">
+              <circle class="conv-a g-fill" cx="50" cy="89" r="44" style="transform-origin:50px 89px"/>
+              <polygon class="conv-b g-fill" points="50,22 90,89 50,156 10,89" style="transform-origin:50px 89px"/>
+              <rect class="conv-c g-fill" x="14" y="53" width="72" height="72" style="transform-origin:50px 89px"/>
+              <circle class="conv-center g-fill" cx="50" cy="89" r="8"/>
+              <line class="g-line" x1="50" y1="10" x2="50" y2="168" stroke-opacity="0.04"/>
+              <line class="g-line" x1="5" y1="89" x2="95" y2="89" stroke-opacity="0.04"/>
+            </svg>
+          </div>
+        </div>
+        <div class="content">
+          <div class="tags"><span class="tag">Practice</span><span class="tag">Role</span></div>
+          <div class="title">HAS Design: The Practice</div>
+          <div class="desc">We need a name for the integrated practice of designing across humans, agents, and systems.</div>
+          <div class="date">2026.01.12</div>
+        </div>
+      </div>
+
+      <!-- CARD 5 -->
+      <div class="card c5" data-index="4">
+        <div class="graphic">
+          <div class="num">05</div>
+          <div class="thumb">
+            <svg viewBox="0 0 100 178" xmlns="http://www.w3.org/2000/svg">
+              <rect class="lane g-fill" x="6" y="18" width="88" height="44" rx="1"/>
+              <line class="g-line" x1="6" y1="40" x2="94" y2="40" stroke-dasharray="2 3"/>
+              <rect class="lane g-fill" x="6" y="96" width="88" height="68" rx="1"/>
+              <line class="g-line" x1="6" y1="130" x2="94" y2="130" stroke-dasharray="2 3"/>
+              <line class="signal sig1 g-line" x1="22" y1="62" x2="22" y2="96" stroke-width="1"/>
+              <line class="signal sig2 g-line" x1="40" y1="62" x2="40" y2="96" stroke-width="1"/>
+              <line class="signal sig3 g-line" x1="60" y1="62" x2="60" y2="96" stroke-width="1"/>
+              <line class="signal sig4 g-line" x1="78" y1="62" x2="78" y2="96" stroke-width="1"/>
+              <polygon class="g-fill" points="20,93 22,97 24,93"/>
+              <polygon class="g-fill" points="38,93 40,97 42,93"/>
+              <polygon class="g-fill" points="58,93 60,97 62,93"/>
+              <polygon class="g-fill" points="76,93 78,97 80,93"/>
+              <text class="g-text" x="10" y="31" font-size="4.2" letter-spacing="0.5">FRONTSTAGE</text>
+              <text class="g-text" x="10" y="110" font-size="4.2" letter-spacing="0.5">BACKSTAGE</text>
+              <circle class="g-dot" cx="6" cy="18" r="1.5"/>
+              <circle class="g-dot" cx="94" cy="18" r="1.5"/>
+              <circle class="g-dot" cx="6" cy="164" r="1.5"/>
+              <circle class="g-dot" cx="94" cy="164" r="1.5"/>
+            </svg>
+          </div>
+        </div>
+        <div class="content">
+          <div class="tags"><span class="tag">Methodology</span><span class="tag">Blueprints</span></div>
+          <div class="title">Service Blueprints for Agentic Orchestrations</div>
+          <div class="desc">Traditional UX artifacts fail in agentic systems — here's what replaces them.</div>
+          <div class="date">2026.01.19</div>
+        </div>
+      </div>
+
+      <!-- CARD 6 -->
+      <div class="card c6" data-index="5">
+        <div class="graphic">
+          <div class="num">06</div>
+          <div class="thumb">
+            <svg viewBox="0 0 100 178" id="svg06" xmlns="http://www.w3.org/2000/svg">
+              <defs><path id="career" d="M10,165 C20,148 30,128 42,110 C54,92 58,72 66,54 C74,36 82,22 90,10"/></defs>
+              <line class="grid-line g-line" x1="10" y1="10" x2="10" y2="170" stroke-opacity="0.04"/>
+              <line class="grid-line g-line" x1="10" y1="165" x2="95" y2="165" stroke-opacity="0.04"/>
+              <line class="grid-line g-line" x1="50" y1="10" x2="50" y2="170" stroke-opacity="0.03"/>
+              <line class="grid-line g-line" x1="10" y1="89" x2="95" y2="89" stroke-opacity="0.03"/>
+              <path class="path-line g-line" d="M10,165 C20,148 30,128 42,110 C54,92 58,72 66,54 C74,36 82,22 90,10" stroke-width="0.9"/>
+              <circle class="waypoint wp1 g-dot" cx="10" cy="165" r="2.5"/>
+              <circle class="waypoint wp2 g-dot" cx="42" cy="110" r="2.5"/>
+              <circle class="waypoint wp3 g-dot" cx="58" cy="72" r="2.5"/>
+              <circle class="waypoint wp4 g-dot" cx="74" cy="36" r="2.5"/>
+              <circle class="waypoint wp5 g-dot" cx="90" cy="10" r="2.5"/>
+              <circle class="tracer" r="3.5">
+                <animateMotion id="tracer-anim" begin="indefinite" dur="1.6s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"><mpath href="#career"/></animateMotion>
+              </circle>
+            </svg>
+          </div>
+        </div>
+        <div class="content">
+          <div class="tags"><span class="tag">Career</span><span class="tag">Future</span></div>
+          <div class="title">The Career Path for HAS Designers</div>
+          <div class="desc">Designers who evolve into this practice will lead the next decade of software.</div>
+          <div class="date">2026.01.26</div>
+        </div>
+      </div>
+
+    </div><!-- /track -->
+  </div><!-- /track-wrap -->
+
+  <!-- NAV BAR -->
+  <div class="nav-bar">
+    <div class="nav-arrows">
+      <button class="arrow-btn" id="btn-prev">← Prev</button>
+      <button class="arrow-btn" id="btn-next">Next →</button>
+    </div>
+    <div class="dots" id="dots"></div>
+    <div class="nav-hint">Drag or scroll to browse</div>
+  </div>
+</div><!-- /stage -->
+
+<script>
+(function () {
+  var CARD_W   = 260;
+  var CARD_GAP = 32; // 2rem at 16px
+  var STEP     = CARD_W + CARD_GAP;
+  var PUSH     = 10;
+  var TOTAL    = 6;
+
+  var track    = document.getElementById('track');
+  var wrap     = document.getElementById('track-wrap');
+  var btnPrev  = document.getElementById('btn-prev');
+  var btnNext  = document.getElementById('btn-next');
+  var dotsEl   = document.getElementById('dots');
+  var cards    = Array.prototype.slice.call(document.querySelectorAll('.card'));
+
+  var currentIndex = 0;
+  var isDragging = false;
+  var dragStartX = 0;
+  var dragStartOffset = 0;
+  var currentOffset = 0;
+
+  // ── Build dots ──
+  for (var i = 0; i < TOTAL; i++) {
+    var d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' on' : '');
+    d.dataset.i = i;
+    d.addEventListener('click', function(e) { goTo(parseInt(e.target.dataset.i)); });
+    dotsEl.appendChild(d);
+  }
+
+  function maxOffset() {
+    // How far left we can scroll
+    var trackW = TOTAL * CARD_W + (TOTAL - 1) * CARD_GAP;
+    var wrapW  = wrap.offsetWidth - 96; // subtract padding
+    return Math.max(0, trackW - wrapW);
+  }
+
+  function setOffset(x, animate) {
+    x = Math.max(-maxOffset(), Math.min(0, x));
+    currentOffset = x;
+    track.style.transition = animate ? 'transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94)' : 'none';
+    track.style.transform = 'translateX(' + x + 'px)';
+
+    // Update active index based on offset
+    var idx = Math.round(-x / STEP);
+    idx = Math.max(0, Math.min(TOTAL - 1, idx));
+    setActiveIndex(idx);
+  }
+
+  function setActiveIndex(idx) {
+    currentIndex = idx;
+    // Dots
+    var dots = dotsEl.querySelectorAll('.dot');
+    dots.forEach(function(d, i) { d.classList.toggle('on', i === idx); });
+    // Arrows
+    btnPrev.disabled = idx === 0;
+    btnNext.disabled = idx >= TOTAL - 1;
+  }
+
+  function goTo(idx) {
+    idx = Math.max(0, Math.min(TOTAL - 1, idx));
+    var target = -idx * STEP;
+    setOffset(target, true);
+  }
+
+  btnPrev.addEventListener('click', function() { goTo(currentIndex - 1); });
+  btnNext.addEventListener('click', function() { goTo(currentIndex + 1); });
+
+  // ── Keyboard ──
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowLeft')  goTo(currentIndex - 1);
+    if (e.key === 'ArrowRight') goTo(currentIndex + 1);
+  });
+
+  // ── Drag (mouse) ──
+  track.addEventListener('mousedown', function(e) {
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragStartOffset = currentOffset;
+    track.classList.add('dragging');
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    var dx = e.clientX - dragStartX;
+    setOffset(dragStartOffset + dx, false);
+  });
+
+  document.addEventListener('mouseup', function(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    track.classList.remove('dragging');
+    // Snap to nearest card
+    var idx = Math.round(-currentOffset / STEP);
+    goTo(idx);
+  });
+
+  // ── Touch ──
+  track.addEventListener('touchstart', function(e) {
+    dragStartX = e.touches[0].clientX;
+    dragStartOffset = currentOffset;
+    track.classList.add('dragging');
+  }, { passive: true });
+
+  track.addEventListener('touchmove', function(e) {
+    var dx = e.touches[0].clientX - dragStartX;
+    setOffset(dragStartOffset + dx, false);
+  }, { passive: true });
+
+  track.addEventListener('touchend', function(e) {
+    track.classList.remove('dragging');
+    var idx = Math.round(-currentOffset / STEP);
+    goTo(idx);
+  });
+
+  // ── Wheel (horizontal scroll passthrough) ──
+  wrap.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    var delta = e.deltaX || e.deltaY;
+    setOffset(currentOffset - delta, false);
+    clearTimeout(wrap._wt);
+    wrap._wt = setTimeout(function() {
+      var idx = Math.round(-currentOffset / STEP);
+      goTo(idx);
+    }, 120);
+  }, { passive: false });
+
+  // ── Hover repulsion ──
+  function center(el) {
+    var r = el.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+
+  cards.forEach(function(card) {
+    card.addEventListener('mouseenter', function() {
+      var hc = center(card);
+      cards.forEach(function(c) {
+        if (c === card) { c.style.transform = 'translate(0,0)'; c.classList.remove('repelled'); return; }
+        var cc = center(c);
+        var dx = cc.x - hc.x, dy = cc.y - hc.y;
+        var len = Math.sqrt(dx*dx + dy*dy) || 1;
+        c.style.transform = 'translate(' + (dx/len*PUSH) + 'px,' + (dy/len*PUSH) + 'px)';
+        c.classList.add('repelled');
+      });
+    });
+    card.addEventListener('mouseleave', function() {
+      cards.forEach(function(c) { c.style.transform = 'translate(0,0)'; c.classList.remove('repelled'); });
+    });
+  });
+
+  // ── animateMotion triggers ──
+  var t3 = document.querySelector('.c3 .thumb');
+  if (t3) {
+    t3.addEventListener('mouseenter', function() {
+      ['pkt1','pkt2','pkt3','pkt4'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.beginElement();
+      });
+    });
+  }
+  var t6 = document.querySelector('.c6 .thumb');
+  if (t6) {
+    t6.addEventListener('mouseenter', function() {
+      var a = document.getElementById('tracer-anim');
+      if (a) a.beginElement();
+    });
+  }
+
+  // Init
+  setActiveIndex(0);
+  btnPrev.disabled = true;
+})();
+</script>
+
+</body>
+</html>
