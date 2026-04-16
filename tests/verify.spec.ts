@@ -7,7 +7,7 @@ test.describe('verification pass', () => {
     await page.setViewportSize(VP);
   });
 
-  test('Grid: 6 cards, 2 cols, graduated backgrounds, numbers straddle', async ({ page }) => {
+  test('Grid: 6 cards, 2 cols, uniform #111 thumb backgrounds, numbers straddle', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(String(e)));
     page.on('console', (m) => {
@@ -27,10 +27,19 @@ test.describe('verification pass', () => {
     expect(boxes[0].x).toBeLessThan(boxes[1].x);
     expect(boxes[2].y).toBeGreaterThan(boxes[0].y);
 
-    // Graduated backgrounds: c1..c6 mapped
+    // Each card has a c1..c6 class for graphic selection
     for (let i = 1; i <= 6; i++) {
       await expect(page.locator(`.card.c${i}`)).toHaveCount(1);
     }
+
+    // All 6 thumb backgrounds are uniform #111111 (per article-graphics prototype)
+    const bgs = await page.evaluate(() =>
+      Array.from({ length: 6 }, (_, i) => {
+        const el = document.querySelector(`.card.c${i + 1} .thumb`);
+        return el ? getComputedStyle(el as HTMLElement).backgroundColor : null;
+      })
+    );
+    for (const bg of bgs) expect(bg).toBe('rgb(17, 17, 17)');
 
     // Numbers straddle top edge of graphic (num center ≈ graphic top)
     for (let i = 0; i < 6; i++) {
