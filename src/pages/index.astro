@@ -11,6 +11,22 @@ function formatDate(d: Date) {
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}.${m}.${day}`;
 }
+
+const rendered = await Promise.all(
+  articles.map(async (article) => {
+    const { Content } = await article.render();
+    return { article, Content };
+  })
+);
+
+const articleMeta = articles.map((a, i) => ({
+  index: i,
+  slug: a.slug,
+  title: a.data.title,
+  date: formatDate(a.data.date),
+  tags: a.data.tags ?? [],
+  colorIdx: (i % 6) + 1,
+}));
 ---
 <html lang="en">
 <head>
@@ -36,7 +52,7 @@ function formatDate(d: Date) {
           const padded = String(idx).padStart(2, '0');
           const tags = article.data.tags ?? [];
           return (
-            <div class={`card c${idx}`} data-index={i} data-slug={article.slug}>
+            <div class={`card c${((i % 6) + 1)}`} data-index={i} data-slug={article.slug}>
               <div class="graphic">
                 <div class="num">{padded}</div>
                 <div class="thumb">
@@ -57,6 +73,39 @@ function formatDate(d: Date) {
       </div>
     </div>
   </div>
+
+  <div id="article-view">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-label">Articles</div>
+      <ul class="sidebar-list" id="sidebar-list">
+        {articles.map((article, i) => (
+          <li class="sidebar-item" data-index={i} data-slug={article.slug}>{article.data.title}</li>
+        ))}
+      </ul>
+      <button class="back-btn" id="back-btn">All Articles</button>
+    </nav>
+    <div class="article-main" id="article-main">
+      <div class="article-header-band">
+        <div class="article-header-img" id="article-header-img"></div>
+        <div class="article-meta-block" id="article-meta-block">
+          <div class="tags" id="art-tags"></div>
+          <div class="article-title" id="art-title"></div>
+          <div class="article-date" id="art-date"></div>
+        </div>
+      </div>
+      <div class="article-body" id="article-body"></div>
+      <div class="article-footer" id="article-footer"></div>
+    </div>
+    <div class="article-bodies" aria-hidden="true">
+      {rendered.map(({ article, Content }) => (
+        <div id={`body-${article.slug}`} class="article-body-hidden">
+          <Content />
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <script type="application/json" id="article-meta" set:html={JSON.stringify(articleMeta)}></script>
 
   <script>
     import '../scripts/main.js';
