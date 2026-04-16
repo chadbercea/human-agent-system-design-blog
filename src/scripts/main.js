@@ -487,20 +487,20 @@
     });
   });
 
-  var c3Thumb = document.querySelector('.c3 .thumb');
-  if (c3Thumb) {
-    c3Thumb.addEventListener('mouseenter', function () {
+  var thumb3 = document.querySelector('.c3 .thumb');
+  if (thumb3) {
+    thumb3.addEventListener('mouseenter', function () {
       ['pkt1', 'pkt2', 'pkt3', 'pkt4'].forEach(function (id) {
         var el = document.getElementById(id);
-        if (el && el.beginElement) { try { el.beginElement(); } catch (e) {} }
+        if (el) el.beginElement();
       });
     });
   }
-  var c6Thumb = document.querySelector('.c6 .thumb');
-  if (c6Thumb) {
-    c6Thumb.addEventListener('mouseenter', function () {
-      var a = document.getElementById('tracer-anim');
-      if (a && a.beginElement) { try { a.beginElement(); } catch (e) {} }
+  var thumb6 = document.querySelector('.c6 .thumb');
+  if (thumb6) {
+    thumb6.addEventListener('mouseenter', function () {
+      var anim = document.getElementById('tracer-anim');
+      if (anim) anim.beginElement();
     });
   }
 
