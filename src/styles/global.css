@@ -107,11 +107,12 @@ html, body {
   flex-direction: row;
   gap: clamp(1rem, 2vw, 1.75rem);
   padding-top: 3rem;
-  transition: transform 240ms var(--ease);
-  will-change: transform;
+  transition: transform 240ms var(--ease), opacity 240ms var(--ease);
+  will-change: transform, opacity;
   cursor: pointer;
 }
-.card:hover { transform: translateY(-4px); }
+.card.repelled { opacity: 0.45; }
+.card.exiting { transition: transform 700ms var(--ease), opacity 700ms var(--ease); }
 
 .graphic {
   position: relative;
