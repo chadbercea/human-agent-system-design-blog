@@ -4,6 +4,13 @@ import '../styles/global.css';
 
 const articles = (await getCollection('articles', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+function formatDate(d: Date) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}.${m}.${day}`;
+}
 ---
 <html lang="en">
 <head>
@@ -21,6 +28,34 @@ const articles = (await getCollection('articles', ({ data }) => !data.draft))
     </nav>
   </header>
 
-  <!-- grid-view, article-view, about-view, contact-view go here -->
+  <div id="grid-view">
+    <div class="stage">
+      <div class="grid" id="grid">
+        {articles.map((article, i) => {
+          const idx = i + 1;
+          const padded = String(idx).padStart(2, '0');
+          const tags = article.data.tags ?? [];
+          return (
+            <div class={`card c${idx}`} data-index={i} data-slug={article.slug}>
+              <div class="graphic">
+                <div class="num">{padded}</div>
+                <div class="thumb">
+                  <span class="thumb-cat">{tags.join(' · ')}</span>
+                </div>
+              </div>
+              <div class="content">
+                <div class="tags">
+                  {tags.map(t => <span class="tag">{t}</span>)}
+                </div>
+                <div class="title">{article.data.title}</div>
+                <div class="desc">{article.data.description}</div>
+                <div class="date">{formatDate(article.data.date)}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
 </body>
 </html>
