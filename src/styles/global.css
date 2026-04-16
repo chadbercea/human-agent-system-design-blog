@@ -480,11 +480,32 @@ html, body {
   pointer-events: auto;
 }
 
+.meta-stage,
 .meta-inner {
   padding: clamp(2rem, 4vh, 4rem) clamp(2rem, 6vw, 6rem);
   max-width: 720px;
 }
 
+.meta-stage {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.meta-stage.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.meta-eyebrow {
+  font-family: 'Courier New', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sub);
+  margin-bottom: 1.4rem;
+}
+
+.meta-title,
 .pg-title {
   font-family: Georgia, serif;
   font-size: clamp(2.4rem, 5.5vw, 4.8rem);
@@ -495,6 +516,7 @@ html, body {
   color: var(--text);
 }
 
+.meta-bio,
 .pg-sub {
   font-family: Georgia, serif;
   font-size: clamp(0.85rem, 1.25vw, 1rem);
@@ -505,6 +527,9 @@ html, body {
   max-width: 42ch;
 }
 
+.meta-fields { margin-top: 1rem; }
+
+.meta-field,
 .meta-view .field {
   border-bottom: 1px solid var(--dim);
   padding: 0.55rem 0;
@@ -514,6 +539,17 @@ html, body {
   margin-bottom: 1px;
 }
 
+.meta-field {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 400ms var(--ease), transform 400ms var(--ease);
+}
+.meta-field.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.field-key,
 .meta-view .fk {
   font-family: 'Courier New', monospace;
   font-size: 0.5rem;
@@ -522,6 +558,7 @@ html, body {
   color: var(--sub);
 }
 
+.field-val,
 .meta-view .fv {
   font-family: Georgia, serif;
   font-size: 0.76rem;

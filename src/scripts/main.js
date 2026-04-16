@@ -17,6 +17,11 @@
   var sidebarItems = Array.prototype.slice.call(document.querySelectorAll('.sidebar-item'));
   var aboutView = document.getElementById('about-view');
   var contactView = document.getElementById('contact-view');
+  var aboutStage = aboutView ? aboutView.querySelector('.meta-stage') : null;
+  var aboutFields = aboutView
+    ? Array.prototype.slice.call(aboutView.querySelectorAll('.meta-field'))
+    : [];
+  var aboutTimers = [];
   var hnArticles = document.getElementById('hn-articles');
   var hnAbout = document.getElementById('hn-about');
   var hnContact = document.getElementById('hn-contact');
@@ -251,6 +256,7 @@
 
     aboutView.classList.remove('visible');
     contactView.classList.remove('visible');
+    clearAboutStagger();
 
     if (prev === 'article') {
       articleView.classList.remove('body-in', 'meta-in');
@@ -270,6 +276,23 @@
       resetCards();
       setTimeout(function () { state = 'grid'; }, 900);
     }
+  }
+
+  function staggerAboutIn() {
+    if (!aboutStage) return;
+    clearAboutStagger();
+    aboutStage.classList.add('in');
+    aboutFields.forEach(function (f, i) {
+      var t = setTimeout(function () { f.classList.add('in'); }, 200 + i * 70);
+      aboutTimers.push(t);
+    });
+  }
+
+  function clearAboutStagger() {
+    aboutTimers.forEach(function (t) { clearTimeout(t); });
+    aboutTimers = [];
+    if (aboutStage) aboutStage.classList.remove('in');
+    aboutFields.forEach(function (f) { f.classList.remove('in'); });
   }
 
   function openMeta(which, navEl) {
@@ -294,9 +317,11 @@
     if (which === 'about') {
       contactView.classList.remove('visible');
       aboutView.classList.add('visible');
+      staggerAboutIn();
     } else {
       aboutView.classList.remove('visible');
       contactView.classList.add('visible');
+      clearAboutStagger();
     }
 
     setTimeout(function () { state = which; }, 600);
