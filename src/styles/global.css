@@ -462,6 +462,73 @@ html, body {
 .article-bodies { display: none; }
 .article-body-hidden { display: none; }
 
+.meta-view {
+  position: fixed;
+  top: var(--hh);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg);
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  overflow-y: auto;
+  transition: opacity var(--dur) var(--ease);
+}
+.meta-view.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.meta-inner {
+  padding: clamp(2rem, 4vh, 4rem) clamp(2rem, 6vw, 6rem);
+  max-width: 720px;
+}
+
+.pg-title {
+  font-family: Georgia, serif;
+  font-size: clamp(2.4rem, 5.5vw, 4.8rem);
+  font-weight: bold;
+  line-height: 0.97;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+.pg-sub {
+  font-family: Georgia, serif;
+  font-size: clamp(0.85rem, 1.25vw, 1rem);
+  color: var(--sub);
+  font-style: italic;
+  margin-bottom: 2.5rem;
+  line-height: 1.65;
+  max-width: 42ch;
+}
+
+.meta-view .field {
+  border-bottom: 1px solid var(--dim);
+  padding: 0.55rem 0;
+  display: flex;
+  justify-content: space-between;
+  max-width: 320px;
+  margin-bottom: 1px;
+}
+
+.meta-view .fk {
+  font-family: 'Courier New', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sub);
+}
+
+.meta-view .fv {
+  font-family: Georgia, serif;
+  font-size: 0.76rem;
+  color: #4a4a4a;
+  font-style: italic;
+}
+
 @media (max-width: 720px) {
   .grid { grid-template-columns: 1fr; }
   .graphic { flex: 0 0 38%; }
