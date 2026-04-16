@@ -1,0 +1,127 @@
+---
+const { index } = Astro.props;
+---
+{index === 0 && (
+  <svg viewBox="0 0 100 178" xmlns="http://www.w3.org/2000/svg">
+    <line class="g-line" x1="50" y1="0"   x2="50"  y2="178" stroke-opacity="0.04"/>
+    <line class="g-line" x1="0"  y1="89"  x2="100" y2="89"  stroke-opacity="0.04"/>
+    <circle class="persona g-fill" cx="38" cy="78" r="48"/>
+    <polygon class="spec g-fill" points="62,32 96,89 62,146 28,89" style="transform-origin:62px 89px"/>
+    <line class="reject g-line" x1="52" y1="76" x2="66" y2="90" stroke-width="1.2"/>
+    <line class="reject g-line" x1="66" y1="76" x2="52" y2="90" stroke-width="1.2" style="transition-delay:0.08s"/>
+    <circle class="g-dot" cx="8"  cy="8"   r="2"/>
+    <circle class="g-dot" cx="92" cy="8"   r="2"/>
+    <circle class="g-dot" cx="8"  cy="170" r="2"/>
+    <circle class="g-dot" cx="92" cy="170" r="2"/>
+  </svg>
+)}
+{index === 1 && (
+  <svg viewBox="0 0 100 178" xmlns="http://www.w3.org/2000/svg">
+    <polygon class="g-fill" points="50,22 82,148 18,148" fill="none"/>
+    <line class="edge-active ea1 g-line" x1="50" y1="22"  x2="18" y2="148" stroke-dasharray="145" stroke-dashoffset="145"/>
+    <line class="edge-active ea2 g-line" x1="18" y1="148" x2="82" y2="148" stroke-dasharray="68"  stroke-dashoffset="68"/>
+    <line class="edge-active ea3 g-line" x1="82" y1="148" x2="50" y2="22"  stroke-dasharray="145" stroke-dashoffset="145"/>
+    <circle class="node-dot g-dot" cx="50" cy="22" r="7"/>
+    <circle class="g-fill" cx="50" cy="22" r="13" fill="none"/>
+    <polygon class="node-dot g-dot" points="18,138 26,148 18,158 10,148"/>
+    <polygon class="g-fill" points="18,134 29,148 18,162 7,148" fill="none"/>
+    <rect class="node-dot g-dot" x="74" y="141" width="16" height="14"/>
+    <rect class="g-fill" x="71" y="138" width="22" height="20" fill="none"/>
+    <circle class="g-dot" cx="50" cy="106" r="2.5"/>
+  </svg>
+)}
+{index === 2 && (
+  <svg viewBox="0 0 100 178" id="svg03" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <path id="p3a" d="M50,20 L16,55 L50,89 L84,123 L50,158"/>
+      <path id="p3b" d="M50,20 L84,55 L50,89 L16,123 L50,158"/>
+      <path id="p3c" d="M16,55 L16,123 L50,158"/>
+      <path id="p3d" d="M84,55 L84,123 L50,158"/>
+    </defs>
+    <line class="net-edge g-line" x1="50"  y1="20"  x2="16"  y2="55"/>
+    <line class="net-edge g-line" x1="50"  y1="20"  x2="84"  y2="55"/>
+    <line class="net-edge g-line" x1="16"  y1="55"  x2="50"  y2="89"/>
+    <line class="net-edge g-line" x1="84"  y1="55"  x2="50"  y2="89"/>
+    <line class="net-edge g-line" x1="16"  y1="55"  x2="16"  y2="123"/>
+    <line class="net-edge g-line" x1="84"  y1="55"  x2="84"  y2="123"/>
+    <line class="net-edge g-line" x1="50"  y1="89"  x2="16"  y2="123"/>
+    <line class="net-edge g-line" x1="50"  y1="89"  x2="84"  y2="123"/>
+    <line class="net-edge g-line" x1="16"  y1="123" x2="50"  y2="158"/>
+    <line class="net-edge g-line" x1="84"  y1="123" x2="50"  y2="158"/>
+    <line class="net-edge g-line" x1="16"  y1="55"  x2="84"  y2="55"/>
+    <line class="net-edge g-line" x1="16"  y1="123" x2="84"  y2="123"/>
+    <polygon class="net-node g-fill" points="50,12 58,20 50,28 42,20"/>
+    <rect    class="net-node g-fill" x="9"   y="48"  width="14" height="14"/>
+    <rect    class="net-node g-fill" x="77"  y="48"  width="14" height="14"/>
+    <polygon class="net-node g-fill" points="50,81 58,89 50,97 42,89"/>
+    <rect    class="net-node g-fill" x="9"   y="116" width="14" height="14"/>
+    <rect    class="net-node g-fill" x="77"  y="116" width="14" height="14"/>
+    <polygon class="net-node g-fill" points="50,150 58,158 50,166 42,158"/>
+    <circle class="pkt" r="2.2">
+      <animateMotion id="pkt1" begin="indefinite" dur="1.2s" repeatCount="indefinite" calcMode="linear"><mpath href="#p3a"/></animateMotion>
+    </circle>
+    <circle class="pkt" r="2.2">
+      <animateMotion id="pkt2" begin="indefinite" dur="1.0s" repeatCount="indefinite" calcMode="linear"><mpath href="#p3b"/></animateMotion>
+    </circle>
+    <circle class="pkt" r="2.2">
+      <animateMotion id="pkt3" begin="indefinite" dur="1.4s" repeatCount="indefinite" calcMode="linear"><mpath href="#p3c"/></animateMotion>
+    </circle>
+    <circle class="pkt" r="2.2">
+      <animateMotion id="pkt4" begin="indefinite" dur="0.9s" repeatCount="indefinite" calcMode="linear"><mpath href="#p3d"/></animateMotion>
+    </circle>
+  </svg>
+)}
+{index === 3 && (
+  <svg viewBox="0 0 100 178" xmlns="http://www.w3.org/2000/svg">
+    <circle   class="conv-a g-fill" cx="50" cy="89" r="44" style="transform-origin:50px 89px"/>
+    <polygon  class="conv-b g-fill" points="50,22 90,89 50,156 10,89" style="transform-origin:50px 89px"/>
+    <rect     class="conv-c g-fill" x="14" y="53" width="72" height="72" style="transform-origin:50px 89px"/>
+    <circle class="conv-center g-fill" cx="50" cy="89" r="8"/>
+    <line class="g-line" x1="50" y1="10"  x2="50"  y2="168" stroke-opacity="0.04"/>
+    <line class="g-line" x1="5"  y1="89"  x2="95"  y2="89"  stroke-opacity="0.04"/>
+  </svg>
+)}
+{index === 4 && (
+  <svg viewBox="0 0 100 178" xmlns="http://www.w3.org/2000/svg">
+    <rect class="lane g-fill" x="6" y="18"  width="88" height="44" rx="1"/>
+    <line class="g-line"      x1="6"  y1="40"  x2="94" y2="40"  stroke-dasharray="2 3"/>
+    <rect class="lane g-fill" x="6" y="96"  width="88" height="68" rx="1"/>
+    <line class="g-line"      x1="6"  y1="130" x2="94" y2="130" stroke-dasharray="2 3"/>
+    <line class="signal sig1 g-line" x1="22" y1="62" x2="22" y2="96" stroke-width="1"/>
+    <line class="signal sig2 g-line" x1="40" y1="62" x2="40" y2="96" stroke-width="1"/>
+    <line class="signal sig3 g-line" x1="60" y1="62" x2="60" y2="96" stroke-width="1"/>
+    <line class="signal sig4 g-line" x1="78" y1="62" x2="78" y2="96" stroke-width="1"/>
+    <polygon class="g-fill" points="20,93 22,97 24,93"/>
+    <polygon class="g-fill" points="38,93 40,97 42,93"/>
+    <polygon class="g-fill" points="58,93 60,97 62,93"/>
+    <polygon class="g-fill" points="76,93 78,97 80,93"/>
+    <text class="g-text" x="10" y="31" font-size="4.2" letter-spacing="0.5">FRONTSTAGE</text>
+    <text class="g-text" x="10" y="110" font-size="4.2" letter-spacing="0.5">BACKSTAGE</text>
+    <circle class="g-dot" cx="6"  cy="18"  r="1.5"/>
+    <circle class="g-dot" cx="94" cy="18"  r="1.5"/>
+    <circle class="g-dot" cx="6"  cy="164" r="1.5"/>
+    <circle class="g-dot" cx="94" cy="164" r="1.5"/>
+  </svg>
+)}
+{index === 5 && (
+  <svg viewBox="0 0 100 178" id="svg06" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <path id="career" d="M10,165 C20,148 30,128 42,110 C54,92 58,72 66,54 C74,36 82,22 90,10"/>
+    </defs>
+    <line class="grid-line g-line" x1="10" y1="10"  x2="10" y2="170" stroke-opacity="0.04"/>
+    <line class="grid-line g-line" x1="10" y1="165" x2="95" y2="165" stroke-opacity="0.04"/>
+    <line class="grid-line g-line" x1="50" y1="10"  x2="50" y2="170" stroke-opacity="0.03"/>
+    <line class="grid-line g-line" x1="10" y1="89"  x2="95" y2="89"  stroke-opacity="0.03"/>
+    <path class="path-line g-line" d="M10,165 C20,148 30,128 42,110 C54,92 58,72 66,54 C74,36 82,22 90,10" stroke-width="0.9"/>
+    <circle class="waypoint wp1 g-dot" cx="10" cy="165" r="2.5"/>
+    <circle class="waypoint wp2 g-dot" cx="42" cy="110" r="2.5"/>
+    <circle class="waypoint wp3 g-dot" cx="58" cy="72"  r="2.5"/>
+    <circle class="waypoint wp4 g-dot" cx="74" cy="36"  r="2.5"/>
+    <circle class="waypoint wp5 g-dot" cx="90" cy="10"  r="2.5"/>
+    <circle class="tracer" r="3.5">
+      <animateMotion id="tracer-anim" begin="indefinite" dur="1.6s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1">
+        <mpath href="#career"/>
+      </animateMotion>
+    </circle>
+  </svg>
+)}
