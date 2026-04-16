@@ -1,11 +1,26 @@
 ---
+import { getCollection } from 'astro:content';
+import '../styles/global.css';
+
+const articles = (await getCollection('articles', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
-<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>HAS-DESIGN</title>
-  </head>
-  <body></body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HAS Design</title>
+</head>
+<body>
+  <header class="hdr" id="hdr">
+    <a class="brand" href="#" data-nav="list" id="brandBtn">Human Agent System Design</a>
+    <nav class="hnav">
+      <a class="hn on" href="#articles" data-nav="list" id="hn-articles">Articles</a>
+      <a class="hn" href="#about" data-nav="about" id="hn-about">About</a>
+      <a class="hn" href="#contact" data-nav="contact" id="hn-contact">Contact</a>
+    </nav>
+  </header>
+
+  <!-- grid-view, article-view, about-view, contact-view go here -->
+</body>
 </html>
