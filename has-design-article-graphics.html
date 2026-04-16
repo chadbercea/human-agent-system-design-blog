@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAS Design — Article Graphics</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0a; --border: #1c1c1c; --t1: #111111;
+    --idle-fill:   rgba(200,200,200,0.04);
+    --idle-stroke: rgba(200,200,200,0.14);
+    --idle-dot:    rgba(200,200,200,0.18);
+    --hot-fill:    rgba(200,200,200,0.10);
+    --hot-stroke:  rgba(200,200,200,0.72);
+    --hot-dot:     rgba(200,200,200,0.85);
+    --hot-dim:     rgba(200,200,200,0.30);
+  }
+  html, body { background: var(--bg); font-family: 'Courier New', monospace; padding: 4rem 3rem; }
+  h1 { font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase; color: #2a2a2a; margin-bottom: 3rem; }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2rem; }
+  .card { display: flex; flex-direction: column; gap: 1rem; }
+  .thumb { position: relative; width: 100%; padding-bottom: 177.78%; border: 1px solid var(--border); overflow: hidden; cursor: pointer; background: var(--t1); transition: border-color 0.3s; }
+  .thumb:hover { border-color: #2e2e2e; }
+  .thumb svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .label { font-size: 0.38rem; letter-spacing: 0.1em; text-transform: uppercase; color: #2a2a2a; line-height: 1.6; }
+
+  .g-fill  { fill: var(--idle-fill); stroke: var(--idle-stroke); stroke-width: 0.7; }
+  .g-line  { fill: none; stroke: var(--idle-stroke); stroke-width: 0.7; }
+  .g-dot   { fill: var(--idle-dot); }
+  .g-text  { fill: var(--idle-stroke); font-family: 'Courier New', monospace; }
+  .g-fill, .g-line, .g-dot { transition: fill 0.4s ease, stroke 0.4s ease; }
+
+  /* ─── 01: Wrong Container ─── */
+  .c1 .thumb:hover .persona { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: pulse-ring 0.9s ease-in-out infinite alternate; }
+  .c1 .thumb:hover .spec    { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: vibrate 0.15s ease-in-out infinite alternate; transform-origin: 62px 89px; }
+  .c1 .thumb:hover .reject  { stroke: var(--hot-stroke); stroke-dashoffset: 0; transition: stroke-dashoffset 0.35s ease, stroke 0.3s; }
+  .reject { stroke-dasharray: 14; stroke-dashoffset: 14; transition: stroke 0.3s; }
+  @keyframes pulse-ring { from { stroke-width: 0.7; } to { stroke-width: 2.8; stroke: var(--hot-dim); } }
+  @keyframes vibrate    { from { transform: translateX(0); } to { transform: translateX(5px); } }
+
+  /* ─── 02: Triangle Circuit ─── */
+  .edge-active { stroke-dasharray: 120; stroke-dashoffset: 120; transition: stroke-dashoffset 0s; }
+  .c2 .thumb:hover .edge-active { stroke: var(--hot-stroke); stroke-dashoffset: 0; }
+  .c2 .thumb:hover .ea1 { transition: stroke-dashoffset 0.55s ease 0s, stroke 0.2s; }
+  .c2 .thumb:hover .ea2 { transition: stroke-dashoffset 0.55s ease 0.45s, stroke 0.2s; }
+  .c2 .thumb:hover .ea3 { transition: stroke-dashoffset 0.55s ease 0.9s, stroke 0.2s; }
+  .c2 .thumb:hover .node-dot { fill: var(--hot-dot); }
+
+  /* ─── 03: ACI Network ─── */
+  .c3 .thumb:hover .net-node { stroke: var(--hot-dim); fill: var(--hot-fill); }
+  .c3 .thumb:hover .net-edge { stroke: var(--hot-dim); }
+  .pkt { fill: var(--hot-dot); opacity: 0; }
+  .c3 .thumb:hover .pkt { opacity: 1; }
+
+  /* ─── 04: Convergence ─── */
+  .c4 .thumb:hover .conv-a { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: drift-a 1.4s ease-in-out infinite alternate; }
+  .c4 .thumb:hover .conv-b { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: drift-b 1.4s ease-in-out infinite alternate; }
+  .c4 .thumb:hover .conv-c { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: drift-c 1.4s ease-in-out infinite alternate; }
+  .c4 .thumb:hover .conv-center { fill: var(--hot-fill); stroke: var(--hot-stroke); }
+  @keyframes drift-a { from { transform: translate(0,0); } to { transform: translate(-8px,-10px); } }
+  @keyframes drift-b { from { transform: translate(0,0); } to { transform: translate(10px, 4px); } }
+  @keyframes drift-c { from { transform: translate(0,0); } to { transform: translate(-5px, 9px); } }
+
+  /* ─── 05: Service Layers ─── */
+  .c5 .thumb:hover .lane   { stroke: var(--hot-dim); fill: var(--hot-fill); }
+  .c5 .thumb:hover .signal { stroke: var(--hot-stroke); animation: flow-down 0.65s linear infinite; }
+  .c5 .thumb:hover .sig2   { animation-delay: 0.22s; }
+  .c5 .thumb:hover .sig3   { animation-delay: 0.44s; }
+  .c5 .thumb:hover .sig4   { animation-delay: 0.11s; }
+  .signal { stroke-dasharray: 5 5; }
+  @keyframes flow-down { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 20; } }
+
+  /* ─── 06: Trajectory ─── */
+  .c6 .thumb:hover .path-line { stroke: var(--hot-dim); }
+  .c6 .thumb:hover .grid-line { stroke: rgba(200,200,200,0.08); }
+  .c6 .thumb:hover .waypoint  { fill: var(--hot-dot); }
+  .c6 .thumb:hover .wp2 { animation: wp-light 0.3s ease 0.3s both; }
+  .c6 .thumb:hover .wp3 { animation: wp-light 0.3s ease 0.6s both; }
+  .c6 .thumb:hover .wp4 { animation: wp-light 0.3s ease 0.9s both; }
+  .c6 .thumb:hover .wp5 { animation: wp-light 0.3s ease 1.2s both; }
+  .tracer { fill: var(--hot-dot); opacity: 0; }
+  .c6 .thumb:hover .tracer { opacity: 1; }
+  @keyframes wp-light {
+    0%   { r: 2.5; fill: var(--idle-dot); }
+    50%  { r: 5;   fill: var(--hot-dot); }
+    100% { r: 3;   fill: var(--hot-dot); }
+  }
+</style>
+</head>
+<body>
+
+<h1>Human Agent System Design — Article Graphics</h1>
+
+<div class="grid">
+
+  <!-- ── 01: Wrong Container — fills card with large overlapping forms ── -->
+  <div class="card c1">
+    <div class="thumb">
+      <svg viewBox="0 0 100 178" xmlns="http://www.w3.org/2000/svg">
+        <!-- Faint structural grid -->
+        <line class="g-line" x1="50" y1="0"   x2="50"  y2="178" stroke-opacity="0.04"/>
+        <line class="g-line" x1="0"  y1="89"  x2="100" y2="89"  stroke-opacity="0.04"/>
+        <!-- Persona: large circle anchored upper-left quadrant -->
+        <circle class="persona g-fill" cx="38" cy="78" r="48"/>
+        <!-- Spec: large diamond overlapping right side -->
+        <polygon class="spec g-fill" points="62,32 96,89 62,146 28,89" style="transform-origin:62px 89px"/>
+        <!-- Rejection marks — reveal on hover, centered in overlap zone -->
+        <line class="reject g-line" x1="52" y1="76" x2="66" y2="90" stroke-width="1.2"/>
+        <line class="reject g-line" x1="66" y1="76" x2="52" y2="90" stroke-width="1.2" style="transition-delay:0.08s"/>
+        <!-- Corner dots -->
+        <circle class="g-dot" cx="8"  cy="8"   r="2"/>
+        <circle class="g-dot" cx="92" cy="8"   r="2"/>
+        <circle class="g-dot" cx="8"  cy="170" r="2"/>
+        <circle class="g-dot" cx="92" cy="170" r="2"/>
+      </svg>
+    </div>
+    <div class="label">01 — Agents Aren't Personas</div>
+  </div>
+
+  <!-- ── 02: Three Actors — inner margin ── -->
+  <div class="card c2">
+    <div class="thumb">
+      <svg viewBox="0 0 100 178" xmlns="http://www.w3.org/2000/svg">
+        <!-- Dim base triangle — inset with margin -->
+        <polygon class="g-fill" points="50,22 82,148 18,148" fill="none"/>
+        <!-- Animated trace overlays -->
+        <line class="edge-active ea1 g-line" x1="50" y1="22" x2="18"  y2="148" stroke-dasharray="145" stroke-dashoffset="145"/>
+        <line class="edge-active ea2 g-line" x1="18" y1="148" x2="82" y2="148" stroke-dasharray="68"  stroke-dashoffset="68"/>
+        <line class="edge-active ea3 g-line" x1="82" y1="148" x2="50" y2="22"  stroke-dasharray="145" stroke-dashoffset="145"/>
+        <!-- Human: circle — top center, inset -->
+        <circle class="node-dot g-dot" cx="50" cy="22" r="7"/>
+        <circle class="g-fill" cx="50" cy="22" r="13" fill="none"/>
+        <!-- Agent: diamond — bottom left, inset -->
+        <polygon class="node-dot g-dot" points="18,138 26,148 18,158 10,148"/>
+        <polygon class="g-fill" points="18,134 29,148 18,162 7,148" fill="none"/>
+        <!-- System: square — bottom right, inset -->
+        <rect class="node-dot g-dot" x="74" y="141" width="16" height="14"/>
+        <rect class="g-fill" x="71" y="138" width="22" height="20" fill="none"/>
+        <!-- Center point -->
+        <circle class="g-dot" cx="50" cy="106" r="2.5"/>
+      </svg>
+    </div>
+    <div class="label">02 — The Three Actors</div>
+  </div>
+
+  <!-- ── 03: ACI Network — centered 7-node symmetric layout ── -->
+  <!-- Nodes: T(50,20) UL(16,55) UR(84,55) C(50,89) LL(16,123) LR(84,123) B(50,158) -->
+  <div class="card c3">
+    <div class="thumb">
+      <svg viewBox="0 0 100 178" id="svg03" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <path id="p3a" d="M50,20 L16,55 L50,89 L84,123 L50,158"/>
+          <path id="p3b" d="M50,20 L84,55 L50,89 L16,123 L50,158"/>
+          <path id="p3c" d="M16,55 L16,123 L50,158"/>
+          <path id="p3d" d="M84,55 L84,123 L50,158"/>
+        </defs>
+        <!-- Edges -->
+        <line class="net-edge g-line" x1="50"  y1="20"  x2="16"  y2="55"/>
+        <line class="net-edge g-line" x1="50"  y1="20"  x2="84"  y2="55"/>
+        <line class="net-edge g-line" x1="16"  y1="55"  x2="50"  y2="89"/>
+        <line class="net-edge g-line" x1="84"  y1="55"  x2="50"  y2="89"/>
+        <line class="net-edge g-line" x1="16"  y1="55"  x2="16"  y2="123"/>
+        <line class="net-edge g-line" x1="84"  y1="55"  x2="84"  y2="123"/>
+        <line class="net-edge g-line" x1="50"  y1="89"  x2="16"  y2="123"/>
+        <line class="net-edge g-line" x1="50"  y1="89"  x2="84"  y2="123"/>
+        <line class="net-edge g-line" x1="16"  y1="123" x2="50"  y2="158"/>
+        <line class="net-edge g-line" x1="84"  y1="123" x2="50"  y2="158"/>
+        <line class="net-edge g-line" x1="16"  y1="55"  x2="84"  y2="55"/>
+        <line class="net-edge g-line" x1="16"  y1="123" x2="84"  y2="123"/>
+        <!-- All machine nodes: diamonds and squares, no human circle -->
+        <polygon class="net-node g-fill" points="50,12 58,20 50,28 42,20"/>
+        <rect    class="net-node g-fill" x="9"   y="48"  width="14" height="14"/>
+        <rect    class="net-node g-fill" x="77"  y="48"  width="14" height="14"/>
+        <polygon class="net-node g-fill" points="50,81 58,89 50,97 42,89"/>
+        <rect    class="net-node g-fill" x="9"   y="116" width="14" height="14"/>
+        <rect    class="net-node g-fill" x="77"  y="116" width="14" height="14"/>
+        <polygon class="net-node g-fill" points="50,150 58,158 50,166 42,158"/>
+        <!-- Packets: begin="indefinite" -->
+        <circle class="pkt" r="2.2">
+          <animateMotion id="pkt1" begin="indefinite" dur="1.2s" repeatCount="indefinite" calcMode="linear"><mpath href="#p3a"/></animateMotion>
+        </circle>
+        <circle class="pkt" r="2.2">
+          <animateMotion id="pkt2" begin="indefinite" dur="1.0s" repeatCount="indefinite" calcMode="linear"><mpath href="#p3b"/></animateMotion>
+        </circle>
+        <circle class="pkt" r="2.2">
+          <animateMotion id="pkt3" begin="indefinite" dur="1.4s" repeatCount="indefinite" calcMode="linear"><mpath href="#p3c"/></animateMotion>
+        </circle>
+        <circle class="pkt" r="2.2">
+          <animateMotion id="pkt4" begin="indefinite" dur="0.9s" repeatCount="indefinite" calcMode="linear"><mpath href="#p3d"/></animateMotion>
+        </circle>
+      </svg>
+    </div>
+    <div class="label">03 — ACI: Agent-Computer Interaction</div>
+  </div>
+
+  <!-- ── 04: Convergence — large overlapping shapes spanning card ── -->
+  <div class="card c4">
+    <div class="thumb">
+      <svg viewBox="0 0 100 178" xmlns="http://www.w3.org/2000/svg">
+        <!-- Three large shapes, all centered at 50,89 -->
+        <circle   class="conv-a g-fill" cx="50" cy="89" r="44" style="transform-origin:50px 89px"/>
+        <polygon  class="conv-b g-fill" points="50,22 90,89 50,156 10,89" style="transform-origin:50px 89px"/>
+        <rect     class="conv-c g-fill" x="14" y="53" width="72" height="72" style="transform-origin:50px 89px"/>
+        <!-- Convergence center — brightest point -->
+        <circle class="conv-center g-fill" cx="50" cy="89" r="8"/>
+        <!-- Axis hints -->
+        <line class="g-line" x1="50" y1="10"  x2="50"  y2="168" stroke-opacity="0.04"/>
+        <line class="g-line" x1="5"  y1="89"  x2="95"  y2="89"  stroke-opacity="0.04"/>
+      </svg>
+    </div>
+    <div class="label">04 — HAS Design: The Practice</div>
+  </div>
+
+  <!-- ── 05: Service Layers — full-width bands, 4 handoffs ── -->
+  <div class="card c5">
+    <div class="thumb">
+      <svg viewBox="0 0 100 178" xmlns="http://www.w3.org/2000/svg">
+        <!-- Frontstage band — top third -->
+        <rect class="lane g-fill" x="6" y="18"  width="88" height="44" rx="1"/>
+        <line class="g-line"      x1="6"  y1="40"  x2="94" y2="40"  stroke-dasharray="2 3"/>
+        <!-- Backstage band — bottom half -->
+        <rect class="lane g-fill" x="6" y="96"  width="88" height="68" rx="1"/>
+        <line class="g-line"      x1="6"  y1="130" x2="94" y2="130" stroke-dasharray="2 3"/>
+        <!-- 4 handoff connectors spanning the gap -->
+        <line class="signal sig1 g-line" x1="22"  y1="62" x2="22"  y2="96" stroke-width="1"/>
+        <line class="signal sig2 g-line" x1="40"  y1="62" x2="40"  y2="96" stroke-width="1"/>
+        <line class="signal sig3 g-line" x1="60"  y1="62" x2="60"  y2="96" stroke-width="1"/>
+        <line class="signal sig4 g-line" x1="78"  y1="62" x2="78"  y2="96" stroke-width="1"/>
+        <!-- Arrow tips -->
+        <polygon class="g-fill" points="20,93 22,97 24,93"/>
+        <polygon class="g-fill" points="38,93 40,97 42,93"/>
+        <polygon class="g-fill" points="58,93 60,97 62,93"/>
+        <polygon class="g-fill" points="76,93 78,97 80,93"/>
+        <!-- Layer labels -->
+        <text class="g-text" x="10" y="31" font-size="4.2" letter-spacing="0.5">FRONTSTAGE</text>
+        <text class="g-text" x="10" y="110" font-size="4.2" letter-spacing="0.5">BACKSTAGE</text>
+        <!-- Corner dots at edges -->
+        <circle class="g-dot" cx="6"  cy="18"  r="1.5"/>
+        <circle class="g-dot" cx="94" cy="18"  r="1.5"/>
+        <circle class="g-dot" cx="6"  cy="164" r="1.5"/>
+        <circle class="g-dot" cx="94" cy="164" r="1.5"/>
+      </svg>
+    </div>
+    <div class="label">05 — Service Blueprints</div>
+  </div>
+
+  <!-- ── 06: Trajectory — path spans full diagonal ── -->
+  <div class="card c6">
+    <div class="thumb">
+      <svg viewBox="0 0 100 178" id="svg06" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <path id="career" d="M10,165 C20,148 30,128 42,110 C54,92 58,72 66,54 C74,36 82,22 90,10"/>
+        </defs>
+        <!-- Light grid -->
+        <line class="grid-line g-line" x1="10" y1="10"  x2="10"  y2="170" stroke-opacity="0.04"/>
+        <line class="grid-line g-line" x1="10" y1="165" x2="95"  y2="165" stroke-opacity="0.04"/>
+        <line class="grid-line g-line" x1="50" y1="10"  x2="50"  y2="170" stroke-opacity="0.03"/>
+        <line class="grid-line g-line" x1="10" y1="89"  x2="95"  y2="89"  stroke-opacity="0.03"/>
+        <!-- Path spanning full card diagonal -->
+        <path class="path-line g-line" d="M10,165 C20,148 30,128 42,110 C54,92 58,72 66,54 C74,36 82,22 90,10" stroke-width="0.9"/>
+        <!-- 5 waypoints distributed along path -->
+        <circle class="waypoint wp1 g-dot" cx="10"  cy="165" r="2.5"/>
+        <circle class="waypoint wp2 g-dot" cx="42"  cy="110" r="2.5"/>
+        <circle class="waypoint wp3 g-dot" cx="58"  cy="72"  r="2.5"/>
+        <circle class="waypoint wp4 g-dot" cx="74"  cy="36"  r="2.5"/>
+        <circle class="waypoint wp5 g-dot" cx="90"  cy="10"  r="2.5"/>
+        <!-- Tracer -->
+        <circle class="tracer" r="3.5">
+          <animateMotion id="tracer-anim" begin="indefinite" dur="1.6s"
+            fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1">
+            <mpath href="#career"/>
+          </animateMotion>
+        </circle>
+      </svg>
+    </div>
+    <div class="label">06 — The Career Path</div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  // 03: fire packets on hover
+  var t3 = document.querySelector('.c3 .thumb');
+  if (t3) {
+    t3.addEventListener('mouseenter', function () {
+      ['pkt1','pkt2','pkt3','pkt4'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.beginElement();
+      });
+    });
+  }
+  // 06: restart tracer each hover
+  var t6 = document.querySelector('.c6 .thumb');
+  if (t6) {
+    t6.addEventListener('mouseenter', function () {
+      var a = document.getElementById('tracer-anim');
+      if (a) a.beginElement();
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
