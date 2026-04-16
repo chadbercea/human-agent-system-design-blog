@@ -10,3 +10,7 @@ node_modules
 # Editor / tool configs (local-only)
 .cursor/
 .emdash.json
+
+# Playwright artifacts
+test-results/
+playwright-report/
