@@ -1,0 +1,91 @@
+:root {
+  --idle-fill:   rgba(200, 200, 200, 0.04);
+  --idle-stroke: rgba(200, 200, 200, 0.14);
+  --idle-dot:    rgba(200, 200, 200, 0.18);
+  --hot-fill:    rgba(200, 200, 200, 0.10);
+  --hot-stroke:  rgba(200, 200, 200, 0.72);
+  --hot-dot:     rgba(200, 200, 200, 0.85);
+  --hot-dim:     rgba(200, 200, 200, 0.30);
+}
+
+.g-fill { fill: var(--idle-fill); stroke: var(--idle-stroke); stroke-width: 0.7; }
+.g-line { fill: none; stroke: var(--idle-stroke); stroke-width: 0.7; }
+.g-dot  { fill: var(--idle-dot); }
+.g-text { fill: var(--idle-stroke); font-family: 'Courier New', monospace; }
+.g-fill, .g-line, .g-dot { transition: fill 0.4s ease, stroke 0.4s ease; }
+
+.reject      { stroke-dasharray: 14;  stroke-dashoffset: 14;  transition: stroke 0.3s; }
+.edge-active { stroke-dasharray: 120; stroke-dashoffset: 120; transition: stroke-dashoffset 0s; }
+.pkt    { fill: var(--hot-dot); opacity: 0; }
+.tracer { fill: var(--hot-dot); opacity: 0; }
+.signal { stroke-dasharray: 5 5; }
+
+/* ─── 01: Wrong Container ─── */
+.c1 .thumb:hover .persona { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: pulse-ring 0.9s ease-in-out infinite alternate; }
+.c1 .thumb:hover .spec    { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: vibrate 0.15s ease-in-out infinite alternate; transform-origin: 62px 89px; }
+.c1 .thumb:hover .reject  { stroke: var(--hot-stroke); stroke-dashoffset: 0; transition: stroke-dashoffset 0.35s ease, stroke 0.3s; }
+
+/* ─── 02: Triangle Circuit ─── */
+.c2 .thumb:hover .edge-active { stroke: var(--hot-stroke); stroke-dashoffset: 0; }
+.c2 .thumb:hover .ea1         { transition: stroke-dashoffset 0.55s ease 0s,    stroke 0.2s; }
+.c2 .thumb:hover .ea2         { transition: stroke-dashoffset 0.55s ease 0.45s, stroke 0.2s; }
+.c2 .thumb:hover .ea3         { transition: stroke-dashoffset 0.55s ease 0.9s,  stroke 0.2s; }
+.c2 .thumb:hover .node-dot    { fill: var(--hot-dot); }
+
+/* ─── 03: ACI Network ─── */
+.c3 .thumb:hover .net-node { stroke: var(--hot-dim); fill: var(--hot-fill); }
+.c3 .thumb:hover .net-edge { stroke: var(--hot-dim); }
+.c3 .thumb:hover .pkt      { opacity: 1; }
+
+/* ─── 04: Convergence ─── */
+.c4 .thumb:hover .conv-a      { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: drift-a 1.4s ease-in-out infinite alternate; }
+.c4 .thumb:hover .conv-b      { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: drift-b 1.4s ease-in-out infinite alternate; }
+.c4 .thumb:hover .conv-c      { stroke: var(--hot-stroke); fill: var(--hot-fill); animation: drift-c 1.4s ease-in-out infinite alternate; }
+.c4 .thumb:hover .conv-center { fill: var(--hot-fill); stroke: var(--hot-stroke); }
+
+/* ─── 05: Service Layers ─── */
+.c5 .thumb:hover .lane   { stroke: var(--hot-dim); fill: var(--hot-fill); }
+.c5 .thumb:hover .signal { stroke: var(--hot-stroke); animation: flow-down 0.65s linear infinite; }
+.c5 .thumb:hover .sig2   { animation-delay: 0.22s; }
+.c5 .thumb:hover .sig3   { animation-delay: 0.44s; }
+.c5 .thumb:hover .sig4   { animation-delay: 0.11s; }
+
+/* ─── 06: Trajectory ─── */
+.c6 .thumb:hover .path-line { stroke: var(--hot-dim); }
+.c6 .thumb:hover .grid-line { stroke: rgba(200, 200, 200, 0.08); }
+.c6 .thumb:hover .waypoint  { fill: var(--hot-dot); }
+.c6 .thumb:hover .wp2       { animation: wp-light 0.3s ease 0.3s both; }
+.c6 .thumb:hover .wp3       { animation: wp-light 0.3s ease 0.6s both; }
+.c6 .thumb:hover .wp4       { animation: wp-light 0.3s ease 0.9s both; }
+.c6 .thumb:hover .wp5       { animation: wp-light 0.3s ease 1.2s both; }
+.c6 .thumb:hover .tracer    { opacity: 1; }
+
+@keyframes pulse-ring {
+  from { stroke-width: 0.7; }
+  to   { stroke-width: 2.8; stroke: var(--hot-dim); }
+}
+@keyframes vibrate {
+  from { transform: translateX(0); }
+  to   { transform: translateX(5px); }
+}
+@keyframes flow-down {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: 20; }
+}
+@keyframes drift-a {
+  from { transform: translate(0, 0); }
+  to   { transform: translate(-8px, -10px); }
+}
+@keyframes drift-b {
+  from { transform: translate(0, 0); }
+  to   { transform: translate(10px, 4px); }
+}
+@keyframes drift-c {
+  from { transform: translate(0, 0); }
+  to   { transform: translate(-5px, 9px); }
+}
+@keyframes wp-light {
+  0%   { r: 2.5; fill: var(--idle-dot); }
+  50%  { r: 5;   fill: var(--hot-dot); }
+  100% { r: 3;   fill: var(--hot-dot); }
+}
