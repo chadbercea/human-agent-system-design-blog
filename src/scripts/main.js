@@ -5,6 +5,24 @@
   var cards = Array.prototype.slice.call(track.querySelectorAll('.card'));
   if (!cards.length) return;
 
+  var CARD_W = 260;
+  var CARD_GAP = 32;
+  var STEP = CARD_W + CARD_GAP;
+  var TOTAL = cards.length;
+
+  var trackWrap = document.getElementById('track-wrap');
+  var btnPrev = document.getElementById('btn-prev');
+  var btnNext = document.getElementById('btn-next');
+  var dotsEl = document.getElementById('dots');
+
+  var currentIndex = 0;
+  var currentOffset = 0;
+  var isDragging = false;
+  var dragStartX = 0;
+  var dragStartOffset = 0;
+  var dragMoved = false;
+  var wheelTimer = null;
+
   var articleView = document.getElementById('article-view');
   var gridView = document.getElementById('grid-view');
   var articleMain = document.getElementById('article-main');
@@ -475,17 +493,138 @@
 
   cards.forEach(function (card) {
     card.addEventListener('mouseenter', function () {
-      if (state !== 'grid') return;
+      if (state !== 'grid' || isDragging) return;
       repel(card, 10);
     });
     card.addEventListener('mouseleave', function () {
-      if (state !== 'grid') return;
+      if (state !== 'grid' || isDragging) return;
       resetCards();
     });
     card.addEventListener('click', function () {
+      if (dragMoved) return;
       if (state === 'grid') openArticle(card);
     });
   });
+
+  function maxOffset() {
+    if (!trackWrap) return 0;
+    var trackW = TOTAL * CARD_W + (TOTAL - 1) * CARD_GAP;
+    var wrapW = trackWrap.offsetWidth - 96;
+    return Math.max(0, trackW - wrapW);
+  }
+
+  function setOffset(x, animate) {
+    x = Math.max(-maxOffset(), Math.min(0, x));
+    currentOffset = x;
+    track.style.transition = animate
+      ? 'transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94)'
+      : 'none';
+    track.style.transform = 'translateX(' + x + 'px)';
+    var idx = Math.round(-x / STEP);
+    idx = Math.max(0, Math.min(TOTAL - 1, idx));
+    setActiveIndex(idx);
+  }
+
+  function setActiveIndex(idx) {
+    currentIndex = idx;
+    if (dotsEl) {
+      Array.prototype.forEach.call(dotsEl.querySelectorAll('.dot'), function (d, i) {
+        d.classList.toggle('on', i === idx);
+      });
+    }
+    if (btnPrev) btnPrev.disabled = idx === 0;
+    if (btnNext) btnNext.disabled = idx >= TOTAL - 1;
+  }
+
+  function goTo(idx) {
+    idx = Math.max(0, Math.min(TOTAL - 1, idx));
+    setOffset(-idx * STEP, true);
+    setActiveIndex(idx);
+  }
+
+  if (dotsEl) {
+    dotsEl.innerHTML = '';
+    for (var di = 0; di < TOTAL; di++) {
+      (function (i) {
+        var d = document.createElement('div');
+        d.className = 'dot' + (i === 0 ? ' on' : '');
+        d.addEventListener('click', function () { goTo(i); });
+        dotsEl.appendChild(d);
+      })(di);
+    }
+  }
+
+  if (btnPrev) btnPrev.addEventListener('click', function () { goTo(currentIndex - 1); });
+  if (btnNext) btnNext.addEventListener('click', function () { goTo(currentIndex + 1); });
+
+  document.addEventListener('keydown', function (e) {
+    if (state !== 'grid') return;
+    var tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (e.key === 'ArrowLeft') goTo(currentIndex - 1);
+    else if (e.key === 'ArrowRight') goTo(currentIndex + 1);
+  });
+
+  track.addEventListener('mousedown', function (e) {
+    if (state !== 'grid') return;
+    isDragging = true;
+    dragMoved = false;
+    dragStartX = e.clientX;
+    dragStartOffset = currentOffset;
+    track.classList.add('dragging');
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', function (e) {
+    if (!isDragging) return;
+    var dx = e.clientX - dragStartX;
+    if (Math.abs(dx) > 3) dragMoved = true;
+    setOffset(dragStartOffset + dx, false);
+  });
+
+  document.addEventListener('mouseup', function () {
+    if (!isDragging) return;
+    isDragging = false;
+    track.classList.remove('dragging');
+    var idx = Math.round(-currentOffset / STEP);
+    goTo(idx);
+  });
+
+  track.addEventListener('touchstart', function (e) {
+    if (state !== 'grid') return;
+    dragStartX = e.touches[0].clientX;
+    dragStartOffset = currentOffset;
+    dragMoved = false;
+    track.classList.add('dragging');
+  }, { passive: true });
+
+  track.addEventListener('touchmove', function (e) {
+    var dx = e.touches[0].clientX - dragStartX;
+    if (Math.abs(dx) > 3) dragMoved = true;
+    setOffset(dragStartOffset + dx, false);
+  }, { passive: true });
+
+  track.addEventListener('touchend', function () {
+    track.classList.remove('dragging');
+    var idx = Math.round(-currentOffset / STEP);
+    goTo(idx);
+  });
+
+  if (trackWrap) {
+    trackWrap.addEventListener('wheel', function (e) {
+      if (state !== 'grid') return;
+      e.preventDefault();
+      var delta = e.deltaX || e.deltaY;
+      setOffset(currentOffset - delta, false);
+      if (wheelTimer) clearTimeout(wheelTimer);
+      wheelTimer = setTimeout(function () {
+        var idx = Math.round(-currentOffset / STEP);
+        goTo(idx);
+      }, 120);
+    }, { passive: false });
+  }
+
+  setActiveIndex(0);
 
   var thumb3 = document.querySelector('.c3 .thumb');
   if (thumb3) {
