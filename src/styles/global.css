@@ -144,15 +144,15 @@ html, body {
   font-family: 'Courier New', monospace;
   font-size: 0.52rem;
   letter-spacing: 0.12em;
-  color: #2a2a2a;
+  color: #a0a0a0;
   background: none;
-  border: 1px solid #1e1e1e;
+  border: 1px solid #555;
   padding: 0.4rem 0.9rem;
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s;
 }
-.arrow-btn:hover { color: #888; border-color: #333; }
-.arrow-btn:disabled { opacity: 0.2; cursor: default; }
+.arrow-btn:hover { color: #ffffff; border-color: #888; }
+.arrow-btn:disabled { opacity: 0.35; cursor: default; }
 
 .dots { display: flex; gap: 0.5rem; align-items: center; }
 
@@ -160,11 +160,11 @@ html, body {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #1e1e1e;
+  background: #555;
   transition: background 0.25s, transform 0.25s;
   cursor: pointer;
 }
-.dot.on { background: #555; transform: scale(1.5); }
+.dot.on { background: #c8c8c8; transform: scale(1.5); }
 
 .num {
   position: absolute;
