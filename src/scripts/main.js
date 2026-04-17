@@ -508,9 +508,7 @@
 
   function maxOffset() {
     if (!trackWrap) return 0;
-    var trackW = TOTAL * CARD_W + (TOTAL - 1) * CARD_GAP;
-    var wrapW = trackWrap.offsetWidth - 96;
-    return Math.max(0, trackW - wrapW);
+    return Math.max(0, track.scrollWidth - trackWrap.offsetWidth);
   }
 
   function setOffset(x, animate) {
