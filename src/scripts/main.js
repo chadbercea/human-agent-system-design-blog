@@ -572,6 +572,7 @@
     dragStartX = e.clientX;
     dragStartOffset = currentOffset;
     track.classList.add('dragging');
+    resetCards();
     e.preventDefault();
   });
 
@@ -596,6 +597,7 @@
     dragStartOffset = currentOffset;
     dragMoved = false;
     track.classList.add('dragging');
+    resetCards();
   }, { passive: true });
 
   track.addEventListener('touchmove', function (e) {
