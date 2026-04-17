@@ -47,7 +47,10 @@ automated sync script. When syncing:
   - `2c670f3a-83ae-809d-ac71-dc50a0285c2a` — Design's Seat At The Table
   - `32b70f3a-83ae-8171-9753-ca8d34dad040` — Wait, You Guys Actually Killed Design
   - `33370f3a-83ae-8063-a00d-f45795457f44` — AI Title Doesn't Mean You Know AI
-- Strip `DRAFT:` prefix from titles and leading emoji/icons.
+- Strip `DRAFT:` prefix and leading emoji/icons from titles. When the Notion
+  title starts with `DRAFT:`, set `draft: true` in the Markdown frontmatter
+  so the article is excluded from the rendered list (see
+  `src/pages/index.astro` filter on `!data.draft`).
 - Strip Notion artifacts: `📷 HERO/IMAGE` photo-direction blocks, `<file>` tags,
   `<empty-block/>`, and any "Exported from … exported_from_atlassian_cloud"
   footer lines.
