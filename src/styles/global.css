@@ -132,17 +132,13 @@ html, body {
   overflow: visible;
 }
 
-.nav-bar {
-  height: 64px;
+.card-controls {
+  position: absolute;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 3rem;
-  border-top: 1px solid var(--dim);
-  flex-shrink: 0;
+  gap: 0.75rem;
+  z-index: 5;
 }
-
-.nav-arrows { display: flex; gap: 1rem; }
 
 .arrow-btn {
   font-family: 'Courier New', monospace;
@@ -169,14 +165,6 @@ html, body {
   cursor: pointer;
 }
 .dot.on { background: #555; transform: scale(1.5); }
-
-.nav-hint {
-  font-family: 'Courier New', monospace;
-  font-size: 0.4rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #1e1e1e;
-}
 
 .num {
   position: absolute;

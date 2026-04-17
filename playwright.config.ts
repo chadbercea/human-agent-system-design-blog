@@ -9,7 +9,7 @@ export default defineConfig({
     headless: true,
   },
   webServer: {
-    command: 'npm run dev',
+    command: 'ASTRO_TEST=1 npm run dev',
     port: 4321,
     reuseExistingServer: true,
     timeout: 20_000,

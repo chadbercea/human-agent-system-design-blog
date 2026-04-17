@@ -555,6 +555,18 @@
   if (btnPrev) btnPrev.addEventListener('click', function () { goTo(currentIndex - 1); });
   if (btnNext) btnNext.addEventListener('click', function () { goTo(currentIndex + 1); });
 
+  var cardControls = document.getElementById('card-controls');
+  function positionCardControls() {
+    if (!cardControls || !gridView || !cards[0]) return;
+    var firstCard = cards[0];
+    var cardRect = firstCard.getBoundingClientRect();
+    var gridRect = gridView.getBoundingClientRect();
+    cardControls.style.left = (cardRect.left - gridRect.left - currentOffset) + 'px';
+    cardControls.style.top = (cardRect.bottom - gridRect.top + 80) + 'px';
+  }
+  requestAnimationFrame(positionCardControls);
+  window.addEventListener('resize', positionCardControls);
+
   document.addEventListener('keydown', function (e) {
     if (state !== 'grid') return;
     var tag = (e.target && e.target.tagName) || '';

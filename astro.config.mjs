@@ -8,4 +8,5 @@ const site =
 export default defineConfig({
   site,
   integrations: [sitemap()],
+  devToolbar: { enabled: !process.env.ASTRO_TEST },
 });
