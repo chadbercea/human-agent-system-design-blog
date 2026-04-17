@@ -69,6 +69,23 @@
     articleData = [];
   }
 
+  var activeThumb = null;
+  var activeCardIndex = null;
+
+  function returnThumbToCard() {
+    if (activeThumb == null || activeCardIndex == null) return;
+    var sourceCard = cards[activeCardIndex];
+    if (sourceCard) {
+      var graphic = sourceCard.querySelector('.graphic');
+      if (graphic) graphic.appendChild(activeThumb);
+    }
+    activeThumb.style.transition = '';
+    activeThumb.style.transform = '';
+    activeThumb.style.transformOrigin = '';
+    activeThumb = null;
+    activeCardIndex = null;
+  }
+
   function center(rect) {
     return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
   }
@@ -223,30 +240,34 @@
     state = 'busy';
     setActiveNav('articles');
 
-    var graphicEl = card.querySelector('.graphic');
+    var thumbEl = card.querySelector('.thumb');
     var index = parseInt(card.dataset.index, 10);
     var slug = card.dataset.slug;
 
     exitOtherCards(card);
 
-    var first = graphicEl.getBoundingClientRect();
+    var first = thumbEl.getBoundingClientRect();
 
     articleView.classList.add('visible');
     loadArticle(slug, index);
 
-    var last = headerImg.getBoundingClientRect();
+    headerImg.appendChild(thumbEl);
+    activeThumb = thumbEl;
+    activeCardIndex = index;
+
+    var last = thumbEl.getBoundingClientRect();
     var scaleX = first.width / last.width;
     var scaleY = first.height / last.height;
     var tx = first.left - last.left;
     var ty = first.top - last.top;
 
-    headerImg.style.transition = 'none';
-    headerImg.style.transformOrigin = 'top left';
-    headerImg.style.transform =
+    thumbEl.style.transition = 'none';
+    thumbEl.style.transformOrigin = 'top left';
+    thumbEl.style.transform =
       'translate(' + tx + 'px, ' + ty + 'px) scale(' + scaleX + ', ' + scaleY + ')';
-    void headerImg.getBoundingClientRect();
-    headerImg.style.transition = 'transform var(--dur) var(--ease)';
-    headerImg.style.transform = '';
+    void thumbEl.getBoundingClientRect();
+    thumbEl.style.transition = 'transform var(--dur) var(--ease)';
+    thumbEl.style.transform = '';
 
     setTimeout(function () {
       articleView.classList.add('sidebar-in');
@@ -272,6 +293,16 @@
     articleMain.style.transition = 'opacity 200ms var(--ease)';
     articleMain.style.opacity = '0';
     setTimeout(function () {
+      returnThumbToCard();
+      var newCard = cards[index];
+      if (newCard) {
+        var newThumb = newCard.querySelector('.thumb');
+        if (newThumb) {
+          headerImg.appendChild(newThumb);
+          activeThumb = newThumb;
+          activeCardIndex = index;
+        }
+      }
       loadArticle(slug, index);
       articleMain.style.opacity = '1';
       setTimeout(function () {
@@ -295,6 +326,27 @@
 
     if (prev === 'article') {
       articleView.classList.remove('body-in', 'meta-in');
+
+      gridView.classList.remove('hidden');
+      resetCards();
+
+      if (activeThumb != null && activeCardIndex != null) {
+        var sourceCard = cards[activeCardIndex];
+        var sourceGraphic = sourceCard ? sourceCard.querySelector('.graphic') : null;
+        if (sourceGraphic) {
+          var fromRect = activeThumb.getBoundingClientRect();
+          var toRect = sourceGraphic.getBoundingClientRect();
+          var dx = toRect.left - fromRect.left;
+          var dy = toRect.top - fromRect.top;
+          var sx = toRect.width / fromRect.width;
+          var sy = toRect.height / fromRect.height;
+          activeThumb.style.transition = 'transform var(--dur) var(--ease)';
+          activeThumb.style.transformOrigin = 'top left';
+          activeThumb.style.transform =
+            'translate(' + dx + 'px, ' + dy + 'px) scale(' + sx + ', ' + sy + ')';
+        }
+      }
+
       setTimeout(function () {
         articleView.classList.remove('sidebar-in');
         clearSidebarStagger();
@@ -302,9 +354,8 @@
       setTimeout(function () {
         articleView.classList.remove('visible');
         resetHeaderFlip();
-        gridView.classList.remove('hidden');
-        resetCards();
-      }, 280);
+        returnThumbToCard();
+      }, 500);
       setTimeout(function () { state = 'grid'; }, 1000);
     } else {
       gridView.classList.remove('hidden');
@@ -342,6 +393,7 @@
       setTimeout(function () {
         articleView.classList.remove('visible');
         resetHeaderFlip();
+        returnThumbToCard();
       }, 260);
     }
 
