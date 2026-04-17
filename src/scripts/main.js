@@ -1,8 +1,8 @@
 (function () {
   var state = 'grid';
-  var grid = document.getElementById('grid');
-  if (!grid) return;
-  var cards = Array.prototype.slice.call(grid.querySelectorAll('.card'));
+  var track = document.getElementById('track');
+  if (!track) return;
+  var cards = Array.prototype.slice.call(track.querySelectorAll('.card'));
   if (!cards.length) return;
 
   var articleView = document.getElementById('article-view');
