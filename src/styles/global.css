@@ -132,31 +132,27 @@ html, body {
   overflow: visible;
 }
 
-.nav-bar {
-  height: 64px;
+.card-controls {
+  position: absolute;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 3rem;
-  border-top: 1px solid var(--dim);
-  flex-shrink: 0;
+  gap: 0.75rem;
+  z-index: 5;
 }
-
-.nav-arrows { display: flex; gap: 1rem; }
 
 .arrow-btn {
   font-family: 'Courier New', monospace;
   font-size: 0.52rem;
   letter-spacing: 0.12em;
-  color: #2a2a2a;
+  color: #a0a0a0;
   background: none;
-  border: 1px solid #1e1e1e;
+  border: 1px solid #555;
   padding: 0.4rem 0.9rem;
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s;
 }
-.arrow-btn:hover { color: #888; border-color: #333; }
-.arrow-btn:disabled { opacity: 0.2; cursor: default; }
+.arrow-btn:hover { color: #ffffff; border-color: #888; }
+.arrow-btn:disabled { opacity: 0.35; cursor: default; }
 
 .dots { display: flex; gap: 0.5rem; align-items: center; }
 
@@ -164,19 +160,11 @@ html, body {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #1e1e1e;
+  background: #555;
   transition: background 0.25s, transform 0.25s;
   cursor: pointer;
 }
-.dot.on { background: #555; transform: scale(1.5); }
-
-.nav-hint {
-  font-family: 'Courier New', monospace;
-  font-size: 0.4rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #1e1e1e;
-}
+.dot.on { background: #c8c8c8; transform: scale(1.5); }
 
 .num {
   position: absolute;

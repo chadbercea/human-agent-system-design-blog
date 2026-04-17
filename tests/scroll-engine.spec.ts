@@ -13,12 +13,6 @@ function tx(transform: string): number {
 test.describe('scroll engine', () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize(VP);
-    await page.addInitScript(() => {
-      // Hide Astro dev toolbar so clicks aren't intercepted
-      const style = document.createElement('style');
-      style.textContent = 'astro-dev-toolbar{display:none!important;pointer-events:none!important}';
-      document.documentElement.appendChild(style);
-    });
   });
 
   test('dots are rendered, one per article, first is active', async ({ page }) => {
