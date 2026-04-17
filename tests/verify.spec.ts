@@ -7,7 +7,7 @@ test.describe('verification pass', () => {
     await page.setViewportSize(VP);
   });
 
-  test('Grid: 6 cards, 2 cols, uniform #111 thumb backgrounds, numbers straddle', async ({ page }) => {
+  test('Grid: 6 cards, horizontal row, uniform #111 thumb backgrounds, numbers straddle', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(String(e)));
     page.on('console', (m) => {
@@ -19,13 +19,14 @@ test.describe('verification pass', () => {
     const cards = page.locator('.card');
     await expect(cards).toHaveCount(6);
 
-    // 2-column: cards in row 1 share y, cards on left vs right differ
+    // Horizontal track: all 6 cards share the same Y, sequential ascending X
     const boxes = await cards.evaluateAll((els) =>
       els.map((el) => (el as HTMLElement).getBoundingClientRect()).map((r) => ({ x: r.left, y: r.top, w: r.width, h: r.height }))
     );
-    expect(boxes[0].y).toBeCloseTo(boxes[1].y, 0);
-    expect(boxes[0].x).toBeLessThan(boxes[1].x);
-    expect(boxes[2].y).toBeGreaterThan(boxes[0].y);
+    for (let i = 1; i < boxes.length; i++) {
+      expect(boxes[i].y).toBeCloseTo(boxes[0].y, 0);
+      expect(boxes[i].x).toBeGreaterThan(boxes[i - 1].x);
+    }
 
     // Each card has a c1..c6 class for graphic selection
     for (let i = 1; i <= 6; i++) {
