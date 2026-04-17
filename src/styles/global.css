@@ -360,7 +360,8 @@ html, body {
   width: 200px;
   height: 355px;
   background: #1c1c1c;
-  will-change: transform;
+  position: relative;
+  overflow: hidden;
 }
 
 .article-meta-block {
