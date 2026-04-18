@@ -35,13 +35,14 @@ No Astro routing. No View Transitions API. No multi-page navigation.
 are NOT the author's general-interest essays from Medium — those are explicitly
 out of scope and must not be duplicated here.
 
-- **Canonical source:** the planning page "Article Series: Agentic Orchestration"
-  at Notion ID `2cb70f3a-83ae-8120-a4ac-fe55f2923747` (parent: "HAS Design
-  Framework" `2cb70f3a-83ae-818d-9d8b-e39c7ef762ab`). That page contains 6
-  article outlines, each with a hook, thesis, key points, payoff, and planned
-  publish date.
-- **Canonical article set** (6 stubs until the full drafts are written — exactly
-  these, no more, no less):
+- **Reference source** (not canonical — these are ideas, not finished work): the
+  planning page "Article Series: Agentic Orchestration" at Notion ID
+  `2cb70f3a-83ae-8120-a4ac-fe55f2923747` (parent: "HAS Design Framework"
+  `2cb70f3a-83ae-818d-9d8b-e39c7ef762ab`). That page contains 6 article
+  outlines, each with a hook, thesis, key points, payoff, and planned publish
+  date.
+- **Current article set** (6 stubs — expected to evolve as drafts are written;
+  nothing here is canonical or final):
   1. `agents-arent-personas.md` — Dec 22, 2025
   2. `the-three-actors.md` — Dec 29, 2025
   3. `aci-agent-computer-interaction.md` — Jan 5, 2026
