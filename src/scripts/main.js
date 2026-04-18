@@ -5,10 +5,15 @@
   var cards = Array.prototype.slice.call(track.querySelectorAll('.card'));
   if (!cards.length) return;
 
-  var CARD_W = 260;
   var CARD_GAP = 32;
+  var CARD_W = cards[0].offsetWidth || 260;
   var STEP = CARD_W + CARD_GAP;
   var TOTAL = cards.length;
+
+  function recomputeStep() {
+    CARD_W = cards[0].offsetWidth || CARD_W;
+    STEP = CARD_W + CARD_GAP;
+  }
 
   var trackWrap = document.getElementById('track-wrap');
   var btnPrev = document.getElementById('btn-prev');
@@ -617,7 +622,11 @@
     cardControls.style.top = (cardRect.bottom - gridRect.top + 80) + 'px';
   }
   requestAnimationFrame(positionCardControls);
-  window.addEventListener('resize', positionCardControls);
+  window.addEventListener('resize', function () {
+    recomputeStep();
+    setOffset(-currentIndex * STEP, false);
+    positionCardControls();
+  });
 
   document.addEventListener('keydown', function (e) {
     if (state !== 'grid') return;

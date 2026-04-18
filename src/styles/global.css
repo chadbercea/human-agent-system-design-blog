@@ -14,7 +14,8 @@
   --dur: 460ms;
   --pl: 20vw;
   --pr: 6vw;
-  --card-w: 260px;
+  --card-h: 50vh;
+  --card-w: calc(var(--card-h) * 9 / 16);
   --card-gap: 2rem;
 }
 
@@ -127,7 +128,7 @@ html, body {
 .graphic {
   position: relative;
   width: var(--card-w);
-  height: calc(var(--card-w) * 16 / 9);
+  height: var(--card-h);
   flex-shrink: 0;
   overflow: visible;
 }

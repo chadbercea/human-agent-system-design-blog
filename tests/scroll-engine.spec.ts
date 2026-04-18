@@ -1,13 +1,18 @@
 import { test, expect } from '@playwright/test';
 
 const VP = { width: 1440, height: 900 };
-const STEP = 260 + 32; // CARD_W + CARD_GAP
+const CARD_GAP = 32;
 
 function tx(transform: string): number {
   const m = transform.match(/matrix\(([^)]+)\)/);
   if (!m) return 0;
   const parts = m[1].split(',').map((n) => parseFloat(n));
   return parts[4];
+}
+
+async function getStep(page): Promise<number> {
+  const w = await page.locator('.card').first().evaluate((el: HTMLElement) => el.offsetWidth);
+  return w + CARD_GAP;
 }
 
 test.describe('scroll engine', () => {
@@ -33,6 +38,7 @@ test.describe('scroll engine', () => {
   test('next button advances index and translates track by -STEP', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.card');
+    const STEP = await getStep(page);
     await page.locator('#btn-next').click();
     await page.waitForTimeout(650);
     const t = await page.locator('#track').evaluate((el) => getComputedStyle(el as HTMLElement).transform);
@@ -83,6 +89,7 @@ test.describe('scroll engine', () => {
   test('mouse drag snaps to nearest card', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.card');
+    const STEP = await getStep(page);
     const trackBox = await page.locator('#track').boundingBox();
     if (!trackBox) throw new Error('no track box');
     const startX = trackBox.x + 200;
@@ -118,6 +125,7 @@ test.describe('scroll engine', () => {
   test('wheel scroll debounces and snaps', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.card');
+    const STEP = await getStep(page);
     // Emit wheel events on the track-wrap
     await page.locator('#track-wrap').hover();
     await page.mouse.wheel(300, 0);
