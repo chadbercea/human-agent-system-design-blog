@@ -15,17 +15,21 @@ async function getStep(page): Promise<number> {
   return w + CARD_GAP;
 }
 
+async function activeIndex(page): Promise<number> {
+  const v = await page.locator('#track').getAttribute('data-active-index');
+  return v == null ? -1 : parseInt(v, 10);
+}
+
 test.describe('scroll engine', () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize(VP);
   });
 
-  test('dots are rendered, one per article, first is active', async ({ page }) => {
+  test('six cards rendered, first is active', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.card');
-    const dots = page.locator('#dots .dot');
-    await expect(dots).toHaveCount(6);
-    await expect(dots.nth(0)).toHaveClass(/on/);
+    await expect(page.locator('.card')).toHaveCount(6);
+    expect(await activeIndex(page)).toBe(0);
   });
 
   test('prev button disabled at start, next enabled', async ({ page }) => {
@@ -43,7 +47,7 @@ test.describe('scroll engine', () => {
     await page.waitForTimeout(650);
     const t = await page.locator('#track').evaluate((el) => getComputedStyle(el as HTMLElement).transform);
     expect(Math.round(tx(t))).toBe(-STEP);
-    await expect(page.locator('#dots .dot').nth(1)).toHaveClass(/on/);
+    expect(await activeIndex(page)).toBe(1);
   });
 
   test('next to last, next disabled; prev works back', async ({ page }) => {
@@ -54,22 +58,11 @@ test.describe('scroll engine', () => {
       await page.waitForTimeout(620);
     }
     await expect(page.locator('#btn-next')).toBeDisabled();
-    await expect(page.locator('#dots .dot').nth(5)).toHaveClass(/on/);
+    expect(await activeIndex(page)).toBe(5);
     await page.locator('#btn-prev').click();
     await page.waitForTimeout(620);
     await expect(page.locator('#btn-next')).toBeEnabled();
-    await expect(page.locator('#dots .dot').nth(4)).toHaveClass(/on/);
-  });
-
-  test('dot click jumps directly to that index', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForSelector('.card');
-    await page.locator('#dots .dot').nth(3).click({ force: true });
-    await page.waitForTimeout(650);
-    await expect(page.locator('#dots .dot').nth(3)).toHaveClass(/on/);
-    const t = await page.locator('#track').evaluate((el) => getComputedStyle(el as HTMLElement).transform);
-    // Track moved negatively (may clamp at maxOffset on wide viewports — logical index is the source of truth)
-    expect(tx(t)).toBeLessThan(0);
+    expect(await activeIndex(page)).toBe(4);
   });
 
   test('ArrowRight and ArrowLeft navigate', async ({ page }) => {
@@ -77,13 +70,13 @@ test.describe('scroll engine', () => {
     await page.waitForSelector('.card');
     await page.keyboard.press('ArrowRight');
     await page.waitForTimeout(700);
-    await expect(page.locator('#dots .dot').nth(1)).toHaveClass(/on/);
+    expect(await activeIndex(page)).toBe(1);
     await page.keyboard.press('ArrowRight');
     await page.waitForTimeout(700);
-    await expect(page.locator('#dots .dot').nth(2)).toHaveClass(/on/);
+    expect(await activeIndex(page)).toBe(2);
     await page.keyboard.press('ArrowLeft');
     await page.waitForTimeout(700);
-    await expect(page.locator('#dots .dot').nth(1)).toHaveClass(/on/);
+    expect(await activeIndex(page)).toBe(1);
   });
 
   test('mouse drag snaps to nearest card', async ({ page }) => {
@@ -94,7 +87,6 @@ test.describe('scroll engine', () => {
     if (!trackBox) throw new Error('no track box');
     const startX = trackBox.x + 200;
     const y = trackBox.y + 300;
-    // Drag leftward by STEP (full step → snap to index 1 even for wide cards)
     const drag = STEP;
     await page.mouse.move(startX, y);
     await page.mouse.down();
@@ -104,7 +96,7 @@ test.describe('scroll engine', () => {
     await page.waitForTimeout(650);
     const t = await page.locator('#track').evaluate((el) => getComputedStyle(el as HTMLElement).transform);
     expect(Math.round(tx(t))).toBe(-STEP);
-    await expect(page.locator('#dots .dot').nth(1)).toHaveClass(/on/);
+    expect(await activeIndex(page)).toBe(1);
   });
 
   test('drag does not open article (drag threshold guards click)', async ({ page }) => {
@@ -127,16 +119,13 @@ test.describe('scroll engine', () => {
     await page.goto('/');
     await page.waitForSelector('.card');
     const STEP = await getStep(page);
-    // Emit wheel events on the track-wrap
     await page.locator('#track-wrap').hover();
     await page.mouse.wheel(300, 0);
     await page.waitForTimeout(250);
     await page.waitForTimeout(650);
     const t = await page.locator('#track').evaluate((el) => getComputedStyle(el as HTMLElement).transform);
-    // Should have snapped to at least index 1
     expect(Math.round(tx(t))).toBeLessThanOrEqual(-STEP + 2);
-    const activeDots = await page.locator('#dots .dot.on').count();
-    expect(activeDots).toBe(1);
+    expect(await activeIndex(page)).toBeGreaterThanOrEqual(1);
   });
 
   test('track still uses cursor grab style', async ({ page }) => {

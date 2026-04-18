@@ -18,7 +18,6 @@
   var trackWrap = document.getElementById('track-wrap');
   var btnPrev = document.getElementById('btn-prev');
   var btnNext = document.getElementById('btn-next');
-  var dotsEl = document.getElementById('dots');
 
   var currentIndex = 0;
   var currentOffset = 0;
@@ -582,11 +581,7 @@
 
   function setActiveIndex(idx) {
     currentIndex = idx;
-    if (dotsEl) {
-      Array.prototype.forEach.call(dotsEl.querySelectorAll('.dot'), function (d, i) {
-        d.classList.toggle('on', i === idx);
-      });
-    }
+    track.dataset.activeIndex = String(idx);
     if (btnPrev) btnPrev.disabled = idx === 0;
     if (btnNext) btnNext.disabled = idx >= TOTAL - 1;
   }
@@ -595,18 +590,6 @@
     idx = Math.max(0, Math.min(TOTAL - 1, idx));
     setOffset(-idx * STEP, true);
     setActiveIndex(idx);
-  }
-
-  if (dotsEl) {
-    dotsEl.innerHTML = '';
-    for (var di = 0; di < TOTAL; di++) {
-      (function (i) {
-        var d = document.createElement('div');
-        d.className = 'dot' + (i === 0 ? ' on' : '');
-        d.addEventListener('click', function () { goTo(i); });
-        dotsEl.appendChild(d);
-      })(di);
-    }
   }
 
   if (btnPrev) btnPrev.addEventListener('click', function () { goTo(currentIndex - 1); });
