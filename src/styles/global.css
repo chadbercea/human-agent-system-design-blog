@@ -14,7 +14,7 @@
   --dur: 460ms;
   --pl: 20vw;
   --pr: 6vw;
-  --card-h: 50vh;
+  --card-h: 66.6vh;
   --card-w: calc(var(--card-h) * 9 / 16);
   --card-gap: 2rem;
 }
