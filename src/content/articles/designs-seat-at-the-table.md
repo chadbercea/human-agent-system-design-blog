@@ -26,7 +26,7 @@ AI can optimize funnels. It cannot create desire.
 
 That gap — the uncomfortable, human gap — is where design has always lived.
 
-And while companies are busy doing **design theater** and calling facilitation "strategy", they're quietly turning themselves into feature factories: high output, low soul, zero loyalty. Products nobody loves. Systems nobody trusts. Brands that feel like vending machines.
+And while companies are busy doing **design theater** and calling facilitation "strategy," they're quietly turning themselves into feature factories: high output, low soul, zero loyalty. Products nobody loves. Systems nobody trusts. Brands that feel like vending machines.
 
 ---
 

@@ -12,7 +12,7 @@ I'm less convinced we've gotten equally good at building AI fluency in the peopl
 
 ---
 
-## Title ≢ Fluency
+## Title ≠ Fluency
 
 Putting "AI" in someone's title doesn't make them AI-native. It makes them a strong designer, who now sits on an AI team, working in a medium they may or may not actually be fluent in.
 
@@ -30,7 +30,7 @@ When that's your personal relationship to AI, it quietly shapes what you design.
 
 This isn't abstract. It leaks directly into what we ship.
 
-If the people designing an AI product experience "memory across sessions" as an unavoidable cognitive tax, they're less likely to ask: "How might the system aggressively maintain and surface context so users don't have to?" Instead, they'll add affordances to re-ingest the same information, write guidance about "how to manage your cognitive load," or accept context loss as "just how AI swork feels."
+If the people designing an AI product experience "memory across sessions" as an unavoidable cognitive tax, they're less likely to ask: "How might the system aggressively maintain and surface context so users don't have to?" Instead, they'll add affordances to re-ingest the same information, write guidance about "how to manage your cognitive load," or accept context loss as "just how AI work feels."
 
 The gap between "this is hard" and "this is designable" is the gap between a mediocre AI feature and a great AI product.
 
@@ -60,7 +60,7 @@ Customers eventually feel that as timid features, cautious UX that underestimate
 
 Acknowledge the gap openly. It's okay that not everyone is AI-native yet. It's not okay to pretend title equals fluency.
 
-Create deliberate paths to fluency. Rotations where designers must use AI daily in their own practice. Pairing AI-fluent practitioners with those earlier in the journey. An expectation that "AI designer" means "I personally work this way with AI" — rather than "I sit on an AI team."
+Create deliberate paths to fluency. Rotations where designers must use AI daily in their own practice. Pairing AI-fluent practitioners with those earlier in the journey. An expectation that "AI designer" means "I personally work this way with AI" — not just "I sit on an AI team."
 
 Make fluency visible in staffing. When assigning AI-heavy work, consider demonstrated AI practice, not just role or level.
 

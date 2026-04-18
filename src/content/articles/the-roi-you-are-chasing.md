@@ -16,7 +16,7 @@ And now you're wondering why the ROI isn't materializing. It isn't a mystery.
 
 ---
 
-## You Didn't Deploy AI9. You Embalmed Your Processes With It.
+## You Didn't Deploy AI. You Embalmed Your Processes With It.
 
 Here is what is actually happening inside your organization.
 
