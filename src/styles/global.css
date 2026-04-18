@@ -2,6 +2,8 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html { font-size: clamp(16px, 1.1vw, 28px); }
+
 :root {
   --bg: #0a0a0a;
   --text: #c8c8c8;
