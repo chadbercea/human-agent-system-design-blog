@@ -94,11 +94,12 @@ test.describe('scroll engine', () => {
     if (!trackBox) throw new Error('no track box');
     const startX = trackBox.x + 200;
     const y = trackBox.y + 300;
-    // Drag leftward by ~200px (more than half a step → snap to index 1)
+    // Drag leftward by STEP (full step → snap to index 1 even for wide cards)
+    const drag = STEP;
     await page.mouse.move(startX, y);
     await page.mouse.down();
-    await page.mouse.move(startX - 100, y, { steps: 5 });
-    await page.mouse.move(startX - 200, y, { steps: 5 });
+    await page.mouse.move(startX - drag / 2, y, { steps: 5 });
+    await page.mouse.move(startX - drag, y, { steps: 5 });
     await page.mouse.up();
     await page.waitForTimeout(650);
     const t = await page.locator('#track').evaluate((el) => getComputedStyle(el as HTMLElement).transform);

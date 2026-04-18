@@ -14,7 +14,7 @@
   --dur: 460ms;
   --pl: 20vw;
   --pr: 6vw;
-  --card-h: 66.6vh;
+  --card-h: 80vh;
   --card-w: calc(var(--card-h) * 9 / 16);
   --card-gap: 2rem;
 }
@@ -77,7 +77,7 @@ html, body {
   top: var(--hh);
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: var(--hh);
   overflow: hidden;
 }
 #grid-view.hidden { display: none; }
@@ -134,11 +134,18 @@ html, body {
 }
 
 .card-controls {
-  position: absolute;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--hh);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  z-index: 5;
+  justify-content: space-between;
+  padding: 0 3rem;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  z-index: 100;
 }
 
 .arrow-btn {
