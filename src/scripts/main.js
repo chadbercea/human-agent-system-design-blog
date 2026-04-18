@@ -5,15 +5,19 @@
   var cards = Array.prototype.slice.call(track.querySelectorAll('.card'));
   if (!cards.length) return;
 
-  var CARD_W = 260;
   var CARD_GAP = 32;
+  var CARD_W = cards[0].offsetWidth || 260;
   var STEP = CARD_W + CARD_GAP;
   var TOTAL = cards.length;
+
+  function recomputeStep() {
+    CARD_W = cards[0].offsetWidth || CARD_W;
+    STEP = CARD_W + CARD_GAP;
+  }
 
   var trackWrap = document.getElementById('track-wrap');
   var btnPrev = document.getElementById('btn-prev');
   var btnNext = document.getElementById('btn-next');
-  var dotsEl = document.getElementById('dots');
 
   var currentIndex = 0;
   var currentOffset = 0;
@@ -577,11 +581,7 @@
 
   function setActiveIndex(idx) {
     currentIndex = idx;
-    if (dotsEl) {
-      Array.prototype.forEach.call(dotsEl.querySelectorAll('.dot'), function (d, i) {
-        d.classList.toggle('on', i === idx);
-      });
-    }
+    track.dataset.activeIndex = String(idx);
     if (btnPrev) btnPrev.disabled = idx === 0;
     if (btnNext) btnNext.disabled = idx >= TOTAL - 1;
   }
@@ -592,32 +592,13 @@
     setActiveIndex(idx);
   }
 
-  if (dotsEl) {
-    dotsEl.innerHTML = '';
-    for (var di = 0; di < TOTAL; di++) {
-      (function (i) {
-        var d = document.createElement('div');
-        d.className = 'dot' + (i === 0 ? ' on' : '');
-        d.addEventListener('click', function () { goTo(i); });
-        dotsEl.appendChild(d);
-      })(di);
-    }
-  }
-
   if (btnPrev) btnPrev.addEventListener('click', function () { goTo(currentIndex - 1); });
   if (btnNext) btnNext.addEventListener('click', function () { goTo(currentIndex + 1); });
 
-  var cardControls = document.getElementById('card-controls');
-  function positionCardControls() {
-    if (!cardControls || !gridView || !cards[0]) return;
-    var firstCard = cards[0];
-    var cardRect = firstCard.getBoundingClientRect();
-    var gridRect = gridView.getBoundingClientRect();
-    cardControls.style.left = (cardRect.left - gridRect.left - currentOffset) + 'px';
-    cardControls.style.top = (cardRect.bottom - gridRect.top + 80) + 'px';
-  }
-  requestAnimationFrame(positionCardControls);
-  window.addEventListener('resize', positionCardControls);
+  window.addEventListener('resize', function () {
+    recomputeStep();
+    setOffset(-currentIndex * STEP, false);
+  });
 
   document.addEventListener('keydown', function (e) {
     if (state !== 'grid') return;
