@@ -29,30 +29,34 @@ No Astro routing. No View Transitions API. No multi-page navigation.
 
 …
 
-## Content Sync — Articles
+## Content — Articles
 
-`src/content/articles/` is synced manually from Notion via MCP. There is no
-automated sync script. When syncing:
+`src/content/articles/` contains the HAS Design academic article series. These
+are NOT the author's general-interest essays from Medium — those are explicitly
+out of scope and must not be duplicated here.
 
-- **Canonical source:** parent page `33f70f3a-83ae-811a-8641-fd227416d127`
-  ("HAS Design Blog — Articles"). Fetch the parent, then iterate its child
-  pages only.
-- **Do NOT use workspace search** (`notion-search`) to find articles. It pulls
-  in unrelated content. The parent page itself says: "fetch all child pages of
-  this page to get the full article list. Do not search the workspace."
-- **Canonical article set** (6 pages — exactly these, no more, no less):
-  - `30d70f3a-83ae-8102-8e7b-de538564c60a` — Why HCI Needs a Child
-  - `30c70f3a-83ae-811e-a0ee-d4aded9e4dce` — There Is No Exodus
-  - `33470f3a-83ae-8134-a4a3-e166d5090008` — The ROI You're Chasing
-  - `2c670f3a-83ae-809d-ac71-dc50a0285c2a` — Design's Seat At The Table
-  - `32b70f3a-83ae-8171-9753-ca8d34dad040` — Wait, You Guys Actually Killed Design
-  - `33370f3a-83ae-8063-a00d-f45795457f44` — AI Title Doesn't Mean You Know AI
-- Strip `DRAFT:` prefix and leading emoji/icons from titles. When the Notion
-  title starts with `DRAFT:`, set `draft: true` in the Markdown frontmatter
-  so the article is excluded from the rendered list (see
-  `src/pages/index.astro` filter on `!data.draft`).
-- Strip Notion artifacts: `📷 HERO/IMAGE` photo-direction blocks, `<file>` tags,
-  `<empty-block/>`, and any "Exported from … exported_from_atlassian_cloud"
-  footer lines.
-- Use the Notion page's last-edited timestamp for frontmatter `date`.
-- `description` is the first substantive sentence of the body.
+- **Canonical source:** the planning page "Article Series: Agentic Orchestration"
+  at Notion ID `2cb70f3a-83ae-8120-a4ac-fe55f2923747` (parent: "HAS Design
+  Framework" `2cb70f3a-83ae-818d-9d8b-e39c7ef762ab`). That page contains 6
+  article outlines, each with a hook, thesis, key points, payoff, and planned
+  publish date.
+- **Canonical article set** (6 stubs until the full drafts are written — exactly
+  these, no more, no less):
+  1. `agents-arent-personas.md` — Dec 22, 2025
+  2. `the-three-actors.md` — Dec 29, 2025
+  3. `aci-agent-computer-interaction.md` — Jan 5, 2026
+  4. `has-design-the-practice.md` — Jan 12, 2026
+  5. `service-blueprints-for-agentic-orchestrations.md` — Jan 19, 2026
+  6. `the-career-path-for-has-designers.md` — Jan 26, 2026
+- The Notion page "HAS Design Blog — Articles"
+  (`33f70f3a-83ae-811a-8641-fd227416d127`) is a list of the author's Medium
+  essays and is **NOT** the source for this blog, despite its own description
+  claiming otherwise. Do not fetch from it. If that description ever needs to
+  be corrected, update it in Notion.
+- Each stub's body is the outline content from the planning page (hook, thesis,
+  key points, payoff) with a top note marking it as a stub. When a full draft
+  is written, replace the stub body and keep the frontmatter `draft: false` so
+  it continues to render.
+- Use the outline's planned publish date for frontmatter `date`.
+- `description` is the thesis statement from the outline.
+- Tags should include `"HAS Design"` and `"Framework"` to group the series.
