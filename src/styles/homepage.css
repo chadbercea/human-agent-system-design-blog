@@ -227,7 +227,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .article-inner {
   width: 100%;
-  max-width: 68ch;
+  max-width: 78ch;
   margin: 0 auto;
   padding: 4rem 3rem 6rem;
   opacity: 0;
@@ -259,17 +259,14 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .art-lede {
   font-size: 22px;
   line-height: 1.55;
-  color: #9a9a9a;
   font-style: italic;
-  margin-bottom: 0;
-  padding-bottom: 2.5rem;
-  border-bottom: 1px solid #1c1c1c;
+  color: #9a9a9a;
+  margin: 0 0 2.5rem;
 }
 .art-body {
   font-size: 18px;
   line-height: 1.65;
   color: #909090;
-  margin-top: 2.5rem;
 }
 .art-body p { margin-bottom: 1.25em; }
 .art-body p:last-child { margin-bottom: 0; }
@@ -507,10 +504,9 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .art-lede {
     font-size: 19px;
     line-height: 1.5;
-    margin-bottom: 0;
-    padding-bottom: 1.75rem;
+    margin: 0 0 1.75rem;
   }
-  .art-body { font-size: 17px; line-height: 1.6; margin-top: 1.75rem; }
+  .art-body { font-size: 17px; line-height: 1.6; }
   .art-body p { margin-bottom: 1.15em; }
   .art-body h2 { font-size: 20px; line-height: 1.3; margin: 2em 0 0.5em; }
   .art-end { margin-top: 3rem; font-size: 12px; }
