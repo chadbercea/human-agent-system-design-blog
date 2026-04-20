@@ -20,12 +20,21 @@ const rendered = await Promise.all(
   })
 );
 
-const articleMeta = articles.map((a) => ({
-  slug: a.slug,
-  title: a.data.title,
-  lede: a.data.description ?? '',
-  eyebrow: [...(a.data.tags ?? []), formatDate(a.data.date)].join(' · '),
-}));
+function readMinutes(body: string): number {
+  const words = body.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 220));
+}
+
+const articleMeta = articles.map((a) => {
+  const minutes = readMinutes(a.body);
+  const base = [...(a.data.tags ?? []), formatDate(a.data.date)].join(' · ');
+  return {
+    slug: a.slug,
+    title: a.data.title,
+    lede: a.data.description ?? '',
+    eyebrow: `${base} · ${minutes} min read`,
+  };
+});
 ---
 <BaseLayout title="HAS Design" activeNav="articles">
   <div class="stage" id="stage">
@@ -66,6 +75,7 @@ const articleMeta = articles.map((a) => ({
         <h1 class="art-h1" id="art-h1"></h1>
         <p class="art-lede" id="art-lede"></p>
         <div class="art-body" id="art-body"></div>
+        <div class="art-end" aria-hidden="true">·&nbsp;·&nbsp;·</div>
       </article>
     </div>
   </div>
@@ -95,25 +105,32 @@ const articleMeta = articles.map((a) => ({
         var h1El = document.getElementById('art-h1');
         var ledeEl = document.getElementById('art-lede');
         var bodyEl = document.getElementById('art-body');
+        var savedScrollY = 0;
 
         function openArticle(idx) {
           var data = meta[idx];
           if (!data) return;
+          var wasOpen = stage.classList.contains('open');
+          if (!wasOpen) {
+            savedScrollY = window.scrollY || window.pageYOffset || 0;
+          }
           eyebrowEl.textContent = data.eyebrow;
           h1El.textContent = data.title;
           ledeEl.textContent = data.lede;
           var src = document.getElementById('body-' + data.slug);
           bodyEl.innerHTML = src ? src.innerHTML : '';
-          if (colArticle) colArticle.scrollTop = 0;
           items.forEach(function (el) { el.classList.remove('active'); });
           var activeEl = items[idx];
           if (activeEl) activeEl.classList.add('active');
           stage.classList.add('open');
+          window.scrollTo(0, 0);
+          if (colArticle) colArticle.scrollTop = 0;
         }
 
         function closeArticle() {
           stage.classList.remove('open');
           items.forEach(function (el) { el.classList.remove('active'); });
+          window.scrollTo(0, savedScrollY);
         }
 
         items.forEach(function (el) {
