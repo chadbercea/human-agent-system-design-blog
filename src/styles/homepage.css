@@ -67,6 +67,76 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 .col:last-child { border-right: none; }
 
+/* ───────────── COL 1: HERO ↔ BACK ───────────── */
+.hero-inner {
+  width: 70vw;
+  height: 100%;
+  padding: 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.stage.open .hero-inner {
+  opacity: 0;
+  transform: translateX(-16px);
+  pointer-events: none;
+}
+.eyebrow {
+  font-family: "Courier New", monospace;
+  font-size: 0.9vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #2a2a2a;
+  margin-bottom: 1.25rem;
+}
+.h1 {
+  font-size: 11vw;
+  font-weight: 700;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  color: #c8c8c8;
+  margin-bottom: 1.5rem;
+}
+.desc {
+  font-size: 1.4vw;
+  line-height: 1.7;
+  color: #585858;
+  font-style: italic;
+}
+
+.back-btn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease 0.25s, color 0.2s;
+  color: #3a3a3a;
+}
+.stage.open .back-btn {
+  opacity: 1;
+  pointer-events: all;
+}
+.back-btn:hover { color: #c8c8c8; }
+.back-content {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  font-family: "Courier New", monospace;
+  font-size: 0.75vw;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+.back-arrow {
+  font-size: 1vw;
+  letter-spacing: 0;
+}
+
 /* ───────────── FOOTER ───────────── */
 .footer {
   display: flex;
@@ -124,6 +194,30 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     position: static;
     overflow: visible;
   }
+
+  .col-hero {
+    border-bottom: 1px solid #1c1c1c;
+  }
+  .hero-inner {
+    width: 100%;
+    height: auto;
+    padding: 2.5rem 1.25rem 3rem;
+    display: block;
+  }
+  .stage.open .hero-inner {
+    opacity: 1;
+    transform: none;
+    pointer-events: all;
+  }
+  .eyebrow { font-size: 11px; margin-bottom: 0.875rem; }
+  .h1 {
+    font-size: 44px;
+    line-height: 0.92;
+    margin-bottom: 1.25rem;
+  }
+  .desc { font-size: 17px; line-height: 1.55; }
+
+  .back-btn { display: none; }
 
   .footer { padding: 0 1.25rem; }
   .footer span { font-size: 11px; }
