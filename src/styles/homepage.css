@@ -42,10 +42,10 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   font-size: 0.9vw;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #2a2a2a;
+  color: #858585;
   transition: color 0.15s;
 }
-.nav a:hover { color: #585858; }
+.nav a:hover { color: #c8c8c8; }
 .nav a.on { color: #c8c8c8; }
 .nav a.on::before { content: "• "; }
 
@@ -87,7 +87,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   font-size: 0.9vw;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #2a2a2a;
+  color: #858585;
   margin-bottom: 1.25rem;
 }
 .h1 {
@@ -102,7 +102,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .desc {
   font-size: 1.4vw;
   line-height: 1.7;
-  color: #585858;
+  color: #9a9a9a;
   font-style: italic;
 }
 
@@ -115,7 +115,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease 0.25s, color 0.2s;
-  color: #3a3a3a;
+  color: #7a7a7a;
 }
 .stage.open .back-btn {
   opacity: 1;
@@ -146,7 +146,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   font-size: 0.75vw;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #2a2a2a;
+  color: #858585;
   padding: 1.5rem 2rem 0.875rem;
   border-bottom: 1px solid #1c1c1c;
 }
@@ -187,14 +187,14 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   font-family: var(--font-mono);
   font-size: 0.75vw;
   letter-spacing: 0.1em;
-  color: #333;
+  color: #7a7a7a;
   margin-bottom: 0.4rem;
 }
-.ai-date { color: #252525; }
+.ai-date { color: #7a7a7a; }
 .ai-title {
   font-size: 1.4vw;
   line-height: 1.35;
-  color: #585858;
+  color: #909090;
   transition: color 0.2s;
 }
 .article-item:hover .ai-title,
@@ -224,7 +224,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   font-size: 0.9vw;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #2a2a2a;
+  color: #858585;
   margin-bottom: 1.5rem;
 }
 .art-h1 {
@@ -239,7 +239,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .art-lede {
   font-size: 1.65vw;
   line-height: 1.6;
-  color: #585858;
+  color: #9a9a9a;
   font-style: italic;
   margin-bottom: 2.5rem;
   padding-bottom: 2.5rem;
@@ -248,13 +248,13 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .art-body {
   font-size: 1.4vw;
   line-height: 1.8;
-  color: #484848;
+  color: #909090;
 }
 .art-body p { margin-bottom: 1.4em; }
 .art-body h2 {
   font-size: 1.65vw;
   font-weight: 700;
-  color: #686868;
+  color: #9a9a9a;
   margin: 2.5em 0 1em;
   letter-spacing: -0.01em;
 }
@@ -291,7 +291,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .prose-lede {
   font-size: 1.65vw;
   line-height: 1.6;
-  color: #585858;
+  color: #9a9a9a;
   font-style: italic;
   margin-bottom: 2.5rem;
   padding-bottom: 2.5rem;
@@ -300,7 +300,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .prose-body {
   font-size: 1.4vw;
   line-height: 1.8;
-  color: #484848;
+  color: #909090;
 }
 .prose-body p { margin-bottom: 1.4em; }
 
@@ -318,7 +318,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   font-size: 0.75vw;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #2a2a2a;
+  color: #858585;
 }
 
 /* ═══════════════════════════════════════════════
@@ -434,7 +434,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #585858;
+    color: #858585;
     transition: color 0.15s;
   }
   .mobile-back:hover, .mobile-back:active { color: #c8c8c8; }
