@@ -2,7 +2,7 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { font-size: clamp(16px, 1.1vw, 28px); }
+html { font-size: 18px; }
 
 :root {
   --bg: #0a0a0a;
@@ -266,7 +266,7 @@ html, body {
 .sidebar {
   flex: 0 0 var(--pl);
   width: var(--pl);
-  padding: clamp(2rem, 4vh, 4rem) clamp(1.25rem, 2vw, 2rem);
+  padding: 3rem 1.5rem;
   overflow-y: auto;
   border-right: 1px solid var(--dim);
   display: flex;
@@ -334,12 +334,12 @@ html, body {
 .article-main {
   flex: 1;
   overflow-y: auto;
-  padding: clamp(2rem, 4vh, 4rem) clamp(2rem, 6vw, 6rem) 4rem clamp(2rem, 4vw, 4rem);
+  padding: 3rem 4rem 4rem 3rem;
 }
 
 .article-header-band {
   display: flex;
-  gap: clamp(1.5rem, 3vw, 3rem);
+  gap: 2rem;
   align-items: flex-end;
   margin-bottom: 2.5rem;
   padding-bottom: 2rem;
@@ -371,7 +371,7 @@ html, body {
 
 .article-title {
   font-family: Georgia, serif;
-  font-size: clamp(2rem, 4.5vw, 3.8rem);
+  font-size: 2.8rem;
   font-weight: bold;
   line-height: 1.02;
   letter-spacing: -0.03em;
@@ -391,7 +391,7 @@ html, body {
 .article-body {
   max-width: 58ch;
   font-family: Georgia, serif;
-  font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+  font-size: 1rem;
   line-height: 1.72;
   color: #9a9a9a;
   opacity: 0;
@@ -405,7 +405,7 @@ html, body {
 .article-body p { margin-bottom: 1.1rem; }
 .article-body h2 {
   font-family: Georgia, serif;
-  font-size: clamp(1.2rem, 1.8vw, 1.4rem);
+  font-size: 1.3rem;
   font-weight: bold;
   margin: 2.2rem 0 0.8rem;
   color: var(--text);
@@ -413,7 +413,7 @@ html, body {
 }
 .article-body h3 {
   font-family: Georgia, serif;
-  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  font-size: 1.1rem;
   font-weight: bold;
   margin: 1.6rem 0 0.6rem;
   color: var(--text);
@@ -422,7 +422,7 @@ html, body {
 .article-body .lede {
   font-style: italic;
   color: #777;
-  font-size: clamp(1rem, 1.35vw, 1.15rem);
+  font-size: 1.1rem;
   line-height: 1.65;
   margin-bottom: 1.8rem;
 }
@@ -511,7 +511,7 @@ html, body {
 
 .meta-stage,
 .meta-inner {
-  padding: clamp(2rem, 4vh, 4rem) clamp(2rem, 6vw, 6rem);
+  padding: 3rem 4rem;
   max-width: 720px;
 }
 
@@ -537,7 +537,7 @@ html, body {
 .meta-title,
 .pg-title {
   font-family: Georgia, serif;
-  font-size: clamp(2.4rem, 5.5vw, 4.8rem);
+  font-size: 3.6rem;
   font-weight: bold;
   line-height: 0.97;
   letter-spacing: -0.03em;
@@ -548,7 +548,7 @@ html, body {
 .meta-bio,
 .pg-sub {
   font-family: Georgia, serif;
-  font-size: clamp(0.85rem, 1.25vw, 1rem);
+  font-size: 0.92rem;
   color: var(--sub);
   font-style: italic;
   margin-bottom: 2.5rem;
@@ -602,7 +602,7 @@ html, body {
 .contact-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(2rem, 5vw, 5rem);
+  gap: 3rem;
   margin-top: 1.5rem;
 }
 
