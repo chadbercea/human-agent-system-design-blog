@@ -8,18 +8,20 @@ test.describe('prototype verification — desktop 1920x1080', () => {
     await page.setViewportSize(DESKTOP);
   });
 
-  test('shell grid: 80px header + 1fr stage + 80px footer, no scroll', async ({ page }) => {
+  test('shell flex: 80px header + flex stage + 80px footer, document scrolls', async ({ page }) => {
     await page.goto('/');
-    const rows = await page.locator('.shell').evaluate(
-      (el) => getComputedStyle(el as HTMLElement).gridTemplateRows
+    const headerH = await page.locator('.header').evaluate(
+      (el) => el.getBoundingClientRect().height
     );
-    const parts = rows.split(/\s+/).map(parseFloat);
-    expect(parts[0]).toBe(80);
-    expect(parts[2]).toBe(80);
-    const overflow = await page.locator('body').evaluate(
-      (el) => getComputedStyle(el as HTMLElement).overflow
+    const footerH = await page.locator('.footer').evaluate(
+      (el) => el.getBoundingClientRect().height
     );
-    expect(overflow).toBe('hidden');
+    expect(headerH).toBe(80);
+    expect(footerH).toBe(80);
+    const headerPos = await page.locator('.header').evaluate(
+      (el) => getComputedStyle(el as HTMLElement).position
+    );
+    expect(headerPos).toBe('sticky');
   });
 
   test('default state: 70% / 30% / 0 columns', async ({ page }) => {
@@ -33,12 +35,12 @@ test.describe('prototype verification — desktop 1920x1080', () => {
     expect(parts[2]).toBe(0);
   });
 
-  test('hero h1 is pure vw (≈211px at 1920)', async ({ page }) => {
+  test('hero h1 is pure vw (≈134px at 1920)', async ({ page }) => {
     await page.goto('/');
     const size = await page.locator('.h1').evaluate(
       (el) => parseFloat(getComputedStyle(el as HTMLElement).fontSize)
     );
-    expect(size).toBeCloseTo(1920 * 0.11, 0);
+    expect(size).toBeCloseTo(1920 * 0.07, 0);
   });
 
   test('header brand shows full text, Articles is .on with bullet', async ({ page }) => {
@@ -103,6 +105,52 @@ test.describe('prototype verification — desktop 1920x1080', () => {
     await expect(page.locator('.prose-page .prose-h1')).toBeVisible();
   });
 
+  test('reader: body 18px, h2 24px, title 48px, bounded column', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('.article-item').first().click();
+    await page.waitForTimeout(700);
+    const body = await page.locator('.art-body').evaluate(
+      (el) => parseFloat(getComputedStyle(el as HTMLElement).fontSize)
+    );
+    expect(body).toBe(18);
+    const h1 = await page.locator('.art-h1').evaluate(
+      (el) => parseFloat(getComputedStyle(el as HTMLElement).fontSize)
+    );
+    expect(h1).toBe(48);
+    const lede = await page.locator('.art-lede').evaluate(
+      (el) => parseFloat(getComputedStyle(el as HTMLElement).fontSize)
+    );
+    expect(lede).toBe(22);
+    const inner = page.locator('.article-inner');
+    const maxW = await inner.evaluate(
+      (el) => getComputedStyle(el as HTMLElement).maxWidth
+    );
+    expect(maxW).not.toBe('none');
+  });
+
+  test('reader: end marker visible, eyebrow contains read time', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('.article-item').first().click();
+    await page.waitForTimeout(700);
+    await expect(page.locator('.art-end')).toBeVisible();
+    const eyebrow = await page.locator('#art-eyebrow').textContent();
+    expect(eyebrow).toMatch(/\d+\s+min read/);
+  });
+
+  test('reader open: hero and list become sticky', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('.article-item').first().click();
+    await page.waitForTimeout(700);
+    const heroPos = await page.locator('.col-hero').evaluate(
+      (el) => getComputedStyle(el as HTMLElement).position
+    );
+    const listPos = await page.locator('.col-list').evaluate(
+      (el) => getComputedStyle(el as HTMLElement).position
+    );
+    expect(heroPos).toBe('sticky');
+    expect(listPos).toBe('sticky');
+  });
+
   test('no console errors on /', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(String(e)));
@@ -158,11 +206,13 @@ test.describe('prototype verification — mobile 375x667', () => {
 
   test('footer uses 60px mobile row', async ({ page }) => {
     await page.goto('/');
-    const rows = await page.locator('.shell').evaluate(
-      (el) => getComputedStyle(el as HTMLElement).gridTemplateRows
+    const headerH = await page.locator('.header').evaluate(
+      (el) => el.getBoundingClientRect().height
     );
-    const parts = rows.split(/\s+/).map(parseFloat);
-    expect(parts[0]).toBe(80);
-    expect(parts[parts.length - 1]).toBe(60);
+    const footerH = await page.locator('.footer').evaluate(
+      (el) => el.getBoundingClientRect().height
+    );
+    expect(headerH).toBe(80);
+    expect(footerH).toBe(60);
   });
 });

@@ -3,29 +3,32 @@
 html { font-size: 16px; }
 
 html, body {
-  height: 100%;
+  height: auto;
   background: #0a0a0a;
   color: #c8c8c8;
   font-family: var(--font-prose);
-  overflow: hidden;
 }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 
 .shell {
-  display: grid;
-  grid-template-rows: 80px 1fr 80px;
-  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* ───────────── HEADER ───────────── */
 .header {
   display: flex;
+  flex: 0 0 80px;
   align-items: center;
   justify-content: space-between;
   padding: 0 2.5rem;
   border-bottom: 1px solid #1c1c1c;
   background: #0a0a0a;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 .brand {
   font-family: var(--font-ui);
@@ -55,9 +58,24 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   grid-template-columns: 70% 30% 0;
   overflow: hidden;
   transition: grid-template-columns 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  flex: 1 1 auto;
+  min-height: 0;
 }
 .stage.open {
   grid-template-columns: 80px calc(30% - 80px) 70%;
+  overflow: visible;
+  height: auto;
+}
+.stage.open .col-article {
+  overflow: visible;
+  height: auto;
+}
+.stage.open .col-hero,
+.stage.open .col-list {
+  overflow: hidden;
+  height: calc(100vh - 160px);
+  position: sticky;
+  top: 80px;
 }
 
 .col {
@@ -208,8 +226,10 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .mobile-back { display: none; }
 
 .article-inner {
-  width: 70vw;
-  padding: 3.5rem 3rem 4rem;
+  width: 100%;
+  max-width: 68ch;
+  margin: 0 auto;
+  padding: 4rem 3rem 6rem;
   opacity: 0;
   transform: translateX(16px);
   transition: opacity 0.4s ease 0.3s, transform 0.4s ease 0.3s;
@@ -221,42 +241,54 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .art-eyebrow {
   font-family: var(--font-ui);
-  font-size: 0.9vw;
+  font-size: 13px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #858585;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 .art-h1 {
   font-family: var(--font-display);
-  font-size: 4vw;
+  font-size: 48px;
   font-weight: 700;
-  line-height: 1.03;
+  line-height: 1.1;
   letter-spacing: -0.03em;
   color: #c8c8c8;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 .art-lede {
-  font-size: 1.65vw;
-  line-height: 1.6;
+  font-size: 22px;
+  line-height: 1.55;
   color: #9a9a9a;
   font-style: italic;
-  margin-bottom: 2.5rem;
+  margin-bottom: 0;
   padding-bottom: 2.5rem;
   border-bottom: 1px solid #1c1c1c;
 }
 .art-body {
-  font-size: 1.4vw;
-  line-height: 1.8;
+  font-size: 18px;
+  line-height: 1.65;
   color: #909090;
+  margin-top: 2.5rem;
 }
-.art-body p { margin-bottom: 1.4em; }
+.art-body p { margin-bottom: 1.25em; }
+.art-body p:last-child { margin-bottom: 0; }
 .art-body h2 {
-  font-size: 1.65vw;
+  font-size: 24px;
   font-weight: 700;
-  color: #9a9a9a;
-  margin: 2.5em 0 1em;
+  line-height: 1.25;
+  color: #c8c8c8;
+  margin: 2.5em 0 0.5em;
   letter-spacing: -0.01em;
+}
+.art-body h2 + p { margin-top: 0; }
+
+.art-end {
+  margin-top: 4rem;
+  text-align: center;
+  color: #7a7a7a;
+  letter-spacing: 0.5em;
+  font-size: 14px;
 }
 
 /* ───────────── PROSE PAGES (About / Contact) ─────────────
@@ -307,6 +339,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 /* ───────────── FOOTER ───────────── */
 .footer {
   display: flex;
+  flex: 0 0 80px;
   align-items: center;
   justify-content: space-between;
   padding: 0 2.5rem;
@@ -335,10 +368,10 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   }
 
   .shell {
-    grid-template-rows: 80px auto 60px;
     height: auto;
     min-height: 100vh;
   }
+  .footer { flex: 0 0 60px; }
 
   /* Header: compact padding, swap brand text */
   .header { padding: 0 1.25rem; }
@@ -356,6 +389,19 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     grid-template-columns: none;
   }
   .stage.open { grid-template-columns: none; }
+
+  /* Reset the desktop document-scroll rules — mobile already page-scrolls */
+  .stage.open .col-hero,
+  .stage.open .col-list {
+    position: static;
+    height: auto;
+    top: auto;
+    overflow: visible;
+  }
+  .stage.open .col-article {
+    overflow-y: auto;
+    height: auto;
+  }
 
   .col {
     width: 100%;
@@ -441,7 +487,9 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
   .article-inner {
     width: 100%;
-    padding: 2rem 1.25rem 3rem;
+    max-width: none;
+    margin: 0;
+    padding: 2rem 1.5rem 4rem;
     opacity: 1;
     transform: none;
     transition: none;
@@ -450,20 +498,22 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     opacity: 1;
     transform: none;
   }
-  .art-eyebrow { font-size: 11px; margin-bottom: 1rem; }
+  .art-eyebrow { font-size: 12px; margin-bottom: 0.5rem; }
   .art-h1 {
     font-size: 32px;
-    line-height: 1.05;
+    line-height: 1.08;
     margin-bottom: 1.25rem;
   }
   .art-lede {
-    font-size: 20px;
-    line-height: 1.55;
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
+    font-size: 19px;
+    line-height: 1.5;
+    margin-bottom: 0;
+    padding-bottom: 1.75rem;
   }
-  .art-body { font-size: 17px; line-height: 1.65; }
-  .art-body h2 { font-size: 18px; margin: 2em 0 0.75em; }
+  .art-body { font-size: 17px; line-height: 1.6; margin-top: 1.75rem; }
+  .art-body p { margin-bottom: 1.15em; }
+  .art-body h2 { font-size: 20px; line-height: 1.3; margin: 2em 0 0.5em; }
+  .art-end { margin-top: 3rem; font-size: 12px; }
 
   /* Footer: tighter height */
   .footer {
