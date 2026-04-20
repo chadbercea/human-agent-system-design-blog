@@ -6,7 +6,7 @@ html, body {
   height: 100%;
   background: #0a0a0a;
   color: #c8c8c8;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-prose);
   overflow: hidden;
 }
 a { color: inherit; text-decoration: none; }
@@ -28,7 +28,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   background: #0a0a0a;
 }
 .brand {
-  font-family: "Courier New", monospace;
+  font-family: var(--font-ui);
   font-size: 0.9vw;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -38,7 +38,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .nav { display: flex; gap: 2rem; }
 .nav a {
-  font-family: "Courier New", monospace;
+  font-family: var(--font-ui);
   font-size: 0.9vw;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -83,7 +83,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   pointer-events: none;
 }
 .eyebrow {
-  font-family: "Courier New", monospace;
+  font-family: var(--font-ui);
   font-size: 0.9vw;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -91,6 +91,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   margin-bottom: 1.25rem;
 }
 .h1 {
+  font-family: var(--font-display);
   font-size: 7vw;
   font-weight: 700;
   line-height: 0.88;
@@ -127,7 +128,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   display: flex;
   align-items: center;
   gap: 1.25rem;
-  font-family: "Courier New", monospace;
+  font-family: var(--font-ui);
   font-size: 0.75vw;
   letter-spacing: 0.3em;
   text-transform: uppercase;
@@ -141,7 +142,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .col-list { display: flex; flex-direction: column; }
 .list-label {
   flex-shrink: 0;
-  font-family: "Courier New", monospace;
+  font-family: var(--font-ui);
   font-size: 0.75vw;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -183,7 +184,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .ai-meta {
   display: flex;
   justify-content: space-between;
-  font-family: "Courier New", monospace;
+  font-family: var(--font-mono);
   font-size: 0.75vw;
   letter-spacing: 0.1em;
   color: #333;
@@ -219,7 +220,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 
 .art-eyebrow {
-  font-family: "Courier New", monospace;
+  font-family: var(--font-ui);
   font-size: 0.9vw;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -227,6 +228,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   margin-bottom: 1.5rem;
 }
 .art-h1 {
+  font-family: var(--font-display);
   font-size: 4vw;
   font-weight: 700;
   line-height: 1.03;
@@ -278,6 +280,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 
 .prose-h1 {
+  font-family: var(--font-display);
   font-size: 4vw;
   font-weight: 700;
   line-height: 1.03;
@@ -311,7 +314,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   background: #0a0a0a;
 }
 .footer span {
-  font-family: "Courier New", monospace;
+  font-family: var(--font-ui);
   font-size: 0.75vw;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -427,7 +430,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     background: #0a0a0a;
     border-bottom: 1px solid #1c1c1c;
     z-index: 10;
-    font-family: "Courier New", monospace;
+    font-family: var(--font-ui);
     font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
