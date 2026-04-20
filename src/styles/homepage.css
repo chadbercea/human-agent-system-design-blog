@@ -259,21 +259,21 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   line-height: 1.55;
   font-style: italic;
   color: #9a9a9a;
-  margin: 0 0 2.5rem;
+  margin: 0 0 1.5rem;
 }
 .art-body {
   font-size: 1.1vw;
   line-height: 1.65;
   color: #909090;
 }
-.art-body p { margin-bottom: 1.25em; }
+.art-body p { margin-bottom: 1em; }
 .art-body p:last-child { margin-bottom: 0; }
 .art-body h2 {
   font-size: 1.5vw;
   font-weight: 700;
   line-height: 1.25;
   color: #c8c8c8;
-  margin: 2.5em 0 0.5em;
+  margin: 2em 0 0.4em;
   letter-spacing: -0.01em;
 }
 .art-body h2 + p { margin-top: 0; }
