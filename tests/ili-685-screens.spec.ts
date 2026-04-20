@@ -15,8 +15,8 @@ test.describe('ILI-685 verification — vw typography, no max-width cap', () => 
 
     const body = page.locator('.art-body').first();
     const bodyFs = await body.evaluate((el) => getComputedStyle(el).fontSize);
-    // 1.4vw of 1400 = 19.6px
-    expect(parseFloat(bodyFs)).toBeCloseTo(19.6, 0);
+    // 1.1vw of 1400 = 15.4px
+    expect(parseFloat(bodyFs)).toBeCloseTo(15.4, 0);
 
     const inner = page.locator('.article-inner');
     const maxW = await inner.evaluate((el) => getComputedStyle(el).maxWidth);
@@ -32,8 +32,8 @@ test.describe('ILI-685 verification — vw typography, no max-width cap', () => 
 
     const body = page.locator('.art-body').first();
     const bodyFs = await body.evaluate((el) => getComputedStyle(el).fontSize);
-    // 1.4vw of 1920 = 26.88px
-    expect(parseFloat(bodyFs)).toBeCloseTo(26.88, 0);
+    // 1.1vw of 1920 = 21.12px
+    expect(parseFloat(bodyFs)).toBeCloseTo(21.12, 0);
   });
 
   test('2560×1600 — reader open', async ({ page }) => {
@@ -45,8 +45,8 @@ test.describe('ILI-685 verification — vw typography, no max-width cap', () => 
 
     const body = page.locator('.art-body').first();
     const bodyFs = await body.evaluate((el) => getComputedStyle(el).fontSize);
-    // 1.4vw of 2560 = 35.84px
-    expect(parseFloat(bodyFs)).toBeCloseTo(35.84, 0);
+    // 1.1vw of 2560 = 28.16px
+    expect(parseFloat(bodyFs)).toBeCloseTo(28.16, 0);
   });
 
   test('400×900 — mobile reader preserved', async ({ page }) => {

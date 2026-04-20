@@ -227,7 +227,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .article-inner {
   width: 100%;
-  padding: 4rem 3rem 6rem;
+  padding: 4rem 4rem 6rem;
   opacity: 0;
   transform: translateX(16px);
   transition: opacity 0.4s ease 0.3s, transform 0.4s ease 0.3s;
@@ -239,7 +239,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .art-eyebrow {
   font-family: var(--font-ui);
-  font-size: 0.9vw;
+  font-size: 0.75vw;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #858585;
@@ -247,7 +247,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 .art-h1 {
   font-family: var(--font-display);
-  font-size: 4vw;
+  font-size: 3.5vw;
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.03em;
@@ -255,21 +255,21 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   margin-bottom: 1.75rem;
 }
 .art-lede {
-  font-size: 1.65vw;
+  font-size: 1.3vw;
   line-height: 1.55;
   font-style: italic;
   color: #9a9a9a;
   margin: 0 0 2.5rem;
 }
 .art-body {
-  font-size: 1.4vw;
+  font-size: 1.1vw;
   line-height: 1.65;
   color: #909090;
 }
 .art-body p { margin-bottom: 1.25em; }
 .art-body p:last-child { margin-bottom: 0; }
 .art-body h2 {
-  font-size: 1.65vw;
+  font-size: 1.5vw;
   font-weight: 700;
   line-height: 1.25;
   color: #c8c8c8;
@@ -283,7 +283,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   text-align: center;
   color: #7a7a7a;
   letter-spacing: 0.5em;
-  font-size: 14px;
+  font-size: 0.85vw;
 }
 
 /* ───────────── PROSE PAGES (About / Contact) ─────────────
