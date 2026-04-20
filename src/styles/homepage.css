@@ -49,6 +49,24 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .nav a.on { color: #c8c8c8; }
 .nav a.on::before { content: "• "; }
 
+/* ───────────── STAGE (the animated grid) ───────────── */
+.stage {
+  display: grid;
+  grid-template-columns: 70% 30% 0;
+  overflow: hidden;
+  transition: grid-template-columns 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.stage.open {
+  grid-template-columns: 80px calc(30% - 80px) 70%;
+}
+
+.col {
+  position: relative;
+  overflow: hidden;
+  border-right: 1px solid #1c1c1c;
+}
+.col:last-child { border-right: none; }
+
 /* ───────────── FOOTER ───────────── */
 .footer {
   display: flex;
@@ -91,6 +109,21 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .brand { font-size: 13px; }
   .nav { gap: 1.25rem; }
   .nav a { font-size: 12px; }
+
+  .stage {
+    display: block;
+    overflow: visible;
+    transition: none;
+    grid-template-columns: none;
+  }
+  .stage.open { grid-template-columns: none; }
+
+  .col {
+    width: 100%;
+    border-right: none;
+    position: static;
+    overflow: visible;
+  }
 
   .footer { padding: 0 1.25rem; }
   .footer span { font-size: 11px; }
