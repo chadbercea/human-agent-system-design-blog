@@ -294,6 +294,30 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   color: #7a7a7a;
 }
 
+/* Skeleton blocks for behavior-testing placeholder articles */
+.art-body .sk { display: block; background: #1c1c1c; border-radius: 3px; }
+.art-body .sk-h2 {
+  height: clamp(22px, 1.5vw, 32px);
+  width: 32%;
+  margin: clamp(28px, 2.5rem, 40px) 0 clamp(6px, 0.5rem, 8px);
+}
+.art-body .sk-line {
+  height: clamp(14px, 1.1vw, 22px);
+  width: 100%;
+  margin-bottom: clamp(6px, 0.5vw, 10px);
+}
+.art-body .sk-line.w-95 { width: 95%; }
+.art-body .sk-line.w-90 { width: 90%; }
+.art-body .sk-line.w-85 { width: 85%; }
+.art-body .sk-line.w-75 { width: 75%; }
+.art-body .sk-line.w-60 { width: 60%; }
+.art-body .sk-line.w-45 { width: 45%; }
+.art-body .sk-line.w-30 { width: 30%; }
+.art-body .sk-para { margin-bottom: clamp(14px, 1.25rem, 20px); }
+.art-body .sk-para:last-child { margin-bottom: 0; }
+.art-body .sk-para .sk-line:last-child { margin-bottom: 0; }
+.art-body ul .sk-line, .art-body ol .sk-line { margin-bottom: 0; }
+
 .art-end {
   margin-top: 4rem;
   text-align: center;
