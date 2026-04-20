@@ -137,6 +137,68 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   letter-spacing: 0;
 }
 
+/* ───────────── COL 2: ARTICLE LIST ───────────── */
+.col-list { display: flex; flex-direction: column; }
+.list-label {
+  flex-shrink: 0;
+  font-family: "Courier New", monospace;
+  font-size: 0.75vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #2a2a2a;
+  padding: 1.5rem 2rem 0.875rem;
+  border-bottom: 1px solid #1c1c1c;
+}
+.article-list {
+  list-style: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+}
+.article-list::-webkit-scrollbar { width: 2px; }
+.article-list::-webkit-scrollbar-thumb { background: #1c1c1c; }
+
+.article-item {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #1c1c1c;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s;
+}
+.article-item::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: #c8c8c8;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.article-item:hover::before,
+.article-item.active::before { transform: scaleY(1); }
+.article-item:hover { background: rgba(255,255,255,0.015); }
+.article-item.active { background: rgba(255,255,255,0.03); }
+
+.ai-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: "Courier New", monospace;
+  font-size: 0.75vw;
+  letter-spacing: 0.1em;
+  color: #333;
+  margin-bottom: 0.4rem;
+}
+.ai-date { color: #252525; }
+.ai-title {
+  font-size: 1.4vw;
+  line-height: 1.35;
+  color: #585858;
+  transition: color 0.2s;
+}
+.article-item:hover .ai-title,
+.article-item.active .ai-title { color: #c8c8c8; }
+
 /* ───────────── FOOTER ───────────── */
 .footer {
   display: flex;
@@ -218,6 +280,20 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .desc { font-size: 17px; line-height: 1.55; }
 
   .back-btn { display: none; }
+
+  /* Article list: full width, all items expand, standard scroll */
+  .col-list { display: block; }
+  .list-label {
+    font-size: 11px;
+    padding: 1.25rem 1.25rem 0.75rem;
+  }
+  .article-list {
+    overflow: visible;
+    flex: none;
+  }
+  .article-item { padding: 1.25rem 1.25rem; }
+  .ai-meta { font-size: 11px; }
+  .ai-title { font-size: 17px; line-height: 1.35; }
 
   .footer { padding: 0 1.25rem; }
   .footer span { font-size: 11px; }

@@ -1,5 +1,17 @@
 ---
+import { getCollection } from 'astro:content';
 import '../styles/homepage.css';
+
+const articles = (await getCollection('articles'))
+  .filter((a) => !a.data.draft)
+  .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+
+function formatDate(d: Date): string {
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}.${m}.${day}`;
+}
 ---
 <html lang="en">
 <head>
@@ -35,7 +47,20 @@ import '../styles/homepage.css';
           </span>
         </button>
       </div>
-      <div class="col col-list"></div>
+      <div class="col col-list">
+        <span class="list-label">Published Articles</span>
+        <ul class="article-list" id="article-list">
+          {articles.map((a, i) => (
+            <li class="article-item" data-index={i} data-slug={a.slug}>
+              <div class="ai-meta">
+                <span>{String(i + 1).padStart(2, '0')}</span>
+                <span class="ai-date">{formatDate(a.data.date)}</span>
+              </div>
+              <div class="ai-title">{a.data.title}</div>
+            </li>
+          ))}
+        </ul>
+      </div>
       <div class="col col-article"></div>
     </div>
 
