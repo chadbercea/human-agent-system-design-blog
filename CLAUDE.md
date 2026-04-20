@@ -8,26 +8,41 @@ When you complete a task:
 
 Do this automatically without being asked. Never leave work uncommitted.
 
-## Design Direction — Prototype UX
+## Approved Prototype
 
 The approved prototype is `has-design-prototype.html` at the repo root.
-Read it completely before writing any code. It is the source of truth.
+Read it completely before writing any code. It is the source of truth
+for the Astro port milestone (ILI-665). Do not deviate. Do not introduce
+new typography rules, new breakpoints, new layout strategies, or new
+animations. Port this, exactly.
 
-### Architecture
-Single-page application. All views live in `src/pages/index.astro`.
-Astro renders initial HTML server-side from the content collection.
-Vanilla JS handles all state, transitions, and interactions client-side.
-No Astro routing. No View Transitions API. No multi-page navigation.
+### Non-negotiables
 
-### Views
-- Grid: 2-column card layout, all articles
-- Article: FLIP transition from card graphic to portrait article header
-- About: full-page with field rows
-- Contact: two-column form + Google Calendar scheduler
+- Typography: pure `vw` on desktop, pure `px` on mobile.
+- No `rem` for font sizes. No `clamp()`. No `calc()` on font sizes.
+- No `max-width` caps on content. Text fills its column.
+- The only animation on the columns is `grid-template-columns` — no
+  `translateX` slides between desktop states.
+- Header: 80px static. Footer: 80px desktop / 60px mobile, static.
+  Stage fills between via `grid-template-rows: 80px 1fr 80px`.
+- Desktop default: `grid-template-columns: 70% 30% 0` (hero + list + hidden reader).
+- Desktop article-open: `grid-template-columns: 80px calc(30% - 80px) 70%`
+  (vertical back + list + reader).
+- Mobile breakpoint: 900px. Below this, stage stacks single column and
+  the article reader is a `position: fixed` full-screen overlay that
+  slides in from the right.
+- Escape key closes the article reader.
 
-### Rules
+### Astro port notes
 
-…
+- Replace the prototype's inline `articles` array with
+  `getCollection('articles')`; reader binds by the same DOM ids
+  (`art-eyebrow`, `art-h1`, `art-lede`, `art-body`).
+- `href="/"`, `href="/about"`, `href="/contact"` stay as real links.
+  Only the article reader is client-rendered without navigation.
+- Keep the `.brand-full` / `.brand-short` split intact.
+- CSS lives in `src/styles/homepage.css` imported from a single
+  `Homepage.astro` layout. No Tailwind. No CSS-in-JS. Class names verbatim.
 
 ## Content — Articles
 

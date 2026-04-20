@@ -5,144 +5,733 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HAS Design</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #0d0d0d; --text: #d8d8d8; --sub: #484848; --dim: #1e1e1e;
-  --hh: 48px; --ease: cubic-bezier(0.4,0,0.2,1); --dur: 460ms;
-  --pl: 20vw; --pr: 6vw;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Fluid typography — every size is pure vw.
+   Text is sized as a proportion of the viewport. Fills the space
+   proportionally. Window grows, text grows. Window shrinks, text
+   shrinks. No floors, no ceilings — that's the rule. */
+html { font-size: 16px; }
+
+html, body {
+  height: 100%;
+  background: #0a0a0a;
+  color: #c8c8c8;
+  font-family: Georgia, "Times New Roman", serif;
+  overflow: hidden;
 }
-html,body { height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:Georgia,serif; }
-.hdr { position:fixed; top:0; left:0; right:0; height:var(--hh); display:flex; align-items:center; justify-content:space-between; padding:0 clamp(1.5rem,3vw,3rem); background:var(--bg); border-bottom:1px solid var(--dim); z-index:100; transition:transform 240ms var(--ease); }
-.hdr.away { transform:translateY(-100%); }
-.brand { font-family:'Courier New',monospace; font-size:clamp(0.54rem,0.82vw,0.68rem); letter-spacing:0.16em; text-transform:uppercase; color:var(--text); cursor:pointer; user-select:none; }
-.hnav { display:flex; gap:2rem; }
-.hn { font-family:'Courier New',monospace; font-size:clamp(0.5rem,0.72vw,0.6rem); letter-spacing:0.1em; text-transform:uppercase; color:var(--sub); cursor:pointer; transition:color 0.18s; user-select:none; display:flex; align-items:center; gap:0.3rem; }
-.hn:hover { color:#888; } .hn.on { color:var(--text); }
-.dot { width:3px; height:3px; border-radius:50%; background:var(--text); opacity:0; transition:opacity 0.18s; } .hn.on .dot { opacity:1; }
-.stage { position:fixed; top:var(--hh); left:0; right:0; bottom:0; overflow:hidden; }
-.layer { position:absolute; top:0; bottom:0; left:var(--pl); right:var(--pr); overflow-y:auto; padding:clamp(2rem,4vh,4rem) clamp(1.5rem,3vw,3rem); transition: transform var(--dur) var(--ease), filter var(--dur) var(--ease), opacity calc(var(--dur)*0.75) var(--ease); will-change:transform,filter,opacity; }
-.layer-meta { position:absolute; top:0; bottom:0; left:var(--pl); right:var(--pr); overflow-y:auto; padding:clamp(2rem,4vh,4rem) clamp(1.5rem,3vw,3rem); transition: transform var(--dur) var(--ease), filter var(--dur) var(--ease), opacity calc(var(--dur)*0.75) var(--ease); will-change:transform,filter,opacity; }
-.z-front { transform:none; filter:blur(0); opacity:1; pointer-events:all; z-index:10; }
-.z-ef    { transform:perspective(1400px) translateZ(160px) scale(1.08); filter:blur(14px); opacity:0; pointer-events:none; z-index:10; }
-.z-gone  { transform:perspective(1400px) translateZ(-220px) scale(0.86); filter:blur(18px); opacity:0; pointer-events:none; z-index:1; }
-.z-back  { transform:translateX(-20vw) scale(0.72); transform-origin:left center; filter:blur(8px); opacity:0.25; pointer-events:none; z-index:20; }
-.z-crisp { transform:translateX(-20vw) scale(0.72); transform-origin:left center; filter:blur(0); opacity:1; pointer-events:none; z-index:20; }
-.z-dim   { transform:none; filter:blur(14px); opacity:0.25; pointer-events:none; z-index:10; }
-.hz { position:absolute; top:0; bottom:0; left:0; width:var(--pl); z-index:30; cursor:pointer; display:none; } .hz.on { display:block; }
-.alist { list-style:none; display:inline-flex; flex-direction:column; }
-.ali { display:flex; flex-direction:row; align-items:baseline; gap:0.75rem; padding:0.5rem 0; cursor:pointer; white-space:nowrap; transition:transform 0.18s var(--ease); }
-.ali:hover, .ali.hi { transform:translateX(6px); }
-.alt { font-family:Georgia,serif; font-size:clamp(1.8rem,3.5vw,3.2rem); color:rgba(255,255,255,0.66); font-weight:bold; transition:color 0.15s; line-height:1.1; letter-spacing:-0.02em; }
-.ald { font-family:'Courier New',monospace; font-size:0.48rem; color:rgba(255,255,255,0.5); letter-spacing:0.08em; transition:color 0.15s; }
-.ali:hover .alt, .ali.hi .alt { color:var(--text); } .ali:hover .ald, .ali.hi .ald { color:rgba(255,255,255,0.8); }
-.art-title { font-family:Georgia,serif; font-size:clamp(2rem,5vw,4.5rem); font-weight:bold; line-height:1.02; letter-spacing:-0.03em; margin-bottom:0.8rem; max-width:20ch; }
-.art-meta { font-family:'Courier New',monospace; font-size:0.52rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--sub); margin-bottom:2rem; display:flex; gap:1.5rem; }
-.art-lede { font-family:Georgia,serif; font-size:clamp(0.9rem,1.35vw,1.05rem); line-height:1.68; color:#555; font-style:italic; max-width:54ch; margin-bottom:2rem; padding-bottom:2rem; border-bottom:1px solid var(--dim); }
-.prose { max-width:58ch; } .pl { height:1px; background:var(--dim); margin-bottom:0.48rem; } .pl.f{width:100%}.pl.m{width:76%}.pl.s{width:50%} .pg { height:1rem; }
-.ph { font-family:Georgia,serif; font-size:clamp(0.92rem,1.5vw,1.18rem); font-weight:bold; margin:1.8rem 0 0.7rem; color:var(--text); }
-.pg-title { font-family:Georgia,serif; font-size:clamp(2.4rem,5.5vw,4.8rem); font-weight:bold; line-height:0.97; letter-spacing:-0.03em; margin-bottom:1rem; }
-.pg-sub { font-family:Georgia,serif; font-size:clamp(0.85rem,1.25vw,1rem); color:var(--sub); font-style:italic; margin-bottom:2.5rem; line-height:1.65; max-width:42ch; }
-.field { border-bottom:1px solid var(--dim); padding:0.55rem 0; display:flex; justify-content:space-between; max-width:320px; margin-bottom:1px; }
-.fk { font-family:'Courier New',monospace; font-size:0.5rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--sub); }
-.fv { font-family:Georgia,serif; font-size:0.76rem; color:#4a4a4a; font-style:italic; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+.shell {
+  display: grid;
+  grid-template-rows: 80px 1fr 80px;
+  height: 100vh;
+}
+
+/* ───────────── HEADER ───────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  border-bottom: 1px solid #1c1c1c;
+  background: #0a0a0a;
+}
+.brand {
+  font-family: "Courier New", monospace;
+  font-size: 0.9vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #c8c8c8;
+}
+.brand-short { display: none; }
+
+.mobile-back { display: none; }
+.nav { display: flex; gap: 2rem; }
+.nav a {
+  font-family: "Courier New", monospace;
+  font-size: 0.9vw;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #2a2a2a;
+  transition: color 0.15s;
+}
+.nav a:hover { color: #585858; }
+.nav a.on { color: #c8c8c8; }
+.nav a.on::before { content: "• "; }
+
+/* ───────────── STAGE (the animated grid) ───────────── */
+.stage {
+  display: grid;
+  grid-template-columns: 70% 30% 0;
+  overflow: hidden;
+  transition: grid-template-columns 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.stage.open {
+  grid-template-columns: 80px calc(30% - 80px) 70%;
+}
+
+.col {
+  position: relative;
+  overflow: hidden;
+  border-right: 1px solid #1c1c1c;
+}
+.col:last-child { border-right: none; }
+
+/* ───────────── COL 1: HERO ↔ BACK ───────────── */
+.hero-inner {
+  width: 70vw;           /* fixed width prevents layout thrash during transition */
+  height: 100%;
+  padding: 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.stage.open .hero-inner {
+  opacity: 0;
+  transform: translateX(-16px);
+  pointer-events: none;
+}
+.eyebrow {
+  font-family: "Courier New", monospace;
+  font-size: 0.9vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #2a2a2a;
+  margin-bottom: 1.25rem;
+}
+.h1 {
+  font-size: 11vw;
+  font-weight: 700;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  color: #c8c8c8;
+  margin-bottom: 1.5rem;
+}
+.desc {
+  font-size: 1.4vw;
+  line-height: 1.7;
+  color: #585858;
+  font-style: italic;
+}
+
+.back-btn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease 0.25s, color 0.2s;
+  color: #3a3a3a;
+}
+.stage.open .back-btn {
+  opacity: 1;
+  pointer-events: all;
+}
+.back-btn:hover { color: #c8c8c8; }
+.back-content {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  font-family: "Courier New", monospace;
+  font-size: 0.75vw;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+.back-arrow {
+  font-size: 1vw;
+  letter-spacing: 0;
+}
+
+/* ───────────── COL 2: ARTICLE LIST ───────────── */
+.col-list { display: flex; flex-direction: column; }
+.list-label {
+  flex-shrink: 0;
+  font-family: "Courier New", monospace;
+  font-size: 0.75vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #2a2a2a;
+  padding: 1.5rem 2rem 0.875rem;
+  border-bottom: 1px solid #1c1c1c;
+}
+.article-list {
+  list-style: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+}
+.article-list::-webkit-scrollbar { width: 2px; }
+.article-list::-webkit-scrollbar-thumb { background: #1c1c1c; }
+
+.article-item {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #1c1c1c;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s;
+}
+.article-item::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: #c8c8c8;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.article-item:hover::before,
+.article-item.active::before { transform: scaleY(1); }
+.article-item:hover { background: rgba(255,255,255,0.015); }
+.article-item.active { background: rgba(255,255,255,0.03); }
+
+.ai-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: "Courier New", monospace;
+  font-size: 0.75vw;
+  letter-spacing: 0.1em;
+  color: #333;
+  margin-bottom: 0.4rem;
+}
+.ai-date { color: #252525; }
+.ai-title {
+  font-size: 1.4vw;
+  line-height: 1.35;
+  color: #585858;
+  transition: color 0.2s;
+}
+.article-item:hover .ai-title,
+.article-item.active .ai-title { color: #c8c8c8; }
+
+/* ───────────── COL 3: ARTICLE READER ───────────── */
+.col-article { overflow-y: auto; overflow-x: hidden; }
+.col-article::-webkit-scrollbar { width: 2px; }
+.col-article::-webkit-scrollbar-thumb { background: #1c1c1c; }
+
+.article-inner {
+  width: 70vw;               /* fixed width prevents layout thrash during slide-in */
+  padding: 3.5rem 3rem 4rem;
+  opacity: 0;
+  transform: translateX(16px);
+  transition: opacity 0.4s ease 0.3s, transform 0.4s ease 0.3s;
+}
+.stage.open .article-inner {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.art-eyebrow {
+  font-family: "Courier New", monospace;
+  font-size: 0.9vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #2a2a2a;
+  margin-bottom: 1.5rem;
+}
+.art-h1 {
+  font-size: 4vw;
+  font-weight: 700;
+  line-height: 1.03;
+  letter-spacing: -0.03em;
+  color: #c8c8c8;
+  margin-bottom: 1.5rem;
+}
+.art-lede {
+  font-size: 1.65vw;
+  line-height: 1.6;
+  color: #585858;
+  font-style: italic;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid #1c1c1c;
+}
+.art-body {
+  font-size: 1.4vw;
+  line-height: 1.8;
+  color: #484848;
+}
+.art-body p { margin-bottom: 1.4em; }
+.art-body h2 {
+  font-size: 1.65vw;
+  font-weight: 700;
+  color: #686868;
+  margin: 2.5em 0 1em;
+  letter-spacing: -0.01em;
+}
+
+/* ───────────── FOOTER ───────────── */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  border-top: 1px solid #1c1c1c;
+  background: #0a0a0a;
+}
+.footer span {
+  font-family: "Courier New", monospace;
+  font-size: 0.75vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #2a2a2a;
+}
+
+/* ═══════════════════════════════════════════════
+   MOBILE — below 900px the grid collapses to a
+   single stacked column and the article reader
+   becomes a full-screen overlay.
+   ═══════════════════════════════════════════════ */
+@media (max-width: 900px) {
+
+  html, body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
+  }
+
+  .shell {
+    grid-template-rows: 80px auto 60px;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  /* Header: compact padding, swap brand text */
+  .header { padding: 0 1.25rem; }
+  .brand-full { display: none; }
+  .brand-short { display: inline; }
+  .brand { font-size: 13px; }
+  .nav { gap: 1.25rem; }
+  .nav a { font-size: 12px; }
+
+  /* Stage: collapse grid to stacked block */
+  .stage {
+    display: block;
+    overflow: visible;
+    transition: none;
+    grid-template-columns: none;
+  }
+  .stage.open { grid-template-columns: none; }
+
+  .col {
+    width: 100%;
+    border-right: none;
+    position: static;
+    overflow: visible;
+  }
+
+  /* Hero: natural height, full width, always visible */
+  .col-hero {
+    border-bottom: 1px solid #1c1c1c;
+  }
+  .hero-inner {
+    width: 100%;
+    height: auto;
+    padding: 2.5rem 1.25rem 3rem;
+    display: block;
+  }
+  .stage.open .hero-inner {
+    opacity: 1;
+    transform: none;
+    pointer-events: all;
+  }
+  .eyebrow { font-size: 11px; margin-bottom: 0.875rem; }
+  .h1 {
+    font-size: 44px;
+    line-height: 0.92;
+    margin-bottom: 1.25rem;
+  }
+  .desc { font-size: 17px; line-height: 1.55; }
+
+  /* Desktop back column / button: hide entirely on mobile */
+  .back-btn { display: none; }
+
+  /* Article list: full width, all items expand, standard scroll */
+  .col-list { display: block; }
+  .list-label {
+    font-size: 11px;
+    padding: 1.25rem 1.25rem 0.75rem;
+  }
+  .article-list {
+    overflow: visible;
+    flex: none;
+  }
+  .article-item { padding: 1.25rem 1.25rem; }
+  .ai-meta { font-size: 11px; }
+  .ai-title { font-size: 17px; line-height: 1.35; }
+
+  /* Article reader: full-screen overlay, slides in from right */
+  .col-article {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: #0a0a0a;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+  }
+  .stage.open .col-article {
+    transform: translateX(0);
+  }
+
+  .mobile-back {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 52px;
+    padding: 0 1.25rem;
+    background: #0a0a0a;
+    border-bottom: 1px solid #1c1c1c;
+    z-index: 10;
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #585858;
+    transition: color 0.15s;
+  }
+  .mobile-back:hover, .mobile-back:active { color: #c8c8c8; }
+
+  .article-inner {
+    width: 100%;
+    padding: 2rem 1.25rem 3rem;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .stage.open .article-inner {
+    opacity: 1;
+    transform: none;
+  }
+  .art-eyebrow { font-size: 11px; margin-bottom: 1rem; }
+  .art-h1 {
+    font-size: 32px;
+    line-height: 1.05;
+    margin-bottom: 1.25rem;
+  }
+  .art-lede {
+    font-size: 20px;
+    line-height: 1.55;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+  }
+  .art-body { font-size: 17px; line-height: 1.65; }
+  .art-body h2 { font-size: 18px; margin: 2em 0 0.75em; }
+
+  /* Footer: tighter height */
+  .footer {
+    padding: 0 1.25rem;
+  }
+  .footer span { font-size: 11px; }
+}
 </style>
 </head>
 <body>
-<header class="hdr" id="hdr">
-  <span class="brand" id="brandBtn">Human Agent System Design</span>
-  <nav class="hnav">
-    <span class="hn on" id="hn-articles">Articles</span>
-    <span class="hn"    id="hn-about">About</span>
-    <span class="hn"    id="hn-contact">Contact</span>
-  </nav>
-</header>
-<div class="stage">
-  <div class="hz" id="hz"></div>
-  <div class="layer z-front" id="L"><ul class="alist" id="ul"></ul></div>
-  <div class="layer z-gone" id="A">
-    <h1 class="art-title" id="aT"></h1>
-    <div class="art-meta"><span id="aD"></span><span id="aR"></span></div>
-    <p class="art-lede" id="aL"></p>
-    <div class="prose">
-      <div class="pl f"></div><div class="pl f"></div><div class="pl f"></div><div class="pl m"></div>
-      <div class="pg"></div><div class="pl f"></div><div class="pl f"></div><div class="pl s"></div>
-      <div class="ph" id="aH1"></div>
-      <div class="pl f"></div><div class="pl f"></div><div class="pl f"></div><div class="pl m"></div>
-      <div class="pg"></div><div class="pl f"></div><div class="pl f"></div><div class="pl s"></div>
-      <div class="ph" id="aH2"></div>
-      <div class="pl f"></div><div class="pl f"></div><div class="pl f"></div><div class="pl m"></div>
+<div class="shell">
+
+  <header class="header">
+    <a href="/" class="brand">
+      <span class="brand-full">Human Agent System Design</span>
+      <span class="brand-short">HAS Design</span>
+    </a>
+    <nav class="nav">
+      <a href="/" class="on">Articles</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+    </nav>
+  </header>
+
+  <div class="stage" id="stage">
+
+    <!-- COL 1: HERO ↔ BACK -->
+    <div class="col col-hero">
+      <div class="hero-inner">
+        <div class="eyebrow">Human · Agent · System Design</div>
+        <h1 class="h1">A new<br>discipline<br>for agentic<br>systems.</h1>
+        <p class="desc">HAS Design is the practice of designing multi-actor orchestrations where humans, agents, and software coordinate autonomously to produce outcomes none could achieve alone.</p>
+      </div>
+      <button class="back-btn" id="back-btn" aria-label="Back to articles">
+        <span class="back-content">
+          <span class="back-arrow">←</span>
+          <span>Back</span>
+        </span>
+      </button>
     </div>
+
+    <!-- COL 2: LIST -->
+    <div class="col col-list">
+      <span class="list-label">Published Articles</span>
+      <ul class="article-list" id="article-list"></ul>
+    </div>
+
+    <!-- COL 3: ARTICLE -->
+    <div class="col col-article">
+      <button class="mobile-back" id="mobile-back" aria-label="Back to articles">
+        <span>&larr;</span>
+        <span>All Articles</span>
+      </button>
+      <article class="article-inner">
+        <div class="art-eyebrow" id="art-eyebrow"></div>
+        <h1 class="art-h1" id="art-h1"></h1>
+        <p class="art-lede" id="art-lede"></p>
+        <div class="art-body" id="art-body"></div>
+      </article>
+    </div>
+
   </div>
-  <div class="layer-meta z-gone" id="AB">
-    <h1 class="pg-title">About</h1>
-    <p class="pg-sub">Chad Bercea is Lead Product Designer for AI Dev Tools at Atlassian. HAS Design is a framework for systems where humans, agents, and software coordinate autonomously.</p>
-    <div class="field"><span class="fk">Role</span><span class="fv">Lead Product Designer, AI Dev Tools</span></div>
-    <div class="field"><span class="fk">Company</span><span class="fv">Atlassian</span></div>
-    <div class="field"><span class="fk">Location</span><span class="fv">Rural Idaho</span></div>
-  </div>
-  <div class="layer-meta z-gone" id="CO">
-    <h1 class="pg-title">Contact</h1>
-    <p class="pg-sub">No forms. Just reach out directly.</p>
-    <div class="field"><span class="fk">Email</span><span class="fv">chad [at] hasdesign.io</span></div>
-    <div class="field"><span class="fk">LinkedIn</span><span class="fv">/in/chadbercea</span></div>
-  </div>
+
+  <footer class="footer">
+    <span>HAS Design</span>
+    <span>MMXXVI</span>
+  </footer>
+
 </div>
+
 <script>
-(function() {
-  var ARTS = [
-    {t:"The ROI You're Chasing Doesn't Exist",d:"2026.03.15",r:"8 min",l:"Executives keep asking about ROI on AI adoption while dismantling every process that would generate the data needed to answer the question.",h1:"The Measurement Problem",h2:"What Actually Generates ROI"},
-    {t:"The Arm Is Not The Story",d:"2026.02.08",r:"5 min",l:"Everyone is writing about the mechanism. Nobody is writing about the outcome. The arm is not the story — the reach is.",h1:"Mechanism vs Output",h2:"What Matters"},
-    {t:"Feedback Loops and Guardrails",d:"2026.02.22",r:"7 min",l:"How you build correction into an agent system determines whether it scales or collapses.",h1:"Designing Feedback",h2:"Guardrail Architecture"},
-    {t:"Defining Handoff Protocols",d:"2026.02.21",r:"6 min",l:"The seam between human and agent is the most important design surface in the system.",h1:"The Handoff Problem",h2:"Protocol Design"},
-    {t:"Designing for Failure Modes",d:"2026.02.20",r:"9 min",l:"Most systems are designed for the happy path. The interesting design is what happens when things go wrong.",h1:"Failure Taxonomy",h2:"Recovery Patterns"},
-    {t:"Implementing Approval Workflows",d:"2026.02.19",r:"6 min",l:"Approval is a designed checkpoint that keeps humans in the loop at the right moments.",h1:"When to Gate",h2:"Implementation"},
-    {t:"Metrics and Observability",d:"2026.02.18",r:"7 min",l:"You cannot improve what you cannot see. Agent observability is a first-class design problem.",h1:"What to Measure",h2:"Observability Patterns"},
-    {t:"Context Windows and Memory",d:"2026.02.17",r:"8 min",l:"An agent's context window is its working memory. Designing around its limits is not optional.",h1:"Context as Resource",h2:"Memory Strategies"},
-    {t:"Human-in-the-Loop Patterns",d:"2026.02.12",r:"10 min",l:"HITL is not a single pattern. It is a family of patterns with different cost-benefit profiles.",h1:"Pattern Taxonomy",h2:"Selection Criteria"},
-    {t:"Multi-Agent Orchestration",d:"2026.02.10",r:"8 min",l:"When one agent is not enough, the question becomes how to coordinate many without losing coherence.",h1:"Orchestration Models",h2:"Coordination Failure"},
-    {t:"Cost and Latency Tradeoffs",d:"2026.02.05",r:"6 min",l:"Every agent call is a cost decision. Designing for efficiency matters as much as quality.",h1:"The Cost Equation",h2:"Optimization"},
-    {t:"Trust and Transparency",d:"2026.01.20",r:"7 min",l:"Users trust systems they understand. Transparency is not a feature — it is a foundation.",h1:"Building Trust",h2:"Transparency Patterns"}
+(function () {
+  var articles = [
+    {
+      title: "Agents Aren't Personas",
+      date: "2025.12.22",
+      tags: ["Methodology", "Agents"],
+      lede: "Calling an agent a persona is a category error — one that leads designers to ask the wrong questions, build the wrong artifacts, and produce systems that fail under operational conditions.",
+      body: [
+        { t: "p", v: "The persona is HCI's most successful design artifact. It works because humans have psychology — goals, frustrations, mental models, behavioral patterns. A persona answers the questions a human will be asked to answer." },
+        { t: "h2", v: "Why the category error happens" },
+        { t: "p", v: "Agents don't have psychology. They have capabilities, constraints, protocols, and operational parameters. Designing an agent using persona methodology produces a document that answers questions the agent cannot have." },
+        { t: "h2", v: "The right artifact: the archetype" },
+        { t: "p", v: "An archetype specifies what the agent can do, what it cannot do, what inputs it requires, what outputs it produces, under what conditions it escalates to a human, and how it fails. It is a specification, not a narrative." }
+      ]
+    },
+    {
+      title: "The Three Actors",
+      date: "2025.12.29",
+      tags: ["Framework"],
+      lede: "Every agentic orchestration involves exactly three categories of actor: humans, agents, and systems. Conflating them produces designs that fail.",
+      body: [
+        { t: "h2", v: "Humans" },
+        { t: "p", v: "Humans are characterized by psychology and intent. Designing for humans requires empathy. The canonical artifact is the persona." },
+        { t: "h2", v: "Agents" },
+        { t: "p", v: "Agents are characterized by capability and protocol. They do not have frustration or delight. Designing for agents requires precision. The canonical artifact is the archetype." },
+        { t: "h2", v: "Systems" },
+        { t: "p", v: "Systems are characterized by specification and state — the infrastructure within which agents and humans operate." }
+      ]
+    },
+    {
+      title: "ACI: Agent-Computer Interaction",
+      date: "2026.01.05",
+      tags: ["ACI", "Discipline"],
+      lede: "Agent-to-agent and agent-to-system interactions are not HCI with extra steps. They constitute a distinct discipline.",
+      body: [
+        { t: "p", v: "HCI's foundational assumption: there is one intentional actor in the system, and that actor is human. Remove it and the methods no longer apply." },
+        { t: "h2", v: "Where HCI breaks" },
+        { t: "p", v: "An agent can decide a dependency is outdated, create a branch, update it, run tests, and open a pull request — without being asked. HCI has no framework for an actor that generates its own intent." },
+        { t: "h2", v: "ACI: the new discipline" },
+        { t: "p", v: "Its primary question is not what the user experiences, but what the agent executes, under what conditions, and how the system responds." }
+      ]
+    },
+    {
+      title: "HAS Design: The Practice",
+      date: "2026.01.12",
+      tags: ["Practice"],
+      lede: "Human-Agent-System Design is the integrated practice of designing systems where humans, agents, and systems coordinate to produce agentic orchestrations.",
+      body: [
+        { t: "p", v: "Most design teams working on AI products are doing HAS Design without knowing it — with no unified framework to hold it together." },
+        { t: "h2", v: "What HAS Design produces" },
+        { t: "p", v: "The primary output is the agentic orchestration — a designed coordination of humans, agents, and systems that produces a capability none of the actors could achieve alone." }
+      ]
+    },
+    {
+      title: "Service Blueprints for Agentic Orchestrations",
+      date: "2026.01.19",
+      tags: ["Methodology"],
+      lede: "The journey map fails in agentic systems because it assumes a single human actor on a linear path.",
+      body: [
+        { t: "h2", v: "Why the journey map fails" },
+        { t: "p", v: "Agentic orchestrations have no single human actor on a linear path. Multiple actors operate in parallel. The journey map cannot represent any of this." },
+        { t: "h2", v: "The service blueprint adapted" },
+        { t: "p", v: "The lanes become: human touchpoints, agent-to-human interfaces, agent-to-agent operations, and system calls." }
+      ]
+    },
+    {
+      title: "The Career Path for HAS Designers",
+      date: "2026.01.26",
+      tags: ["Career"],
+      lede: "The designers who will lead the next decade of software are the ones who can design orchestrations.",
+      body: [
+        { t: "h2", v: "Where HAS designers come from" },
+        { t: "p", v: "Product design, systems engineering, service design, and engineering itself. What they share is a capability: holding human experience, agent behavior, and system architecture in view simultaneously." }
+      ]
+    },
+    {
+      title: "Designing Agent Failure Modes",
+      date: "2026.02.02",
+      tags: ["Reliability"],
+      lede: "An agent that never fails has not been tested. Designing the failure modes is as important as designing the happy path.",
+      body: [
+        { t: "p", v: "Traditional UX design assumes the user can recover from a broken state. Agents cannot. They fail silently, fail confidently, or fail in loops. The designer's job is to make failure visible, bounded, and recoverable." },
+        { t: "h2", v: "Three failure classes" },
+        { t: "p", v: "Competence failure: the agent cannot do the task. Context failure: the agent has the capability but lacks the information. Confidence failure: the agent produces output that looks correct but isn't. Each class demands a different design response." }
+      ]
+    },
+    {
+      title: "The Escalation Protocol",
+      date: "2026.02.09",
+      tags: ["Protocol"],
+      lede: "When an agent hands a task back to a human, the handoff is the entire design. Everything else is decoration.",
+      body: [
+        { t: "p", v: "An escalation that requires the human to reconstruct what the agent was doing is a failed escalation. The protocol must carry state, context, confidence, and the specific decision the human is being asked to make." },
+        { t: "h2", v: "Four elements of a clean escalation" },
+        { t: "p", v: "What was being attempted. What was tried. Why the agent stopped. What decision is needed to continue. Anything less produces a support ticket instead of a resolution." }
+      ]
+    },
+    {
+      title: "Trust Asymmetries in Human-Agent Teams",
+      date: "2026.02.16",
+      tags: ["Trust"],
+      lede: "Humans and agents calibrate trust differently. Designing for one calibration breaks the other.",
+      body: [
+        { t: "p", v: "A human trusts an agent based on visible competence over time. An agent trusts a human based on authority granted at session start. These are not symmetric, and pretending they are produces systems that feel broken to both sides." },
+        { t: "h2", v: "Designing the asymmetry" },
+        { t: "p", v: "The human needs provenance and reasoning. The agent needs scope and permissions. Neither needs what the other needs." }
+      ]
+    },
+    {
+      title: "State Machines for Agentic Workflows",
+      date: "2026.02.23",
+      tags: ["Methodology"],
+      lede: "Agentic workflows are not linear. They are state machines — and designing them as anything else produces bugs disguised as features.",
+      body: [
+        { t: "p", v: "The flowchart assumes sequential steps with clear transitions. An agent can be in multiple states at once, transition unexpectedly, or cycle through the same state repeatedly. The state machine — explicit states, explicit transitions, explicit guards — is the only representation that holds up." }
+      ]
+    },
+    {
+      title: "The Intervention Point",
+      date: "2026.03.02",
+      tags: ["Control"],
+      lede: "Every agentic system needs a place where the human can take back control without breaking the work in progress.",
+      body: [
+        { t: "h2", v: "Why intervention is not interruption" },
+        { t: "p", v: "Interruption stops the work. Intervention redirects it. The designer specifies where the human can step in, what state the agent is left in, and how the work resumes — with the human's correction integrated, not just imposed." }
+      ]
+    },
+    {
+      title: "Designing for Agent Transparency",
+      date: "2026.03.09",
+      tags: ["Transparency"],
+      lede: "Transparency is not a log file. It is a designed surface that lets a human verify, correct, and trust the agent's work.",
+      body: [
+        { t: "p", v: "Dumping the agent's reasoning into a scrollable log is the cheapest possible answer to a real problem. Useful transparency is selective: the decisions that mattered, the alternatives considered, the evidence weighted. The log is raw material. The surface is the design." }
+      ]
+    },
+    {
+      title: "Multi-Agent Coordination Patterns",
+      date: "2026.03.16",
+      tags: ["Patterns"],
+      lede: "When multiple agents coordinate on a task, the coordination pattern determines what's possible. There are four that keep coming up.",
+      body: [
+        { t: "h2", v: "Pipeline, swarm, orchestra, market" },
+        { t: "p", v: "Pipeline: agents in sequence, each depending on the last. Swarm: agents in parallel, each working a slice. Orchestra: a conductor agent directs specialists. Market: agents bid for tasks. Each pattern has failure modes the others don't." }
+      ]
+    },
+    {
+      title: "The Shared Context Problem",
+      date: "2026.03.23",
+      tags: ["Context"],
+      lede: "When humans and agents share a workspace, they don't share context. Designing the bridge is the work.",
+      body: [
+        { t: "p", v: "The human has history, intuition, organizational memory. The agent has the current session and whatever was passed to it. The gap between them is not a bug — it is the primary design problem of HAS." },
+        { t: "h2", v: "Bridging strategies" },
+        { t: "p", v: "Persistent project memory. Explicit intent capture. Summarization loops. None of these solve the problem fully; they narrow it." }
+      ]
+    },
+    {
+      title: "HAS Design vs. Traditional UX: What Changes",
+      date: "2026.03.30",
+      tags: ["Discipline"],
+      lede: "HAS Design doesn't replace UX. It expands what UX has to account for.",
+      body: [
+        { t: "p", v: "The user still matters. The interface still matters. What's new is that the user now shares the work with an actor that has its own agency. Designing only the human-facing surface produces a half-designed system." }
+      ]
+    },
+    {
+      title: "The Agent Brief: A New Design Artifact",
+      date: "2026.04.06",
+      tags: ["Artifacts"],
+      lede: "The creative brief is for agencies. The product brief is for teams. The agent brief is for agents — and it's a different document.",
+      body: [
+        { t: "p", v: "An agent brief specifies scope, capability, constraints, escalation conditions, and success criteria. It is written to be executed, not interpreted. The closer it reads to a contract, the better it performs." }
+      ]
+    },
+    {
+      title: "Orchestration Debt",
+      date: "2026.04.13",
+      tags: ["Debt"],
+      lede: "Every shortcut in how humans, agents, and systems coordinate becomes debt. The interest rate is higher than technical debt.",
+      body: [
+        { t: "p", v: "Technical debt slows future engineering. Orchestration debt produces incidents. When the coordination model is implicit, the failure modes are also implicit — and they surface at the worst possible moment." },
+        { t: "h2", v: "Paying it down" },
+        { t: "p", v: "Make the coordination explicit. Name the actors. Specify the handoffs. Document the escalation paths. This is not bureaucracy; it is the design." }
+      ]
+    },
+    {
+      title: "What HAS Design Looks Like at Scale",
+      date: "2026.04.20",
+      tags: ["Scale"],
+      lede: "At ten agents, coordination is a convenience. At a hundred, it is a discipline. At a thousand, it is the entire product.",
+      body: [
+        { t: "p", v: "Scale changes what the design problem is. A well-designed single-agent interaction does not compose into a well-designed multi-agent system. New patterns, new artifacts, new failure modes — HAS Design at scale is a different job than HAS Design at small numbers." }
+      ]
+    }
   ];
-  var SEQ={list:0,reading:1,about:2,contact:3};
-  var ZC=['z-front','z-back','z-crisp','z-dim','z-gone','z-ef'];
-  var L=document.getElementById('L'),A=document.getElementById('A'),AB=document.getElementById('AB'),CO=document.getElementById('CO'),hz=document.getElementById('hz'),hdr=document.getElementById('hdr');
-  var state='list',busy=false;
-  function zz(el,cls){el.classList.remove.apply(el.classList,ZC);el.classList.add(cls);}
-  function dot(key){['articles','about','contact'].forEach(function(k){document.getElementById('hn-'+k).classList.toggle('on',k===key);});}
-  function elFor(s){if(s==='list')return L;if(s==='reading')return A;if(s==='about')return AB;if(s==='contact')return CO;}
-  function applyState(s){
-    if(s==='list'){zz(L,'z-front');zz(A,'z-gone');zz(AB,'z-gone');zz(CO,'z-gone');hz.classList.remove('on');dot('articles');}
-    else if(s==='reading'){zz(A,'z-front');zz(L,'z-back');zz(AB,'z-gone');zz(CO,'z-gone');hz.classList.add('on');dot('articles');}
-    else if(s==='about'){zz(AB,'z-front');zz(L,'z-gone');zz(A,'z-gone');zz(CO,'z-gone');hz.classList.remove('on');dot('about');}
-    else if(s==='contact'){zz(CO,'z-front');zz(L,'z-gone');zz(A,'z-gone');zz(AB,'z-gone');hz.classList.remove('on');dot('contact');}
+
+  var list = document.getElementById("article-list");
+  var stage = document.getElementById("stage");
+  var backBtn = document.getElementById("back-btn");
+
+  articles.forEach(function (a, i) {
+    var li = document.createElement("li");
+    li.className = "article-item";
+    var num = String(i + 1).padStart(2, "0");
+    li.innerHTML =
+      '<div class="ai-meta"><span>' + num + '</span><span class="ai-date">' + a.date + '</span></div>' +
+      '<div class="ai-title">' + a.title + "</div>";
+    li.addEventListener("click", function () { openArticle(i); });
+    list.appendChild(li);
+  });
+
+  function openArticle(idx) {
+    var a = articles[idx];
+    document.getElementById("art-eyebrow").textContent = a.tags.join(" · ") + " · " + a.date;
+    document.getElementById("art-h1").textContent = a.title;
+    document.getElementById("art-lede").textContent = a.lede;
+    document.getElementById("art-body").innerHTML = a.body.map(function (b) {
+      return b.t === "h2" ? "<h2>" + b.v + "</h2>" : "<p>" + b.v + "</p>";
+    }).join("");
+    document.querySelector(".col-article").scrollTop = 0;
+    document.querySelectorAll(".article-item").forEach(function (el) { el.classList.remove("active"); });
+    document.querySelectorAll(".article-item")[idx].classList.add("active");
+    stage.classList.add("open");
   }
-  function navigate(next){
-    if(next===state||busy)return;busy=true;
-    var fwd=SEQ[next]>SEQ[state],old=elFor(state);
-    if(old)zz(old,fwd?'z-ef':'z-gone');
-    setTimeout(function(){applyState(next);state=next;setTimeout(function(){busy=false;},400);},60);
+
+  function closeArticle() {
+    stage.classList.remove("open");
+    document.querySelectorAll(".article-item").forEach(function (el) { el.classList.remove("active"); });
   }
-  function loadArticle(a){document.getElementById('aT').textContent=a.t;document.getElementById('aD').textContent=a.d;document.getElementById('aR').textContent=a.r+' read';document.getElementById('aL').textContent=a.l;document.getElementById('aH1').textContent=a.h1;document.getElementById('aH2').textContent=a.h2;A.scrollTop=0;}
-  function openArticle(a){
-    if(busy)return;
-    if(state==='reading'){busy=true;clearHi();zz(L,'z-back');zz(A,'z-gone');setTimeout(function(){loadArticle(a);zz(A,'z-front');setTimeout(function(){busy=false;},400);},320);}
-    else{loadArticle(a);navigate('reading');}
-  }
-  var ul=document.getElementById('ul'),items=[];
-  ARTS.forEach(function(a){var li=document.createElement('li');li.className='ali';li.innerHTML='<span class="alt">'+a.t+'</span><span class="ald">'+a.d+'</span>';li.addEventListener('click',function(e){e.stopPropagation();if(!busy)openArticle(a);});ul.appendChild(li);});
-  items=Array.prototype.slice.call(ul.querySelectorAll('.ali'));
-  function clearHi(){items.forEach(function(li){li.classList.remove('hi');});}
-  function itemAt(y){for(var i=0;i<items.length;i++){var r=items[i].getBoundingClientRect();if(y>=r.top&&y<=r.bottom)return items[i];}return null;}
-  hz.addEventListener('mouseenter',function(){if(state!=='reading')return;zz(L,'z-crisp');zz(A,'z-front');});
-  hz.addEventListener('mousemove',function(e){if(state!=='reading')return;clearHi();var li=itemAt(e.clientY);if(li){li.classList.add('hi');zz(A,'z-dim');}else{zz(A,'z-front');}});
-  hz.addEventListener('mouseleave',function(){if(state!=='reading')return;clearHi();zz(L,'z-back');zz(A,'z-front');});
-  hz.addEventListener('click',function(e){if(state!=='reading'||busy)return;var li=itemAt(e.clientY);if(li){var idx=items.indexOf(li);if(idx!==-1){openArticle(ARTS[idx]);return;}}navigate('list');});
-  document.getElementById('brandBtn').addEventListener('click',function(){navigate('list');});
-  document.getElementById('hn-articles').addEventListener('click',function(){navigate('list');});
-  document.getElementById('hn-about').addEventListener('click',function(){navigate('about');});
-  document.getElementById('hn-contact').addEventListener('click',function(){navigate('contact');});
-  var lastY=0;A.addEventListener('scroll',function(){var y=A.scrollTop;hdr.classList.toggle('away',y>lastY&&y>80);lastY=y;},{passive:true});
-  applyState('list');
+
+  backBtn.addEventListener("click", closeArticle);
+  document.getElementById("mobile-back").addEventListener("click", closeArticle);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeArticle(); });
 })();
 </script>
 </body>
