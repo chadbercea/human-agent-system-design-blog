@@ -227,7 +227,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .article-inner {
   width: 100%;
-  max-width: 68ch;
+  max-width: 78ch;
   margin: 0 auto;
   padding: 4rem 3rem 6rem;
   opacity: 0;
@@ -259,11 +259,9 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .art-lede {
   font-size: 22px;
   line-height: 1.55;
-  color: #9a9a9a;
   font-style: italic;
-  margin-bottom: 0;
-  padding-bottom: 2.5rem;
-  border-bottom: 1px solid #1c1c1c;
+  color: #9a9a9a;
+  margin: 0 0 2.5rem;
 }
 .art-body {
   font-size: 18px;
