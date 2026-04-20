@@ -12,6 +12,20 @@ function formatDate(d: Date): string {
   const day = String(d.getUTCDate()).padStart(2, '0');
   return `${y}.${m}.${day}`;
 }
+
+const rendered = await Promise.all(
+  articles.map(async (a) => {
+    const { Content } = await a.render();
+    return { article: a, Content };
+  })
+);
+
+const articleMeta = articles.map((a) => ({
+  slug: a.slug,
+  title: a.data.title,
+  lede: a.data.description ?? '',
+  eyebrow: [...(a.data.tags ?? []), formatDate(a.data.date)].join(' · '),
+}));
 ---
 <html lang="en">
 <head>
@@ -61,7 +75,18 @@ function formatDate(d: Date): string {
           ))}
         </ul>
       </div>
-      <div class="col col-article"></div>
+      <div class="col col-article">
+        <button class="mobile-back" id="mobile-back" aria-label="Back to articles">
+          <span>←</span>
+          <span>All Articles</span>
+        </button>
+        <article class="article-inner">
+          <div class="art-eyebrow" id="art-eyebrow"></div>
+          <h1 class="art-h1" id="art-h1"></h1>
+          <p class="art-lede" id="art-lede"></p>
+          <div class="art-body" id="art-body"></div>
+        </article>
+      </div>
     </div>
 
     <footer class="footer">
@@ -69,5 +94,65 @@ function formatDate(d: Date): string {
       <span>MMXXVI</span>
     </footer>
   </div>
+
+  <div hidden aria-hidden="true">
+    {rendered.map(({ article, Content }) => (
+      <div id={`body-${article.slug}`}><Content /></div>
+    ))}
+  </div>
+
+  <script type="application/json" id="article-meta" is:inline set:html={JSON.stringify(articleMeta)} />
+
+  <script is:inline>
+    (function () {
+      var meta = [];
+      try {
+        meta = JSON.parse(document.getElementById('article-meta').textContent || '[]');
+      } catch (e) { meta = []; }
+
+      var stage = document.getElementById('stage');
+      var items = document.querySelectorAll('.article-item');
+      var backBtn = document.getElementById('back-btn');
+      var mobileBack = document.getElementById('mobile-back');
+      var colArticle = document.querySelector('.col-article');
+      var eyebrowEl = document.getElementById('art-eyebrow');
+      var h1El = document.getElementById('art-h1');
+      var ledeEl = document.getElementById('art-lede');
+      var bodyEl = document.getElementById('art-body');
+
+      function openArticle(idx) {
+        var data = meta[idx];
+        if (!data) return;
+        eyebrowEl.textContent = data.eyebrow;
+        h1El.textContent = data.title;
+        ledeEl.textContent = data.lede;
+        var src = document.getElementById('body-' + data.slug);
+        bodyEl.innerHTML = src ? src.innerHTML : '';
+        if (colArticle) colArticle.scrollTop = 0;
+        items.forEach(function (el) { el.classList.remove('active'); });
+        var activeEl = items[idx];
+        if (activeEl) activeEl.classList.add('active');
+        stage.classList.add('open');
+      }
+
+      function closeArticle() {
+        stage.classList.remove('open');
+        items.forEach(function (el) { el.classList.remove('active'); });
+      }
+
+      items.forEach(function (el) {
+        el.addEventListener('click', function () {
+          var idx = parseInt(el.getAttribute('data-index'), 10);
+          openArticle(idx);
+        });
+      });
+
+      if (backBtn) backBtn.addEventListener('click', closeArticle);
+      if (mobileBack) mobileBack.addEventListener('click', closeArticle);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeArticle();
+      });
+    })();
+  </script>
 </body>
 </html>
