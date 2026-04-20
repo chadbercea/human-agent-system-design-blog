@@ -1,172 +1,134 @@
 ---
 import { getCollection } from 'astro:content';
-import ArticleGraphic from '../components/ArticleGraphic.astro';
-import '../styles/global.css';
+import BaseLayout from '../layouts/BaseLayout.astro';
 
-const articles = (await getCollection('articles', ({ data }) => !data.draft))
+const articles = (await getCollection('articles'))
+  .filter((a) => !a.data.draft)
   .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
 
-function formatDate(d: Date) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
+function formatDate(d: Date): string {
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
   return `${y}.${m}.${day}`;
 }
 
 const rendered = await Promise.all(
-  articles.map(async (article) => {
-    const { Content } = await article.render();
-    return { article, Content };
+  articles.map(async (a) => {
+    const { Content } = await a.render();
+    return { article: a, Content };
   })
 );
 
-const articleMeta = articles.map((a, i) => ({
-  index: i,
+const articleMeta = articles.map((a) => ({
   slug: a.slug,
   title: a.data.title,
-  date: formatDate(a.data.date),
-  tags: a.data.tags ?? [],
-  colorIdx: (i % 6) + 1,
+  lede: a.data.description ?? '',
+  eyebrow: [...(a.data.tags ?? []), formatDate(a.data.date)].join(' · '),
 }));
 ---
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HAS Design</title>
-</head>
-<body>
-  <header class="hdr" id="hdr">
-    <a class="brand" href="#" data-nav="list" id="brandBtn">Human Agent System Design</a>
-    <nav class="hnav">
-      <a class="hn on" href="#articles" data-nav="list" id="hn-articles">Articles</a>
-      <a class="hn" href="#about" data-nav="about" id="hn-about">About</a>
-      <a class="hn" href="#contact" data-nav="contact" id="hn-contact">Contact</a>
-    </nav>
-  </header>
-
-  <div id="grid-view">
-    <div class="stage">
-      <div class="track-wrap" id="track-wrap">
-        <div class="track" id="track">
-          {articles.map((article, i) => {
-            const idx = i + 1;
-            const padded = String(idx).padStart(2, '0');
-            const tags = article.data.tags ?? [];
-            return (
-              <div class={`card c${((i % 6) + 1)}`} data-index={i} data-slug={article.slug}>
-                <div class="graphic">
-                  <div class="num">{padded}</div>
-                  <div class="thumb">
-                    <ArticleGraphic index={i} />
-                  </div>
-                </div>
-                <div class="content">
-                  <div class="tags">
-                    {tags.map(t => <span class="tag">{t}</span>)}
-                  </div>
-                  <div class="title">{article.data.title}</div>
-                  <div class="desc">{article.data.description}</div>
-                  <div class="date">{formatDate(article.data.date)}</div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+<BaseLayout title="HAS Design" activeNav="articles">
+  <div class="stage" id="stage">
+    <div class="col col-hero">
+      <div class="hero-inner">
+        <div class="eyebrow">Human · Agent · System Design</div>
+        <h1 class="h1">A new<br>discipline<br>for agentic<br>systems.</h1>
+        <p class="desc">HAS Design is the practice of designing multi-actor orchestrations where humans, agents, and software coordinate autonomously to produce outcomes none could achieve alone.</p>
       </div>
+      <button class="back-btn" id="back-btn" aria-label="Back to articles">
+        <span class="back-content">
+          <span class="back-arrow">←</span>
+          <span>Back</span>
+        </span>
+      </button>
     </div>
-    <button class="nav-arrow nav-arrow-left" id="btn-prev" aria-label="Previous article">‹</button>
-    <button class="nav-arrow nav-arrow-right" id="btn-next" aria-label="Next article">›</button>
-  </div>
-
-  <div id="article-view">
-    <nav class="sidebar" id="sidebar">
-      <div class="sidebar-label">Articles</div>
-      <ul class="sidebar-list" id="sidebar-list">
-        {articles.map((article, i) => (
-          <li class="sidebar-item" data-index={i} data-slug={article.slug}>{article.data.title}</li>
+    <div class="col col-list">
+      <span class="list-label">Published Articles</span>
+      <ul class="article-list" id="article-list">
+        {articles.map((a, i) => (
+          <li class="article-item" data-index={i} data-slug={a.slug}>
+            <div class="ai-meta">
+              <span>{String(i + 1).padStart(2, '0')}</span>
+              <span class="ai-date">{formatDate(a.data.date)}</span>
+            </div>
+            <div class="ai-title">{a.data.title}</div>
+          </li>
         ))}
       </ul>
-      <button class="back-btn" id="back-btn">All Articles</button>
-    </nav>
-    <div class="article-main" id="article-main">
-      <div class="article-header-band">
-        <div class="article-header-img" id="article-header-img"></div>
-        <div class="article-meta-block" id="article-meta-block">
-          <div class="tags" id="art-tags"></div>
-          <div class="article-title" id="art-title"></div>
-          <div class="article-date" id="art-date"></div>
-        </div>
-      </div>
-      <div class="article-body" id="article-body"></div>
-      <div class="article-footer" id="article-footer"></div>
     </div>
-    <div class="article-bodies" aria-hidden="true">
+    <div class="col col-article">
+      <button class="mobile-back" id="mobile-back" aria-label="Back to articles">
+        <span>←</span>
+        <span>All Articles</span>
+      </button>
+      <article class="article-inner">
+        <div class="art-eyebrow" id="art-eyebrow"></div>
+        <h1 class="art-h1" id="art-h1"></h1>
+        <p class="art-lede" id="art-lede"></p>
+        <div class="art-body" id="art-body"></div>
+      </article>
+    </div>
+  </div>
+
+  <Fragment slot="after-shell">
+    <div hidden aria-hidden="true">
       {rendered.map(({ article, Content }) => (
-        <div id={`body-${article.slug}`} class="article-body-hidden">
-          <Content />
-        </div>
+        <div id={`body-${article.slug}`}><Content /></div>
       ))}
     </div>
-  </div>
 
-  <div id="about-view" class="meta-view">
-    <div class="meta-stage">
-      <div class="meta-eyebrow">Profile</div>
-      <h1 class="meta-title">About</h1>
-      <p class="meta-bio">Chad Bercea is Lead Product Designer for AI Dev Tools at Atlassian. HAS Design is a framework for systems where humans, agents, and software coordinate autonomously.</p>
-      <div class="meta-fields">
-        <div class="meta-field"><span class="field-key">Role</span><span class="field-val">Lead Product Designer, AI Dev Tools</span></div>
-        <div class="meta-field"><span class="field-key">Company</span><span class="field-val">Atlassian</span></div>
-        <div class="meta-field"><span class="field-key">Location</span><span class="field-val">Rural Idaho</span></div>
-        <div class="meta-field"><span class="field-key">Framework</span><span class="field-val">Human Agent System Design</span></div>
-        <div class="meta-field"><span class="field-key">Background</span><span class="field-val">Fashion Branding</span></div>
-        <div class="meta-field"><span class="field-key">Previous</span><span class="field-val">Kate Spade</span></div>
-      </div>
-    </div>
-  </div>
+    <script type="application/json" id="article-meta" is:inline set:html={JSON.stringify(articleMeta)} />
 
-  <div id="contact-view" class="meta-view">
-    <div class="meta-stage">
-      <div class="meta-eyebrow">Reach Out</div>
-      <h1 class="meta-title">Contact</h1>
-      <div class="contact-grid">
-        <div class="contact-col" data-col="form">
-          <div class="contact-col-label">Send a message</div>
-          <form class="cf-form" id="cf-form" novalidate>
-            <div class="cf-group">
-              <label class="cf-label" for="cf-subject">Subject</label>
-              <input class="cf-input" id="cf-subject" name="subject" type="text" autocomplete="off" required />
-            </div>
-            <div class="cf-group">
-              <label class="cf-label" for="cf-message">Message</label>
-              <textarea class="cf-textarea" id="cf-message" name="message" rows="6" required></textarea>
-            </div>
-            <div class="cf-group">
-              <label class="cf-label" for="cf-reply">Reply email</label>
-              <input class="cf-input" id="cf-reply" name="reply" type="email" autocomplete="off" required />
-            </div>
-            <button class="cf-submit" id="cf-submit" type="submit">Send</button>
-            <div class="cf-success" id="cf-success">Message sent. Your mail client should be open.</div>
-          </form>
-        </div>
-        <div class="contact-col" data-col="sched">
-          <div class="contact-col-label">Book a 30-minute call</div>
-          <div class="sched-slots" id="sched-slots" role="radiogroup" aria-label="Available time slots"></div>
-          <div class="cf-group">
-            <label class="cf-label" for="sched-email">Your email</label>
-            <input class="cf-input" id="sched-email" name="invitee" type="email" autocomplete="off" required />
-          </div>
-          <button class="cf-book" id="cf-book" type="button">Book</button>
-        </div>
-      </div>
-    </div>
-  </div>
+    <script is:inline>
+      (function () {
+        var meta = [];
+        try {
+          meta = JSON.parse(document.getElementById('article-meta').textContent || '[]');
+        } catch (e) { meta = []; }
 
-  <script type="application/json" id="article-meta" set:html={JSON.stringify(articleMeta)}></script>
+        var stage = document.getElementById('stage');
+        var items = document.querySelectorAll('.article-item');
+        var backBtn = document.getElementById('back-btn');
+        var mobileBack = document.getElementById('mobile-back');
+        var colArticle = document.querySelector('.col-article');
+        var eyebrowEl = document.getElementById('art-eyebrow');
+        var h1El = document.getElementById('art-h1');
+        var ledeEl = document.getElementById('art-lede');
+        var bodyEl = document.getElementById('art-body');
 
-  <script>
-    import '../scripts/main.js';
-  </script>
-</body>
-</html>
+        function openArticle(idx) {
+          var data = meta[idx];
+          if (!data) return;
+          eyebrowEl.textContent = data.eyebrow;
+          h1El.textContent = data.title;
+          ledeEl.textContent = data.lede;
+          var src = document.getElementById('body-' + data.slug);
+          bodyEl.innerHTML = src ? src.innerHTML : '';
+          if (colArticle) colArticle.scrollTop = 0;
+          items.forEach(function (el) { el.classList.remove('active'); });
+          var activeEl = items[idx];
+          if (activeEl) activeEl.classList.add('active');
+          stage.classList.add('open');
+        }
+
+        function closeArticle() {
+          stage.classList.remove('open');
+          items.forEach(function (el) { el.classList.remove('active'); });
+        }
+
+        items.forEach(function (el) {
+          el.addEventListener('click', function () {
+            var idx = parseInt(el.getAttribute('data-index'), 10);
+            openArticle(idx);
+          });
+        });
+
+        if (backBtn) backBtn.addEventListener('click', closeArticle);
+        if (mobileBack) mobileBack.addEventListener('click', closeArticle);
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') closeArticle();
+        });
+      })();
+    </script>
+  </Fragment>
+</BaseLayout>
