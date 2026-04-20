@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 const articles = (await getCollection('articles'))
   .filter((a) => !a.data.draft)
-  .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 function formatDate(d: Date): string {
   const y = d.getUTCFullYear();
