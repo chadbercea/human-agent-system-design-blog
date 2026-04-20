@@ -275,9 +275,9 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 
 /* ═══════════════════════════════════════════════
-   MOBILE — below 900px the shell switches to
-   60px footer and allows natural scroll. Stage
-   rules added in a later issue.
+   MOBILE — below 900px the grid collapses to a
+   single stacked column and the article reader
+   becomes a full-screen overlay.
    ═══════════════════════════════════════════════ */
 @media (max-width: 900px) {
 
@@ -293,6 +293,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     min-height: 100vh;
   }
 
+  /* Header: compact padding, swap brand text */
   .header { padding: 0 1.25rem; }
   .brand-full { display: none; }
   .brand-short { display: inline; }
@@ -300,6 +301,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .nav { gap: 1.25rem; }
   .nav a { font-size: 12px; }
 
+  /* Stage: collapse grid to stacked block */
   .stage {
     display: block;
     overflow: visible;
@@ -315,6 +317,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     overflow: visible;
   }
 
+  /* Hero: natural height, full width, always visible */
   .col-hero {
     border-bottom: 1px solid #1c1c1c;
   }
@@ -337,6 +340,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   }
   .desc { font-size: 17px; line-height: 1.55; }
 
+  /* Desktop back column / button: hide entirely on mobile */
   .back-btn { display: none; }
 
   /* Article list: full width, all items expand, standard scroll */
@@ -414,6 +418,9 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .art-body { font-size: 17px; line-height: 1.65; }
   .art-body h2 { font-size: 18px; margin: 2em 0 0.75em; }
 
-  .footer { padding: 0 1.25rem; }
+  /* Footer: tighter height */
+  .footer {
+    padding: 0 1.25rem;
+  }
   .footer span { font-size: 11px; }
 }
