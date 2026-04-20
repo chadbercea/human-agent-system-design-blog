@@ -259,31 +259,31 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   line-height: 1.55;
   font-style: italic;
   color: #9a9a9a;
-  margin: 0 0 1.5rem;
+  margin: 0 0 clamp(16px, 1.5rem, 24px);
 }
 .art-body {
   font-size: 1.1vw;
   line-height: 1.65;
   color: #909090;
 }
-.art-body p { margin-bottom: 1em; }
+.art-body p { margin-bottom: clamp(14px, 1.25rem, 20px); }
 .art-body p:last-child { margin-bottom: 0; }
 .art-body h2 {
   font-size: 1.5vw;
   font-weight: 700;
   line-height: 1.25;
   color: #c8c8c8;
-  margin: 2em 0 0.4em;
+  margin: clamp(28px, 2.5rem, 40px) 0 clamp(6px, 0.5rem, 8px);
   letter-spacing: -0.01em;
 }
 .art-body h2 + p { margin-top: 0; }
 .art-body ul,
 .art-body ol {
   padding-left: 1.5em;
-  margin: 0 0 1em;
+  margin: 0 0 clamp(14px, 1.25rem, 20px);
 }
 .art-body li {
-  margin-bottom: 0.5em;
+  margin-bottom: clamp(6px, 0.5rem, 8px);
   line-height: 1.65;
 }
 .art-body li::marker {
