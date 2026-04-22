@@ -35,8 +35,12 @@ const articleMeta = articles.map((a) => {
     eyebrow: `${base} · ${minutes} min read`,
   };
 });
+
+const featured = articles[0];
+const siteDescription = featured?.data.description
+  ?? 'A blog about Human-Agent-System Design — humans, agents, and systems shipping products together.';
 ---
-<BaseLayout title="HAS Design" activeNav="articles">
+<BaseLayout title="HAS Design" description={siteDescription} activeNav="articles">
   <div class="stage" id="stage">
     <div class="col col-hero">
       <div class="hero-inner">
