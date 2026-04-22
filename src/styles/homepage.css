@@ -61,7 +61,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   flex: 1 1 auto;
   min-height: 0;
   /* Cap height when closed so residual article content can't stretch the
-     grid row — otherwise hero-inner (height:100%, justify-content:center)
+     grid row. Otherwise hero-inner (height:100%, justify-content:center)
      re-centers into a huge column and appears to slide off-page on close. */
   height: calc(100vh - 160px);
 }
@@ -366,7 +366,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 
 /* ═══════════════════════════════════════════════
-   MOBILE — below 900px the grid collapses to a
+   MOBILE. Below 900px the grid collapses to a
    single stacked column and the article reader
    becomes a full-screen overlay.
    ═══════════════════════════════════════════════ */
@@ -401,7 +401,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   }
   .stage.open { grid-template-columns: none; }
 
-  /* Reset the desktop document-scroll rules — mobile already page-scrolls */
+  /* Reset the desktop document-scroll rules. Mobile already page-scrolls */
   .stage.open .col-hero,
   .stage.open .col-list {
     position: static;
