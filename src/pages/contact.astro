@@ -4,11 +4,45 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <BaseLayout title="Contact · HAS Design" activeNav="contact">
   <main class="prose-page">
     <article class="prose-inner">
+      <p class="eyebrow">Get involved</p>
       <h1 class="prose-h1">Contact</h1>
-      <p class="prose-lede">Placeholder. Content to be provided by Chad.</p>
       <div class="prose-body">
-        <p>Placeholder body paragraph.</p>
+        <p>HAS-D is being built in public. That means the framework gets sharper through three kinds of input from the people working on the ground. Feedback: reactions to the premises, what's missing from v1.0, where the framing falls short. Testing: stories from real products, where the triad held, where it broke, what you learned applying it. Contributing: prior art HAS-D should be citing, phenomena worth naming, concepts that need sharpening. If you've got any of it, send it.</p>
       </div>
+
+      <form class="contact-form" id="contact-form">
+        <label class="contact-field">
+          <span class="contact-label">Subject</span>
+          <input type="text" id="cf-subject" name="subject" autocomplete="off" required />
+        </label>
+        <label class="contact-field">
+          <span class="contact-label">Message</span>
+          <textarea id="cf-message" name="message" rows="6" required></textarea>
+        </label>
+        <label class="contact-field">
+          <span class="contact-label">Reply email</span>
+          <input type="email" id="cf-reply" name="reply" autocomplete="email" required />
+        </label>
+        <button type="submit" class="contact-send">Send</button>
+      </form>
     </article>
   </main>
+
+  <script is:inline>
+    (function () {
+      var form = document.getElementById('contact-form');
+      if (!form) return;
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var subject = document.getElementById('cf-subject').value;
+        var message = document.getElementById('cf-message').value;
+        var reply = document.getElementById('cf-reply').value;
+        var body = message + '\n\nReply to: ' + reply;
+        var url = 'mailto:chadbercea@gmail.com'
+          + '?subject=' + encodeURIComponent(subject)
+          + '&body=' + encodeURIComponent(body);
+        window.location.href = url;
+      });
+    })();
+  </script>
 </BaseLayout>
