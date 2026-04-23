@@ -80,6 +80,45 @@ body::after {
 .rail span { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; }
 .rail em { color: var(--white); font-style: normal; font-weight: 600; }
 
+.topbar {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto auto;
+  align-items: center;
+  gap: 32px;
+  padding: 14px 64px;
+  border-bottom: 1px solid var(--rule);
+}
+.topbar .mark { display: flex; align-items: center; gap: 12px; }
+.topbar .dot {
+  width: 7px; height: 7px;
+  background: var(--white);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.06), 0 0 12px rgba(255,255,255,0.35);
+  animation: pulse 2.2s ease-in-out infinite;
+}
+.topbar .name {
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+.topbar .kv {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.topbar .kv .k { color: var(--dim); }
+.topbar .kv .v { color: var(--white); }
+
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 @keyframes blink { to { opacity: 0; } }
@@ -88,4 +127,5 @@ body::after {
   .rail { display: none; }
   .panel { padding: 80px 32px; }
   .hero { padding: 100px 32px 100px; }
+  .topbar { padding-left: 32px; padding-right: 32px; grid-template-columns: 1fr; gap: 12px; }
 }
