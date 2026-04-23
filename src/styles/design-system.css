@@ -468,6 +468,82 @@ body::after {
   color: var(--mid);
 }
 
+.palette-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--rule-strong);
+  border: 1px solid var(--rule-strong);
+}
+.swatch {
+  aspect-ratio: 1.4;
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+.swatch--black { background: var(--black); color: var(--white); }
+.swatch--white { background: var(--white); color: var(--black); }
+
+.swatch-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+.swatch--black .swatch-top { color: var(--mid); }
+.swatch--black .swatch-top strong { color: var(--white); }
+.swatch--white .swatch-top { color: #777; }
+.swatch--white .swatch-top strong { color: var(--black); }
+
+.swatch-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
+.swatch-hex {
+  font-family: var(--font-mono);
+  font-size: clamp(40px, 6vw, 64px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.swatch-name {
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-size: 48px;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-align: right;
+}
+.swatch-role {
+  position: absolute;
+  top: 36px;
+  bottom: 36px;
+  right: 14px;
+  writing-mode: vertical-rl;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  opacity: 0.45;
+}
+
+.palette-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+}
+.palette-meta div { display: flex; flex-direction: column; gap: 6px; }
+.palette-meta .k { font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.3em; color: var(--dim); text-transform: uppercase; }
+.palette-meta .v { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: var(--white); text-transform: uppercase; }
+
 @media (max-width: 1000px) {
   .spec-display { flex-wrap: wrap; }
   .glyph-grid { flex-basis: 100%; min-height: 260px; }
@@ -485,4 +561,6 @@ body::after {
   .spec-meta { grid-template-columns: repeat(2, 1fr); }
   .spec-weights, .spec-weights--mono { grid-template-columns: repeat(2, 1fr); }
   .spec-display .codepoint { writing-mode: horizontal-tb; flex-basis: 100%; letter-spacing: 0.2em; white-space: normal; }
+  .palette-grid { grid-template-columns: 1fr; }
+  .palette-meta { grid-template-columns: repeat(2, 1fr); }
 }
