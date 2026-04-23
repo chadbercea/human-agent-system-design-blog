@@ -5,7 +5,7 @@ import '../styles/homepage.css';
 interface Props {
   title: string;
   description?: string;
-  activeNav?: 'articles' | 'about' | 'contact';
+  activeNav?: 'articles' | 'design-system' | 'about' | 'contact';
 }
 
 const {
@@ -42,6 +42,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
       </a>
       <nav class="nav">
         <a href="/" class={activeNav === 'articles' ? 'on' : undefined}>Articles</a>
+        <a href="/design-system" class={activeNav === 'design-system' ? 'on' : undefined}>Design System</a>
         <a href="/about" class={activeNav === 'about' ? 'on' : undefined}>About</a>
         <a href="/contact" class={activeNav === 'contact' ? 'on' : undefined}>Contact</a>
       </nav>
