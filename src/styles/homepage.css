@@ -46,6 +46,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #858585;
+  white-space: nowrap;
   transition: color 0.15s;
 }
 .nav a:hover { color: #c8c8c8; }
@@ -450,8 +451,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .brand-full { display: none; }
   .brand-short { display: inline; }
   .brand { font-size: 13px; }
-  .nav { gap: 1.25rem; }
-  .nav a { font-size: 12px; }
+  .nav { gap: 0.875rem; flex-wrap: wrap; justify-content: flex-end; row-gap: 0.25rem; }
+  .nav a { font-size: 11px; }
 
   /* Stage: collapse grid to stacked block */
   .stage {
