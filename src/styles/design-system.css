@@ -642,6 +642,74 @@ body::after {
 .logo-spec .k { font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.3em; color: var(--dim); text-transform: uppercase; }
 .logo-spec .v { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: var(--white); text-transform: uppercase; }
 
+.term {
+  background: var(--near-black);
+  border: 1px solid var(--rule-strong);
+  padding: 0;
+  font-family: var(--font-mono);
+  position: relative;
+}
+.term-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--mid);
+}
+.term-head .live { display: flex; align-items: center; gap: 8px; color: var(--white); }
+.term-head .live .pip {
+  width: 6px; height: 6px;
+  background: var(--white); border-radius: 50%;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.term-body {
+  padding: 24px;
+  font-size: 12px;
+  line-height: 1.9;
+  display: grid;
+  gap: 2px;
+}
+.term-line {
+  display: grid;
+  grid-template-columns: 72px 60px 1fr;
+  gap: 20px;
+  align-items: baseline;
+}
+.term-line .t { color: var(--dim); }
+.term-line .tag-cell { color: var(--white); font-weight: 600; letter-spacing: 0.05em; }
+.term-line .msg { color: var(--light); }
+
+.term-line.soft .tag-cell { color: var(--mid); }
+.term-line.soft .msg { color: var(--mid); }
+.term-line.done .msg { color: var(--white); font-weight: 500; }
+
+.cursor {
+  display: inline-block;
+  width: 8px; height: 14px;
+  background: var(--white);
+  vertical-align: text-bottom;
+  margin-left: 4px;
+  animation: blink 1s steps(2) infinite;
+}
+
+.term-foot {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-top: 1px solid var(--rule);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
 @media (max-width: 1000px) {
   .spec-display { flex-wrap: wrap; }
   .glyph-grid { flex-basis: 100%; min-height: 260px; }
@@ -664,4 +732,8 @@ body::after {
   .scales-bed { gap: 48px; padding: 80px 20px 90px; }
   .variants { grid-template-columns: 1fr; }
   .logo-spec { grid-template-columns: repeat(2, 1fr); }
+  .term-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .term-body { padding: 20px 16px; font-size: 11px; overflow-x: auto; }
+  .term-line { grid-template-columns: 60px 52px 1fr; gap: 12px; }
+  .term-foot { flex-direction: column; align-items: flex-start; gap: 6px; }
 }
