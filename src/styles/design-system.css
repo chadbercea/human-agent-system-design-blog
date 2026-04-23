@@ -544,6 +544,104 @@ body::after {
 .palette-meta .k { font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.3em; color: var(--dim); text-transform: uppercase; }
 .palette-meta .v { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: var(--white); text-transform: uppercase; }
 
+.logo-stage--inv .bar { background: var(--black); }
+
+.scales-bed {
+  border: 1px solid var(--rule);
+  padding: 80px 32px 100px;
+  display: flex;
+  gap: 64px;
+  align-items: flex-end;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 60px;
+  position: relative;
+}
+.scales-bed::before {
+  content: "SCALE SPECIMENS / 420 \00d7  180 BASE";
+  position: absolute;
+  top: 16px; left: 20px;
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.3em; color: var(--dim);
+  text-transform: uppercase;
+}
+.scales-bed::after {
+  content: "REV 01.00";
+  position: absolute;
+  top: 16px; right: 20px;
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.3em; color: var(--dim);
+  text-transform: uppercase;
+}
+
+.shell { position: relative; }
+.shell .tick {
+  position: absolute;
+  bottom: -28px; left: 0;
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.25em; color: var(--mid);
+  text-transform: uppercase;
+}
+.shell--lg { width: 420px; height: 180px; }
+.shell--md { width: 252px; height: 108px; overflow: hidden; }
+.shell--md .logo-stage { transform: scale(0.6); transform-origin: top left; }
+.shell--sm { width: 126px; height: 54px; overflow: hidden; }
+.shell--sm .logo-stage { transform: scale(0.3); transform-origin: top left; }
+
+.variants {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--rule-strong);
+  border: 1px solid var(--rule-strong);
+}
+.variant {
+  padding: 80px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  position: relative;
+}
+.variant--dark { background: var(--black); }
+.variant--light { background: var(--white); }
+
+.variant-top {
+  position: absolute;
+  top: 20px; left: 24px; right: 24px;
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+.variant--dark .variant-top { color: var(--mid); }
+.variant--dark .variant-top strong { color: var(--white); }
+.variant--light .variant-top { color: #888; }
+.variant--light .variant-top strong { color: var(--black); }
+
+.variant-stage {
+  width: 252px; height: 108px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+.variant-stage .logo-stage { transform: scale(0.6); transform-origin: top left; }
+
+.logo-spec {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+}
+.logo-spec div { display: flex; flex-direction: column; gap: 6px; }
+.logo-spec .k { font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.3em; color: var(--dim); text-transform: uppercase; }
+.logo-spec .v { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: var(--white); text-transform: uppercase; }
+
 @media (max-width: 1000px) {
   .spec-display { flex-wrap: wrap; }
   .glyph-grid { flex-basis: 100%; min-height: 260px; }
@@ -563,4 +661,7 @@ body::after {
   .spec-display .codepoint { writing-mode: horizontal-tb; flex-basis: 100%; letter-spacing: 0.2em; white-space: normal; }
   .palette-grid { grid-template-columns: 1fr; }
   .palette-meta { grid-template-columns: repeat(2, 1fr); }
+  .scales-bed { gap: 48px; padding: 80px 20px 90px; }
+  .variants { grid-template-columns: 1fr; }
+  .logo-spec { grid-template-columns: repeat(2, 1fr); }
 }
