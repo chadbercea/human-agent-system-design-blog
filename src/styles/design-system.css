@@ -1,0 +1,91 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #000000;
+  --near-black: #050506;
+  --white: #ffffff;
+  --rule: rgba(255,255,255,0.08);
+  --rule-strong: rgba(255,255,255,0.22);
+  --rule-hud: rgba(255,255,255,0.32);
+  --dim: #5a5a5c;
+  --mid: #8a8a8c;
+  --light: #c4c4c6;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+html, body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+  overflow-x: hidden;
+}
+
+main { position: relative; z-index: 1; }
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px);
+  background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 3px,
+    rgba(255,255,255,0.012) 3px,
+    rgba(255,255,255,0.012) 4px
+  );
+  mix-blend-mode: overlay;
+}
+
+.rail {
+  position: fixed;
+  top: 0; bottom: 0;
+  width: 32px;
+  z-index: 2;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--dim);
+  border-left: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+}
+.rail--left { left: 0; }
+.rail--right { right: 0; }
+.rail span { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; }
+.rail em { color: var(--white); font-style: normal; font-weight: 600; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes blink { to { opacity: 0; } }
+
+@media (max-width: 900px) {
+  .rail { display: none; }
+  .panel { padding: 80px 32px; }
+  .hero { padding: 100px 32px 100px; }
+}
