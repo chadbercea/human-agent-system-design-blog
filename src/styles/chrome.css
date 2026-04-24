@@ -1,0 +1,49 @@
+/* HAS Design — site-wide chrome surfaces.
+   Body canvas color, two-tier grid overlay, and scan-line
+   shimmer. Imported by every layout so the grid is the
+   default background on every route. Header and footer use
+   var(--black) so they read as distinct stripes against the
+   slightly-lighter --bg-canvas body.
+
+   data-chrome on <body> gates the overlays:
+     full     — grid + shimmer (default)
+     minimal  — grid only
+     none     — neither */
+
+html, body { background: var(--bg-canvas); }
+
+main { position: relative; z-index: 1; }
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px);
+  background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 3px,
+    rgba(255,255,255,0.012) 3px,
+    rgba(255,255,255,0.012) 4px
+  );
+  mix-blend-mode: overlay;
+}
+
+body[data-chrome="minimal"]::after,
+body[data-chrome="none"]::before,
+body[data-chrome="none"]::after { display: none; }

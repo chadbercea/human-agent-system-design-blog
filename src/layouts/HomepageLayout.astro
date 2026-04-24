@@ -1,5 +1,6 @@
 ---
 import '../styles/tokens.css';
+import '../styles/chrome.css';
 import '../styles/motion.css';
 import '../styles/entry.css';
 import '../styles/homepage.css';
@@ -15,6 +16,7 @@ interface Props {
   siteName?: string;
   railTag?: string;
   railChannel?: string;
+  chrome?: 'full' | 'minimal' | 'none';
 }
 
 const {
@@ -24,6 +26,7 @@ const {
   siteName = 'DESIGN',
   railTag,
   railChannel,
+  chrome = 'full',
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
@@ -48,7 +51,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
 </head>
-<body>
+<body data-chrome={chrome}>
   <SiteRails tag={railTag} channel={railChannel} />
   <div class="shell">
     <SiteHeader activeNav={activeNav} siteName={siteName} />
