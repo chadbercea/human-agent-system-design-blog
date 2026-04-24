@@ -1,0 +1,41 @@
+/* HAS Design — route entry animations (ILI-735).
+   Every route boots up consistently: chrome fades fast,
+   then main content rises top-to-bottom in a staggered chain.
+   Keyframes come from motion.css; the global reduced-motion
+   guard there handles prefers-reduced-motion. */
+
+/* ── Chrome: instant fade ────────────────────────────────
+   Header, footer, and vertical rails wash in at the same
+   moment so the frame is set before content arrives. */
+.site-header,
+.site-footer,
+.rail {
+  animation: fade var(--dur-fast) var(--ease-out) both;
+}
+
+/* ── Main content: staggered rise ────────────────────────
+   Direct children of <main> rise in sequence. Baseline delay
+   is var(--dur-fast) so the chrome has settled before content
+   starts. `.reveal` elements opt out — ILI-734 owns their
+   entry on scroll rather than on load. */
+main > *:not(.reveal) {
+  animation: rise var(--dur-slow) var(--ease-out) both;
+}
+main > *:nth-child(1):not(.reveal) { animation-delay: calc(var(--dur-fast) + var(--stagger) * 0); }
+main > *:nth-child(2):not(.reveal) { animation-delay: calc(var(--dur-fast) + var(--stagger) * 1); }
+main > *:nth-child(3):not(.reveal) { animation-delay: calc(var(--dur-fast) + var(--stagger) * 2); }
+main > *:nth-child(4):not(.reveal) { animation-delay: calc(var(--dur-fast) + var(--stagger) * 3); }
+main > *:nth-child(5):not(.reveal) { animation-delay: calc(var(--dur-fast) + var(--stagger) * 4); }
+main > *:nth-child(6):not(.reveal) { animation-delay: calc(var(--dur-fast) + var(--stagger) * 5); }
+main > *:nth-child(7):not(.reveal) { animation-delay: calc(var(--dur-fast) + var(--stagger) * 6); }
+main > *:nth-child(8):not(.reveal) { animation-delay: calc(var(--dur-fast) + var(--stagger) * 7); }
+
+/* ── Homepage stage ──────────────────────────────────────
+   The landing route doesn't wrap its content in <main>; the
+   stage grid is the top-level content block, so give it the
+   same single rise the other routes' content blocks get.
+   The hero's internal ILI-730 sequence plays on top of this. */
+.stage {
+  animation: rise var(--dur-slow) var(--ease-out) both;
+  animation-delay: var(--dur-fast);
+}
