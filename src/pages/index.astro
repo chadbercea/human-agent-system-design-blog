@@ -71,11 +71,7 @@ const siteDescription = featured?.data.description
             </div>
           </div>
 
-          <div class="hero-sub">
-            <svg viewBox="0 0 275.44 15" xmlns="http://www.w3.org/2000/svg" aria-label="BUILDING IN PUBLIC · HUMAN × AGENT">
-              <text x="0" y="12" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="500" fill="currentColor" textLength="275.44" lengthAdjust="spacing">BUILDING IN PUBLIC &middot; HUMAN &times; AGENT</text>
-            </svg>
-          </div>
+          <div class="hero-sub">Dispatches from the handoff</div>
 
           <div class="hero-meta">
             <span>WRITING</span>
@@ -84,17 +80,26 @@ const siteDescription = featured?.data.description
             <span class="slash">/</span>
             <span>THINKING OUT LOUD</span>
           </div>
+
+          <div class="hero-story" id="hero-story">
+            <span class="type-line" style="--line: 0;">// PROTOCOL 001</span>
+            <span class="type-line" style="--line: 1;">// PHASE ALPHA</span>
+            <span class="type-line" style="--line: 2;">// CHANNEL 01 &middot; LIVE</span>
+            <span class="type-line sentence" style="--line: 3;">A system is not a tool.</span>
+            <span class="type-line sentence" style="--line: 4;">It is a collaboration.</span>
+            <span class="type-line thesis" style="--line: 5;">The work lives in the handoff.</span>
+          </div>
         </div>
 
         <div class="hud-corner tl">
           <strong>OBS // SITE</strong>
           42.56&deg;N &middot; 114.46&deg;W<br />
           <span class="dim">TWIN FALLS / IDAHO</span><br />
-          T+LIVE
+          <span id="hud-t">T+00:00:00</span>
         </div>
         <div class="hud-corner tr">
           <strong>INDEX // LIVE</strong>
-          ENTRIES {entryCount}<br />
+          ENTRIES <span id="hud-entries" data-target={articles.length}>{entryCount}</span><br />
           UPD {lastUpdated}<br />
           <span class="dim">CH 01 / DISPATCH</span>
         </div>
@@ -107,7 +112,7 @@ const siteDescription = featured?.data.description
         <div class="hud-corner br">
           <strong>BUILD // META</strong>
           REV 01.00<br />
-          HASH 9F2A-8C1D<br />
+          HASH <span id="hud-hash" data-target="9F2A-8C1D">9F2A-8C1D</span><br />
           <span class="dim">GAMMA &middot; sRGB</span>
         </div>
       </div>
@@ -309,6 +314,86 @@ const siteDescription = featured?.data.description
           }
         }
       })();
+    </script>
+
+    <script>
+      import { countUp } from '../lib/countUp';
+
+      const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const pad = (n: number) => (n < 10 ? '0' + n : '' + n);
+      const fmtT = (seconds: number) => {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = Math.floor(seconds % 60);
+        return 'T+' + pad(h) + ':' + pad(m) + ':' + pad(s);
+      };
+
+      const tEl = document.getElementById('hud-t');
+      const entriesEl = document.getElementById('hud-entries');
+      const hashEl = document.getElementById('hud-hash');
+      const typeLines = Array.from(document.querySelectorAll<HTMLElement>('.type-line'));
+
+      // t=80 — telemetry count-ups begin. Corner values resolve first,
+      // then the T+ counter takes over as a live session timer.
+      window.setTimeout(() => {
+        if (entriesEl) {
+          const target = Number(entriesEl.getAttribute('data-target') || '0');
+          countUp(entriesEl, {
+            from: 0,
+            to: target,
+            duration: 520,
+            ease: 'out',
+            format: (v) => String(Math.round(v)).padStart(3, '0'),
+          });
+        }
+
+        if (tEl && !prefersReducedMotion) {
+          const start = performance.now();
+          const tick = () => {
+            const elapsed = (performance.now() - start) / 1000;
+            tEl.textContent = fmtT(elapsed);
+          };
+          tick();
+          window.setInterval(tick, 1000);
+        }
+
+        if (hashEl && !prefersReducedMotion) {
+          const target = hashEl.getAttribute('data-target') || '';
+          const chars = 'ABCDEF0123456789';
+          const duration = 600;
+          const start = performance.now();
+          const scramble = () => {
+            const elapsed = performance.now() - start;
+            if (elapsed >= duration) { hashEl.textContent = target; return; }
+            const locked = Math.floor((elapsed / duration) * target.length);
+            let out = '';
+            for (let i = 0; i < target.length; i++) {
+              if (target[i] === '-') out += '-';
+              else if (i < locked) out += target[i];
+              else out += chars[Math.floor(Math.random() * chars.length)];
+            }
+            hashEl.textContent = out;
+            requestAnimationFrame(scramble);
+          };
+          requestAnimationFrame(scramble);
+        }
+      }, 80);
+
+      // Cursor rides the currently-revealing story line, then parks on the
+      // last line (nothing removes .is-typing from it). Skip entirely under
+      // reduced motion — CSS hides the pseudo and shows all lines.
+      if (!prefersReducedMotion && typeLines.length) {
+        typeLines.forEach((line, i) => {
+          window.setTimeout(() => {
+            typeLines.forEach((l) => l.classList.remove('is-typing'));
+            line.classList.add('is-typing');
+          }, 1000 + i * 180);
+        });
+      }
     </script>
   </Fragment>
 </HomepageLayout>
