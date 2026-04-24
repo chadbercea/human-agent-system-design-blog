@@ -98,7 +98,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   text-transform: uppercase;
   color: var(--dim);
   white-space: nowrap;
-  animation: rise var(--dur-slow) var(--ease-out) both;
+  animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
   animation-delay: 160ms;
 }
 
@@ -111,14 +111,14 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   text-transform: uppercase;
   color: var(--mid);
   line-height: 1.7;
-  animation: fade var(--dur-fast) var(--ease-out) both;
+  animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
 }
 .hud-corner strong { color: var(--white); font-weight: 600; display: block; margin-bottom: 4px; }
 .hud-corner .dim { color: var(--dim); }
-.hud-corner.tl { top: 40px; left: 72px; }
-.hud-corner.tr { top: 40px; right: 72px; text-align: right; }
-.hud-corner.bl { bottom: 40px; left: 72px; }
-.hud-corner.br { bottom: 40px; right: 72px; text-align: right; }
+.hud-corner.tl { top: 40px; left: 72px; animation-delay: 420ms; }
+.hud-corner.tr { top: 40px; right: 72px; text-align: right; animation-delay: 480ms; }
+.hud-corner.bl { bottom: 40px; left: 72px; animation-delay: 540ms; }
+.hud-corner.br { bottom: 40px; right: 72px; text-align: right; animation-delay: 600ms; }
 
 .hud-corner::before {
   content: "";
@@ -143,8 +143,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   width: 275.44px;
   height: 84.86px;
   margin: 0 auto 14.4px;
-  animation: rise var(--dur-slow) var(--ease-out) both;
-  animation-delay: 200ms;
+  animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
 }
 .hero-logo .logo-stage {
   position: absolute;
@@ -185,9 +184,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   text-align: center;
   white-space: nowrap;
   color: var(--mid);
-  clip-path: inset(0 100% 0 0);
-  animation: reveal var(--dur-base) var(--ease-out) forwards;
-  animation-delay: 600ms;
+  animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
+  animation-delay: 220ms;
 }
 
 .hero-meta {
@@ -199,87 +197,64 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   text-transform: uppercase;
   color: var(--mid);
   text-align: center;
-  animation: rise var(--dur-slow) var(--ease-out) both;
-  animation-delay: 800ms;
+  animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
+  animation-delay: 320ms;
 }
 .hero-meta span + span { margin-left: 16px; }
 .hero-meta .slash { color: var(--dim); }
 
-/* ───────────── HERO STORY (ILI-730 · ILI-729 lines B) ─────────────
-   Six lines revealing via clip-path in three typographic movements:
-   mono-caps protocol stamps → mono principle body → Lato thesis.
-   A blinking cursor (::after + .is-typing) rides the currently-
-   revealing line and lands on line 6.
-   ──────────────────────────────────────────────────────────────── */
+/* ───────────── HERO STORY (ILI-730) ─────────────
+   Four locked lines, Lato 300 — the story is the human voice.
+   Each line reveals over var(--dur-base) (320ms) then holds 700ms
+   before the next begins (1020ms cadence, starting at t=0). The
+   cursor is nested inside the final line; it lands and blinks
+   once line 3 has finished revealing at 3380ms. No per-line
+   cursor handoff — chrome/rails own the mono voice upstream.
+   ──────────────────────────────────────────────── */
 .hero-story {
   width: 100%;
   margin-top: 2.25rem;
   text-align: center;
-  color: var(--mid);
-  line-height: 1.75;
 }
 .type-line {
   display: block;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--mid);
-  clip-path: inset(0 100% 0 0);
-  animation: reveal var(--dur-base) var(--ease-out) forwards;
-  animation-delay: calc(1000ms + var(--line) * 180ms);
-}
-.type-line.sentence {
-  letter-spacing: 0.02em;
-  text-transform: none;
-  color: var(--light);
-}
-.type-line.thesis {
   font-family: var(--font-sans);
   font-weight: 300;
-  font-size: 15px;
-  letter-spacing: -0.005em;
-  text-transform: none;
+  font-size: clamp(24px, 3vw, 36px);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
   color: var(--white);
-  margin-top: 0.55rem;
+  clip-path: inset(0 100% 0 0);
+  animation: reveal var(--dur-base) var(--ease-out) forwards;
+  animation-delay: calc(var(--line) * 1020ms);
 }
-.type-line::after {
-  content: '';
+.cursor {
   display: inline-block;
-  width: 0.55em;
+  width: 0.5em;
   height: 0.9em;
   background: currentColor;
-  vertical-align: -0.1em;
-  margin-left: 0.25em;
+  vertical-align: -0.08em;
+  margin-left: 0.2em;
   opacity: 0;
+  animation:
+    cursor-appear 0s 3380ms forwards,
+    blink 1s 3380ms steps(2) infinite;
 }
-.type-line.is-typing::after {
-  opacity: 1;
-  animation: blink 0.9s step-end infinite;
-}
+@keyframes cursor-appear { to { opacity: 1; } }
 
-/* Reduced motion — end states visible immediately, no cursor, no reveal.
-   The global guard (motion.css) nulls animation-duration but preserves
-   animation-delay, which would otherwise leave rise-animated hero pieces
-   invisible until their scheduled moment. Disable the hero animations
-   entirely so each element paints at its authored end state. */
+/* Reduced motion — all four sentences painted instantly at their
+   end state, cursor visible but static (no blink). The global
+   guard (motion.css) nulls animation-duration but preserves
+   animation-delay, which would otherwise keep the cursor and the
+   later story lines invisible during their delay window. */
 @media (prefers-reduced-motion: reduce) {
-  .protocol-chip,
-  .hero-logo,
-  .hero-sub,
-  .hero-meta,
-  .hud-corner,
   .type-line {
     animation: none !important;
-  }
-  .hero-sub,
-  .type-line {
     clip-path: inset(0 0 0 0);
   }
-  .type-line::after,
-  .type-line.is-typing::after {
-    display: none;
+  .cursor {
+    animation: none !important;
+    opacity: 1;
   }
 }
 

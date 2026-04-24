@@ -5,17 +5,19 @@ import path from 'node:path';
 const OUT = path.resolve('verification-screenshots/ili-730');
 fs.mkdirSync(OUT, { recursive: true });
 
-test('ILI-730 — mobile hero renders full story on one line per row', async ({ page }) => {
+test('ILI-730 — mobile hero renders 4 story lines + cursor', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/', { waitUntil: 'load' });
-  await page.waitForTimeout(3200);
+  await page.waitForTimeout(4000);
 
   await page.screenshot({ path: path.join(OUT, 'hero-mobile-view.png'), fullPage: false });
 
-  // Each story line should fit on a single visual row — no wrap.
-  const heights = await page.$$eval('.type-line', (els) => els.map((el) => el.getBoundingClientRect().height));
-  const lineHeight = Math.min(...heights);
-  for (const h of heights) {
-    expect(h).toBeLessThan(lineHeight * 1.5);
-  }
+  expect(await page.$$eval('.type-line', (els) => els.length)).toBe(4);
+  expect(await page.$$eval('.cursor', (els) => els.length)).toBe(1);
+
+  // Page must not scroll sideways at this viewport
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
 });

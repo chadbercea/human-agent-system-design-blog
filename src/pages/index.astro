@@ -82,12 +82,10 @@ const siteDescription = featured?.data.description
           </div>
 
           <div class="hero-story" id="hero-story">
-            <span class="type-line" style="--line: 0;">// PROTOCOL 001</span>
-            <span class="type-line" style="--line: 1;">// PHASE ALPHA</span>
-            <span class="type-line" style="--line: 2;">// CHANNEL 01 &middot; LIVE</span>
-            <span class="type-line sentence" style="--line: 3;">A system is not a tool.</span>
-            <span class="type-line sentence" style="--line: 4;">It is a collaboration.</span>
-            <span class="type-line thesis" style="--line: 5;">The work lives in the handoff.</span>
+            <span class="type-line" style="--line: 0;">Humans set intent.</span>
+            <span class="type-line" style="--line: 1;">Agents carry execution.</span>
+            <span class="type-line" style="--line: 2;">System design is how we make it work.</span>
+            <span class="type-line" style="--line: 3;">These are the field notes.<span class="cursor"></span></span>
           </div>
         </div>
 
@@ -335,7 +333,6 @@ const siteDescription = featured?.data.description
       const tEl = document.getElementById('hud-t');
       const entriesEl = document.getElementById('hud-entries');
       const hashEl = document.getElementById('hud-hash');
-      const typeLines = Array.from(document.querySelectorAll<HTMLElement>('.type-line'));
 
       // t=80 — telemetry count-ups begin. Corner values resolve first,
       // then the T+ counter takes over as a live session timer.
@@ -382,18 +379,6 @@ const siteDescription = featured?.data.description
           requestAnimationFrame(scramble);
         }
       }, 80);
-
-      // Cursor rides the currently-revealing story line, then parks on the
-      // last line (nothing removes .is-typing from it). Skip entirely under
-      // reduced motion — CSS hides the pseudo and shows all lines.
-      if (!prefersReducedMotion && typeLines.length) {
-        typeLines.forEach((line, i) => {
-          window.setTimeout(() => {
-            typeLines.forEach((l) => l.classList.remove('is-typing'));
-            line.classList.add('is-typing');
-          }, 1000 + i * 180);
-        });
-      }
     </script>
   </Fragment>
 </HomepageLayout>
