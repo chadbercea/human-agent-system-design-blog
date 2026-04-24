@@ -1,19 +1,25 @@
 ---
 interface Props {
-  left?: string;
+  tag?: string;
   channel?: string;
+  transmission?: string;
 }
 
 const {
-  left = 'HUMAN · AGENT · SYSTEM',
+  tag = 'HUMAN · AGENT · SYSTEM',
   channel = 'CH 01 · SIGNAL STRONG',
+  transmission = 'LIVE TRANSMISSION',
 } = Astro.props;
 ---
 <div class="rail rail--left" aria-hidden="true">
-  <span><em>{left}</em>&nbsp;&nbsp;/&nbsp;&nbsp;PROTOCOL 001&nbsp;&nbsp;/&nbsp;&nbsp;PHASE ALPHA</span>
+  <span>
+    <em data-rail-tag data-rail-tag-default={tag}>{tag}</em>&nbsp;&nbsp;/&nbsp;&nbsp;PROTOCOL 001&nbsp;&nbsp;/&nbsp;&nbsp;PHASE ALPHA
+  </span>
 </div>
 <div class="rail rail--right" aria-hidden="true">
-  <span>{channel}&nbsp;&nbsp;/&nbsp;&nbsp;<em>LIVE TRANSMISSION</em>&nbsp;&nbsp;/&nbsp;&nbsp;T+<span data-site-timer>00:00:00</span></span>
+  <span>
+    <span data-rail-channel data-rail-channel-default={channel}>{channel}</span>&nbsp;&nbsp;/&nbsp;&nbsp;<em data-rail-transmission data-rail-transmission-default={transmission}>{transmission}</em>&nbsp;&nbsp;/&nbsp;&nbsp;<span data-rail-trailing data-rail-trailing-default="timer">T+<span data-site-timer>00:00:00</span></span>
+  </span>
 </div>
 
 <script is:inline>
@@ -30,10 +36,10 @@ const {
     } catch (e) {
       start = Date.now();
     }
-    var targets = document.querySelectorAll('[data-site-timer]');
-    if (!targets.length) return;
     var pad = function (n) { return n < 10 ? '0' + n : String(n); };
     var tick = function () {
+      var targets = document.querySelectorAll('[data-site-timer]');
+      if (!targets.length) return;
       var s = Math.floor((Date.now() - start) / 1000);
       if (s < 0) s = 0;
       var h = Math.floor(s / 3600);
@@ -44,6 +50,31 @@ const {
     };
     tick();
     setInterval(tick, 1000);
+
+    window.HASRails = {
+      set: function (opts) {
+        opts = opts || {};
+        var tag = document.querySelector('[data-rail-tag]');
+        var channel = document.querySelector('[data-rail-channel]');
+        var transmission = document.querySelector('[data-rail-transmission]');
+        var trailing = document.querySelector('[data-rail-trailing]');
+        if (tag && typeof opts.tag === 'string') tag.textContent = opts.tag;
+        if (channel && typeof opts.channel === 'string') channel.textContent = opts.channel;
+        if (transmission && typeof opts.transmission === 'string') transmission.textContent = opts.transmission;
+        if (trailing && typeof opts.trailing === 'string') trailing.textContent = opts.trailing;
+      },
+      reset: function () {
+        var tag = document.querySelector('[data-rail-tag]');
+        var channel = document.querySelector('[data-rail-channel]');
+        var transmission = document.querySelector('[data-rail-transmission]');
+        var trailing = document.querySelector('[data-rail-trailing]');
+        if (tag) tag.textContent = tag.getAttribute('data-rail-tag-default') || '';
+        if (channel) channel.textContent = channel.getAttribute('data-rail-channel-default') || '';
+        if (transmission) transmission.textContent = transmission.getAttribute('data-rail-transmission-default') || '';
+        if (trailing) trailing.innerHTML = 'T+<span data-site-timer>00:00:00</span>';
+        tick();
+      },
+    };
   })();
 </script>
 

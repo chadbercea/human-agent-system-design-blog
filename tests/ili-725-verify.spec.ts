@@ -71,6 +71,60 @@ test.describe('ILI-725 — Protocol 001 / Phase Alpha framing site-wide', () => 
     });
   });
 
+  test('home: left rail tag is "// FEED · LIVE"', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(BASE + '/');
+    await page.addStyleTag({ content: NO_ANIM });
+    await expect(page.locator('[data-rail-tag]')).toHaveText('// FEED · LIVE');
+  });
+
+  test('about: left rail tag is "// OPERATOR · BIO"', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(BASE + '/about');
+    await page.addStyleTag({ content: NO_ANIM });
+    await expect(page.locator('[data-rail-tag]')).toHaveText('// OPERATOR · BIO');
+  });
+
+  test('opening an article swaps rails to DISPATCH + date + read-time', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(BASE + '/');
+    await page.addStyleTag({ content: NO_ANIM });
+    await page.waitForSelector('.post-card');
+    await page.locator('.post-card').first().click();
+    await page.waitForSelector('#stage.open');
+
+    const tag = await page.locator('[data-rail-tag]').textContent();
+    const channel = await page.locator('[data-rail-channel]').textContent();
+    const transmission = await page.locator('[data-rail-transmission]').textContent();
+    expect(tag).toMatch(/^\/\/ DISPATCH · \/\/ POST \d+$|^\/\/ DISPATCH · POST \d+$/);
+    expect(channel).toMatch(/^\d{4}\.\d{2}\.\d{2}$/);
+    expect(transmission).toMatch(/MIN READ/);
+
+    // Timer still ticking
+    await expect(page.locator('[data-site-timer]')).toHaveText(/^\d{2}:\d{2}:\d{2}$/);
+
+    await page.screenshot({
+      path: 'verification-screenshots/ili-725-home-article-open.png',
+      fullPage: false,
+    });
+  });
+
+  test('closing an article restores default rails', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(BASE + '/');
+    await page.addStyleTag({ content: NO_ANIM });
+    await page.waitForSelector('.post-card');
+    await page.locator('.post-card').first().click();
+    await page.waitForSelector('#stage.open');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.getElementById('stage')?.classList.contains('open'));
+
+    await expect(page.locator('[data-rail-tag]')).toHaveText('// FEED · LIVE');
+    await expect(page.locator('[data-rail-channel]')).toHaveText('CH 01 · SIGNAL STRONG');
+    await expect(page.locator('[data-rail-transmission]')).toHaveText('LIVE TRANSMISSION');
+    await expect(page.locator('[data-site-timer]')).toHaveText(/^\d{2}:\d{2}:\d{2}$/);
+  });
+
   test('mobile: rails hidden below 900px', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(BASE + '/');
