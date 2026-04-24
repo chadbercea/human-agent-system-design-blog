@@ -29,7 +29,7 @@ const dateLabel = formatDate(date);
 const tagLabel = tags.length > 0 ? tags.map((t) => t.toUpperCase()).join(' · ') : '';
 const readLabel = `${minutes} MIN READ`;
 ---
-<li class="post-card" data-index={index} data-slug={slug}>
+<li class="post-card reveal" data-index={index} data-slug={slug} style={`--reveal-i: ${index}`}>
   <div class="post-card-top">
     <span class="post-card-id">{idLabel}</span>
     <span class="post-card-date">{dateLabel}</span>

@@ -58,5 +58,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   </div>
 
   <slot name="after-shell" />
+
+  <script>
+    import { mountReveals } from '../lib/reveals';
+    mountReveals();
+  </script>
 </body>
 </html>
