@@ -319,7 +319,9 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   padding: 1.15rem 1.35rem 1.1rem;
   border: 1px solid var(--rule);
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
 }
 .post-card + .post-card { margin-top: -1px; }
 .post-card:hover,
@@ -521,16 +523,16 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .art-body a {
   color: inherit;
-  text-decoration: underline;
-  text-decoration-color: var(--rule-strong);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule-strong);
+  padding-bottom: 1px;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
 }
-.art-body a:hover,
-.art-body a:focus-visible {
+.art-body a:where(:hover, :focus-visible) {
   color: var(--white);
-  text-decoration-color: var(--white);
+  border-bottom-color: var(--white);
 }
 
 .art-body ul,
@@ -773,14 +775,21 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   font-size: 0.85vw;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #c8c8c8;
-  border: 1px solid #1c1c1c;
+  color: var(--white);
+  background: transparent;
+  border: 1px solid var(--rule-strong);
   padding: 1rem 1.75rem;
   margin-top: 0.5rem;
-  transition: border-color 0.2s ease, color 0.2s ease;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
 }
-.contact-send:hover,
-.contact-send:focus-visible { border-color: #c8c8c8; }
+.contact-send:where(:hover, :focus-visible) {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
+}
 
 /* Footer lives in src/components/SiteFooter.astro. */
 

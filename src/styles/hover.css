@@ -1,0 +1,258 @@
+/* HAS Design — site-wide hover vocabulary (ILI-733).
+   Six effects applied per element type. All transitions use
+   var(--dur-fast) + var(--ease-out) unless noted.
+
+   Focus states mirror hover via :where(:hover, :focus-visible).
+   Touch devices skip hover-only rules via @media (hover: hover) —
+   the end state still triggers on focus-visible for keyboard users.
+
+   Reduced-motion: the global guard in motion.css drops all
+   transition/animation durations to ~0, so end states snap rather
+   than animate. Intentional — still gives feedback. */
+
+/* ── 1. Color shift — text links, soft nav items ─────────── */
+
+.hover-colorshift {
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.hover-colorshift:where(:hover, :focus-visible) { color: var(--white); }
+
+/* ── 2. Underline grow — prose links ─────────────────────── */
+
+.hover-underline {
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule-strong);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.hover-underline:where(:hover, :focus-visible) {
+  border-bottom-color: var(--white);
+}
+
+/* ── 3. Corner bracket — post cards, panels ──────────────── */
+/* Four L-shaped corners drawn via 8 layered backgrounds on a
+   single ::before pseudo. Sits just outside the card border so
+   the card's own hairline + the brackets read as one HUD frame. */
+
+.hover-bracket {
+  position: relative;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.hover-bracket:where(:hover, :focus-visible) {
+  border-color: var(--white);
+}
+.hover-bracket::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+  background-image:
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white));
+  background-size:
+    10px 1px, 1px 10px,
+    10px 1px, 1px 10px,
+    10px 1px, 1px 10px,
+    10px 1px, 1px 10px;
+  background-position:
+    0 0,           0 0,
+    100% 0,        100% 0,
+    0 100%,        0 100%,
+    100% 100%,     100% 100%;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+.hover-bracket:where(:hover, :focus-visible)::before { opacity: 1; }
+
+/* ── 4. Bar shift — HAS logo ─────────────────────────────── */
+/* Inline styles own each bar's rotation, so the hover rule repeats
+   the rotation and appends translateY to stay in the rotated frame.
+   !important overrides inline transform. */
+
+.hover-barshift .bar {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.hover-barshift:where(:hover, :focus-visible) .bar[style*="rotate(45deg)"]  { transform: rotate(45deg)  translateY(-1px) !important; }
+.hover-barshift:where(:hover, :focus-visible) .bar[style*="rotate(-45deg)"] { transform: rotate(-45deg) translateY(-1px) !important; }
+.hover-barshift:where(:hover, :focus-visible) .bar[style*="rotate(90deg)"]  { transform: rotate(90deg)  translateY(-1px) !important; }
+
+/* ── 5. Telemetry flicker — mono caps kv pairs ───────────── */
+/* Flickers the .v child on kv hover. Reuses the `pulse` keyframe
+   from motion.css (identical 1 → 0.4 → 1 curve). */
+
+.hover-flicker .v {
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.hover-flicker:where(:hover, :focus-visible) .v {
+  animation: pulse var(--dur-fast) var(--ease-out);
+}
+
+/* HUD corner variant — the 4 hero corners have `strong` as the
+   bright value and dim secondary text. Flicker the whole block. */
+.hover-flicker-block {
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.hover-flicker-block:where(:hover, :focus-visible) {
+  animation: pulse var(--dur-fast) var(--ease-out);
+}
+
+/* ── 6. Button / pill invert ─────────────────────────────── */
+/* Default: transparent on dark → inverts to solid white with
+   black text on hover. Transition background + color together. */
+
+.hover-invert {
+  background: transparent;
+  color: var(--white);
+  border: 1px solid var(--rule-strong);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+.hover-invert:where(:hover, :focus-visible) {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
+}
+
+/* ── Applied bindings — which elements use which effect ──── */
+
+/* Post cards: corner bracket + existing border brighten */
+.post-card::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+  background-image:
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white));
+  background-size:
+    10px 1px, 1px 10px,
+    10px 1px, 1px 10px,
+    10px 1px, 1px 10px,
+    10px 1px, 1px 10px;
+  background-position:
+    0 0,           0 0,
+    100% 0,        100% 0,
+    0 100%,        0 100%,
+    100% 100%,     100% 100%;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+.post-card:where(:hover, :focus-visible)::before,
+.post-card.active::before { opacity: 1; }
+
+/* Tag label inside post card — color shift on card hover */
+.post-card-tags {
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.post-card:where(:hover, :focus-visible) .post-card-tags,
+.post-card.active .post-card-tags { color: var(--white); }
+
+/* HUD corners on hero — flicker the bright value (strong) on hover */
+.hud-corner strong {
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) {
+  .hud-corner:hover strong {
+    animation: pulse var(--dur-fast) var(--ease-out);
+  }
+}
+
+/* Topbar + footer kv pairs: telemetry flicker on the .v value */
+.site-header .kv .v,
+.site-footer .kv .v {
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) {
+  .site-header .kv:hover .v,
+  .site-footer .kv:hover .v {
+    animation: pulse var(--dur-fast) var(--ease-out);
+  }
+}
+
+/* Header logo bar shift (mirrors .hero-logo hover from homepage.css
+   but scoped to the scaled header mark). */
+.site-header .sh-logo .bar {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) {
+  .site-header .sh-logo:hover .bar[style*="rotate(45deg)"]  { transform: rotate(45deg)  translateY(-1px) !important; }
+  .site-header .sh-logo:hover .bar[style*="rotate(-45deg)"] { transform: rotate(-45deg) translateY(-1px) !important; }
+  .site-header .sh-logo:hover .bar[style*="rotate(90deg)"]  { transform: rotate(90deg)  translateY(-1px) !important; }
+}
+.site-header .sh-logo:focus-visible .bar[style*="rotate(45deg)"]  { transform: rotate(45deg)  translateY(-1px) !important; }
+.site-header .sh-logo:focus-visible .bar[style*="rotate(-45deg)"] { transform: rotate(-45deg) translateY(-1px) !important; }
+.site-header .sh-logo:focus-visible .bar[style*="rotate(90deg)"]  { transform: rotate(90deg)  translateY(-1px) !important; }
+
+/* Design-system panel cards — corner bracket + border brighten.
+   .triad-cell / .swatch / .variant are the visible card units. */
+.triad-cell,
+.swatch,
+.variant {
+  position: relative;
+}
+.triad-cell::before,
+.swatch::before,
+.variant::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+  background-image:
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white)),
+    linear-gradient(var(--white), var(--white));
+  background-size:
+    10px 1px, 1px 10px,
+    10px 1px, 1px 10px,
+    10px 1px, 1px 10px,
+    10px 1px, 1px 10px;
+  background-position:
+    0 0,           0 0,
+    100% 0,        100% 0,
+    0 100%,        0 100%,
+    100% 100%,     100% 100%;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+/* Light backgrounds want dark brackets so they're visible */
+.swatch--white::before,
+.variant--light::before {
+  background-image:
+    linear-gradient(var(--black), var(--black)),
+    linear-gradient(var(--black), var(--black)),
+    linear-gradient(var(--black), var(--black)),
+    linear-gradient(var(--black), var(--black)),
+    linear-gradient(var(--black), var(--black)),
+    linear-gradient(var(--black), var(--black)),
+    linear-gradient(var(--black), var(--black)),
+    linear-gradient(var(--black), var(--black));
+}
+@media (hover: hover) {
+  .triad-cell:hover::before,
+  .swatch:hover::before,
+  .variant:hover::before { opacity: 1; }
+}
