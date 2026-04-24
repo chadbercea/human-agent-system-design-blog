@@ -434,13 +434,25 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .art-head-sep { color: var(--dim); }
 
 .art-h1 {
-  font-family: var(--font-sans);
-  font-weight: 900;
-  font-size: clamp(48px, 6vw, 84px);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: clamp(32px, 5vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
   color: var(--white);
+  max-width: 20ch;
+  word-break: break-word;
+  hyphens: none;
   margin-bottom: 1.5rem;
+  clip-path: inset(0 100% 0 0);
+}
+.stage.open .art-h1 {
+  animation: reveal var(--dur-slow) var(--ease-out) var(--dur-fast) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .art-h1 { clip-path: none; }
+  .stage.open .art-h1 { animation: none; }
 }
 .art-lede {
   font-family: var(--font-sans);
@@ -948,7 +960,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .art-h1 {
     font-size: 44px;
     line-height: 1.02;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.02em;
     margin-bottom: 1rem;
   }
   .art-lede {
@@ -1022,4 +1034,16 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .contact-form input,
   .contact-form textarea { font-size: 16px; }
   .contact-send { font-size: 11px; padding: 0.9rem 1.5rem; }
+}
+
+/* Mono caps at large sizes wrap into ugly orphan stacks on narrow
+   phones — fall back to Lato display for the article title below 480px. */
+@media (max-width: 480px) {
+  .art-h1 {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    text-transform: none;
+    letter-spacing: -0.03em;
+    max-width: none;
+  }
 }
