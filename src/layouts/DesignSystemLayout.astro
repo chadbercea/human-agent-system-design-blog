@@ -3,6 +3,7 @@ import '../styles/tokens.css';
 import '../styles/motion.css';
 import '../styles/design-system.css';
 import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 
 interface Props {
   title: string;
@@ -47,5 +48,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   <main>
     <slot />
   </main>
+  <SiteFooter />
 </body>
 </html>

@@ -3,6 +3,7 @@ import '../styles/tokens.css';
 import '../styles/motion.css';
 import '../styles/homepage.css';
 import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 
 interface Props {
   title: string;
@@ -46,10 +47,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 
     <slot />
 
-    <footer class="footer">
-      <span>HAS Design</span>
-      <span>MMXXVI</span>
-    </footer>
+    <SiteFooter />
   </div>
 
   <slot name="after-shell" />

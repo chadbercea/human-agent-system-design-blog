@@ -64,27 +64,7 @@ body::after {
 .rail em { color: var(--white); font-style: normal; font-weight: 600; }
 
 /* Site-wide header lives in src/components/SiteHeader.astro. */
-
-.footer {
-  position: relative;
-  z-index: 1;
-  padding: 22px 96px;
-  display: grid;
-  grid-template-columns: auto 1fr auto auto auto;
-  gap: 32px;
-  align-items: center;
-  border-top: 1px solid var(--rule);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.3em;
-  color: var(--mid);
-  text-transform: uppercase;
-}
-.footer strong { color: var(--white); font-weight: 600; }
-.footer .kv { display: flex; gap: 8px; }
-.footer .kv .k { color: var(--dim); }
-.footer .kv .v { color: var(--white); }
+/* Site-wide footer lives in src/components/SiteFooter.astro. */
 
 .hero {
   padding: 140px 96px 140px;
@@ -682,7 +662,6 @@ body::after {
   .rail { display: none; }
   .panel { padding: 80px 32px; }
   .hero { padding: 100px 32px 100px; }
-  .footer { padding-left: 32px; padding-right: 32px; grid-template-columns: 1fr; gap: 12px; }
   .hud-corner { position: static; display: block; margin-top: 20px; text-align: left !important; }
   .hud-corner::before { display: none; }
   .triad { grid-template-columns: 1fr; }

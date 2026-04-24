@@ -475,24 +475,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .contact-send:hover,
 .contact-send:focus-visible { border-color: #c8c8c8; }
 
-/* ───────────── FOOTER ───────────── */
-.footer {
-  display: flex;
-  flex: 0 0 80px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 2.5rem;
-  border-top: 1px solid #1c1c1c;
-  background: #0a0a0a;
-}
-.footer span {
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-size: 0.75vw;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #858585;
-}
+/* Footer lives in src/components/SiteFooter.astro. */
 
 /* ═══════════════════════════════════════════════
    MOBILE. Below 900px the grid collapses to a
@@ -511,7 +494,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     height: auto;
     min-height: 100vh;
   }
-  .footer { flex: 0 0 60px; }
 
   /* Stage: collapse grid to stacked block */
   .stage {
@@ -663,12 +645,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     padding-left: 1.25em;
   }
   .art-end { margin-top: 3rem; font-size: 12px; }
-
-  /* Footer: tighter height */
-  .footer {
-    padding: 0 1.25rem;
-  }
-  .footer span { font-size: 11px; }
 
   /* Prose pages */
   .prose-page { padding: 2rem 1.25rem; }
