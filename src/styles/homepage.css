@@ -223,7 +223,10 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   letter-spacing: 0;
 }
 
-/* ───────────── COL 2: ARTICLE LIST ───────────── */
+/* ───────────── COL 2: POST CARD LIST (HUD) ─────────────
+   Spec-sheet cards — mono // POST NN + date header, Lato
+   700 title, dek, mono tag + read-time footer. Hairline
+   border brightens on hover. ILI-721. */
 .col-list { display: flex; flex-direction: column; }
 .list-label {
   flex-shrink: 0;
@@ -234,57 +237,103 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   text-transform: uppercase;
   color: #858585;
   padding: 1.5rem 2rem 0.875rem;
-  border-bottom: 1px solid #1c1c1c;
+  border-bottom: 1px solid var(--rule);
 }
-.article-list {
+.post-card-list {
   list-style: none;
   overflow-y: auto;
   overflow-x: hidden;
   flex: 1;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
-.article-list::-webkit-scrollbar { width: 2px; }
-.article-list::-webkit-scrollbar-thumb { background: #1c1c1c; }
+.post-card-list::-webkit-scrollbar { width: 2px; }
+.post-card-list::-webkit-scrollbar-thumb { background: var(--rule-strong); }
 
-.article-item {
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid #1c1c1c;
-  cursor: pointer;
+.post-card {
   position: relative;
-  transition: background 0.15s;
+  display: block;
+  padding: 1.15rem 1.35rem 1.1rem;
+  border: 1px solid var(--rule);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
-.article-item::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 2px;
-  background: #c8c8c8;
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+.post-card + .post-card { margin-top: -1px; }
+.post-card:hover,
+.post-card.active {
+  border-color: var(--rule-strong);
+  z-index: 1;
 }
-.article-item:hover::before,
-.article-item.active::before { transform: scaleY(1); }
-.article-item:hover { background: rgba(255,255,255,0.015); }
-.article-item.active { background: rgba(255,255,255,0.03); }
+.post-card:hover { background: rgba(255,255,255,0.015); }
+.post-card.active { background: rgba(255,255,255,0.03); }
 
-.ai-meta {
+.post-card-top {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
   font-family: var(--font-mono);
-  font-size: 0.75vw;
-  letter-spacing: 0.1em;
-  color: #7a7a7a;
-  margin-bottom: 0.4rem;
+  font-weight: 500;
+  font-size: 0.68vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 0.85rem;
 }
-.ai-date { color: #7a7a7a; }
-.ai-title {
-  font-size: 1.4vw;
-  line-height: 1.35;
-  color: #909090;
-  transition: color 0.2s;
+.post-card-id { color: var(--white); }
+.post-card-date { color: var(--mid); }
+
+.post-card-body { margin-bottom: 0.95rem; }
+.post-card-title {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 1.5vw;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  color: var(--light);
+  transition: color 0.2s ease;
 }
-.article-item:hover .ai-title,
-.article-item.active .ai-title { color: #c8c8c8; }
+.post-card:hover .post-card-title,
+.post-card.active .post-card-title { color: var(--white); }
+.post-card-dek {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: 0.92vw;
+  line-height: 1.5;
+  color: var(--light);
+  margin-top: 0.4rem;
+}
+
+.post-card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.66vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mid);
+}
+.post-card-tags { color: var(--light); }
+.post-card-tags .tag-label { color: var(--dim); margin-right: 0.4em; }
+.post-card-read {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
+  color: var(--light);
+  white-space: nowrap;
+}
+.post-card-read .arrow {
+  display: inline-block;
+  letter-spacing: 0;
+  transition: transform 0.2s ease;
+}
+.post-card:hover .post-card-read .arrow,
+.post-card.active .post-card-read .arrow { transform: translateX(3px); }
 
 /* ───────────── COL 3: ARTICLE READER ───────────── */
 .col-article { overflow-y: auto; overflow-x: hidden; }
@@ -495,14 +544,17 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     min-height: 100vh;
   }
 
-  /* Stage: collapse grid to stacked block */
+  /* Stage: collapse grid to stacked block. Reset the desktop
+     calc height so taller content (card list + footer) lays
+     out naturally instead of overlapping. */
   .stage {
     display: block;
     overflow: visible;
     transition: none;
     grid-template-columns: none;
+    height: auto;
   }
-  .stage.open { grid-template-columns: none; }
+  .stage.open { grid-template-columns: none; height: auto; }
 
   /* Reset the desktop document-scroll rules. Mobile already page-scrolls */
   .stage.open .col-hero,
@@ -563,19 +615,33 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   /* Desktop back column / button: hide entirely on mobile */
   .back-btn { display: none; }
 
-  /* Article list: full width, all items expand, standard scroll */
+  /* Post card list: full width, all items expand, standard scroll */
   .col-list { display: block; }
   .list-label {
     font-size: 11px;
     padding: 1.25rem 1.25rem 0.75rem;
   }
-  .article-list {
+  .post-card-list {
     overflow: visible;
     flex: none;
+    padding: 1rem 1.25rem 1.5rem;
   }
-  .article-item { padding: 1.25rem 1.25rem; }
-  .ai-meta { font-size: 11px; }
-  .ai-title { font-size: 17px; line-height: 1.35; }
+  .post-card { padding: 1rem 1.1rem 0.95rem; }
+  .post-card-top {
+    font-size: 10px;
+    margin-bottom: 0.7rem;
+  }
+  .post-card-body { margin-bottom: 0.75rem; }
+  .post-card-title {
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  .post-card-dek {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 0.35rem;
+  }
+  .post-card-foot { font-size: 10px; }
 
   /* Article reader: full-screen overlay, slides in from right */
   .col-article {

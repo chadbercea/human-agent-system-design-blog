@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import HomepageLayout from '../layouts/HomepageLayout.astro';
+import PostCard from '../components/PostCard.astro';
 
 const articles = (await getCollection('articles'))
   .filter((a) => !a.data.draft)
@@ -28,14 +29,22 @@ function readMinutes(body: string): number {
   return Math.max(1, Math.ceil(words / 220));
 }
 
-const articleMeta = articles.map((a) => {
-  const minutes = readMinutes(a.body);
-  const base = [...(a.data.tags ?? []), formatDate(a.data.date)].join(' · ');
+const cards = articles.map((a) => ({
+  slug: a.slug,
+  title: a.data.title,
+  date: a.data.date,
+  dek: a.data.description ?? '',
+  tags: a.data.tags ?? [],
+  minutes: readMinutes(a.body),
+}));
+
+const articleMeta = cards.map((c) => {
+  const base = [...c.tags, formatDate(c.date)].join(' · ');
   return {
-    slug: a.slug,
-    title: a.data.title,
-    lede: a.data.description ?? '',
-    eyebrow: `${base} · ${minutes} min read`,
+    slug: c.slug,
+    title: c.title,
+    lede: c.dek,
+    eyebrow: `${base} · ${c.minutes} min read`,
   };
 });
 
@@ -111,15 +120,17 @@ const siteDescription = featured?.data.description
     </div>
     <div class="col col-list">
       <span class="list-label">Published Articles</span>
-      <ul class="article-list" id="article-list">
-        {articles.map((a, i) => (
-          <li class="article-item" data-index={i} data-slug={a.slug}>
-            <div class="ai-meta">
-              <span>{String(i + 1).padStart(2, '0')}</span>
-              <span class="ai-date">{formatDate(a.data.date)}</span>
-            </div>
-            <div class="ai-title">{a.data.title}</div>
-          </li>
+      <ul class="post-card-list" id="article-list">
+        {cards.map((c, i) => (
+          <PostCard
+            index={i}
+            slug={c.slug}
+            title={c.title}
+            date={c.date}
+            dek={c.dek}
+            tags={c.tags}
+            minutes={c.minutes}
+          />
         ))}
       </ul>
     </div>
@@ -155,7 +166,7 @@ const siteDescription = featured?.data.description
         } catch (e) { meta = []; }
 
         var stage = document.getElementById('stage');
-        var items = document.querySelectorAll('.article-item');
+        var items = document.querySelectorAll('.post-card');
         var backBtn = document.getElementById('back-btn');
         var mobileBack = document.getElementById('mobile-back');
         var colArticle = document.querySelector('.col-article');
