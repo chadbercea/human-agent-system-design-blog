@@ -2,15 +2,20 @@
 import '../styles/tokens.css';
 import '../styles/motion.css';
 import '../styles/design-system.css';
+import SiteHeader from '../components/SiteHeader.astro';
 
 interface Props {
   title: string;
   description?: string;
+  activeNav?: 'articles' | 'design-system' | 'about' | 'contact';
+  siteName?: string;
 }
 
 const {
   title,
   description = 'HAS Design System. A techno black-and-white brand showcase for the Human-Agent-System Design blog.',
+  activeNav = 'design-system',
+  siteName = 'STYLE',
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
@@ -38,6 +43,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 <body>
   <div class="rail rail--left"><span><em>HUMAN · AGENT · SYSTEM</em>&nbsp;&nbsp;/&nbsp;&nbsp;PROTOCOL 001&nbsp;&nbsp;/&nbsp;&nbsp;PHASE ALPHA</span></div>
   <div class="rail rail--right"><span>CH 01 · SIGNAL STRONG&nbsp;&nbsp;/&nbsp;&nbsp;<em>LIVE TRANSMISSION</em>&nbsp;&nbsp;/&nbsp;&nbsp;T+00:32:18</span></div>
+  <SiteHeader activeNav={activeNav} siteName={siteName} />
   <main>
     <slot />
   </main>

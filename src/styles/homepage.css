@@ -16,43 +16,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   min-height: 100vh;
 }
 
-/* ───────────── HEADER ───────────── */
-.header {
-  display: flex;
-  flex: 0 0 80px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 2.5rem;
-  border-bottom: 1px solid #1c1c1c;
-  background: #0a0a0a;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.brand {
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-size: 0.9vw;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #c8c8c8;
-}
-.brand-short { display: none; }
-
-.nav { display: flex; gap: 2rem; }
-.nav a {
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-size: 0.9vw;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #858585;
-  white-space: nowrap;
-  transition: color 0.15s;
-}
-.nav a:hover { color: #c8c8c8; }
-.nav a.on { color: #c8c8c8; }
-.nav a.on::before { content: "• "; }
+/* Header chrome lives in src/components/SiteHeader.astro. */
 
 /* ───────────── STAGE (the animated grid) ───────────── */
 .stage {
@@ -548,14 +512,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     min-height: 100vh;
   }
   .footer { flex: 0 0 60px; }
-
-  /* Header: compact padding, swap brand text */
-  .header { padding: 0 1.25rem; }
-  .brand-full { display: none; }
-  .brand-short { display: inline; }
-  .brand { font-size: 13px; }
-  .nav { gap: 0.875rem; flex-wrap: wrap; justify-content: flex-end; row-gap: 0.25rem; }
-  .nav a { font-size: 11px; }
 
   /* Stage: collapse grid to stacked block */
   .stage {

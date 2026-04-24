@@ -2,17 +2,20 @@
 import '../styles/tokens.css';
 import '../styles/motion.css';
 import '../styles/homepage.css';
+import SiteHeader from '../components/SiteHeader.astro';
 
 interface Props {
   title: string;
   description?: string;
   activeNav?: 'articles' | 'design-system' | 'about' | 'contact';
+  siteName?: string;
 }
 
 const {
   title,
   description = 'A blog about Human-Agent-System Design. Humans, agents, and systems shipping products together.',
   activeNav = 'articles',
+  siteName = 'DESIGN',
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
@@ -39,18 +42,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 </head>
 <body>
   <div class="shell">
-    <header class="header">
-      <a href="/" class="brand">
-        <span class="brand-full">Human Agent System Design</span>
-        <span class="brand-short">HAS Design</span>
-      </a>
-      <nav class="nav">
-        <a href="/" class={activeNav === 'articles' ? 'on' : undefined}>Articles</a>
-        <a href="/design-system" class={activeNav === 'design-system' ? 'on' : undefined}>Design System</a>
-        <a href="/about" class={activeNav === 'about' ? 'on' : undefined}>About</a>
-        <a href="/contact" class={activeNav === 'contact' ? 'on' : undefined}>Contact</a>
-      </nav>
-    </header>
+    <SiteHeader activeNav={activeNav} siteName={siteName} />
 
     <slot />
 

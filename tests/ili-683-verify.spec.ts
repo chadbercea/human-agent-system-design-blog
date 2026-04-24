@@ -8,7 +8,7 @@ test('header and col-list stay at top after window scroll (sticky works)', async
   await page.evaluate(() => window.scrollTo(0, 500));
   await page.waitForTimeout(200);
 
-  const headerTop = await page.locator('.header').evaluate(
+  const headerTop = await page.locator('.site-header').evaluate(
     (el) => el.getBoundingClientRect().top
   );
   expect(headerTop).toBeCloseTo(0, 1);

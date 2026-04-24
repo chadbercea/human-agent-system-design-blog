@@ -1,0 +1,178 @@
+---
+interface Props {
+  activeNav?: 'articles' | 'design-system' | 'about' | 'contact';
+  siteName?: string;
+}
+
+const {
+  activeNav = 'articles',
+  siteName = 'DESIGN',
+} = Astro.props;
+
+const now = new Date();
+const buildStr = `${now.getUTCFullYear()}.${String(now.getUTCMonth() + 1).padStart(2, '0')}.${String(now.getUTCDate()).padStart(2, '0')}`;
+---
+<header class="site-header">
+  <div class="sh-mark">
+    <a href="/" class="sh-logo" aria-label="HAS Design home">
+      <div class="logo-stage">
+        <div class="bar full" style="top:30px;left:42px;transform:rotate(45deg)"></div>
+        <div class="bar full" style="top:30px;left:115px;transform:rotate(45deg)"></div>
+        <div class="bar half" style="top:81px;left:165px;transform:rotate(-45deg)"></div>
+        <div class="bar half" style="top:32.6px;left:220.2px;transform:rotate(90deg)"></div>
+        <div class="bar half" style="top:53.8px;left:211.4px;transform:rotate(-45deg)"></div>
+        <div class="bar half" style="top:66.2px;left:253.8px;transform:rotate(-45deg)"></div>
+        <div class="bar half" style="top:87.4px;left:245px;transform:rotate(90deg)"></div>
+      </div>
+    </a>
+    <span class="sh-dot" aria-hidden="true"></span>
+    <span class="sh-name">HAS / {siteName}</span>
+  </div>
+
+  <nav class="nav">
+    <a href="/" class={activeNav === 'articles' ? 'on' : undefined}>Articles</a>
+    <a href="/design-system" class={activeNav === 'design-system' ? 'on' : undefined}>Design System</a>
+    <a href="/about" class={activeNav === 'about' ? 'on' : undefined}>About</a>
+    <a href="/contact" class={activeNav === 'contact' ? 'on' : undefined}>Contact</a>
+  </nav>
+
+  <div class="sh-telemetry">
+    <div class="kv"><span class="k">REV</span><span class="v">01.00</span></div>
+    <div class="kv"><span class="k">BUILD</span><span class="v">{buildStr}</span></div>
+    <div class="kv"><span class="k">CH</span><span class="v">01</span></div>
+  </div>
+</header>
+
+<style is:global>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 32px;
+    height: 80px;
+    padding: 0 2.5rem;
+    background: var(--black);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .site-header .sh-mark {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+  }
+  .site-header a { color: inherit; text-decoration: none; }
+
+  .site-header .sh-logo {
+    width: 63px;
+    height: 27px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    display: block;
+  }
+  .site-header .sh-logo .logo-stage {
+    position: relative;
+    width: 420px;
+    height: 180px;
+    transform: scale(0.15);
+    transform-origin: top left;
+  }
+  .site-header .sh-logo .bar { position: absolute; background: var(--white); }
+  .site-header .sh-logo .full {
+    width: 30px; height: 120px;
+    clip-path: polygon(50% 0%, 100% 12.5%, 100% 87.5%, 50% 100%, 0% 87.5%, 0% 12.5%);
+  }
+  .site-header .sh-logo .half {
+    width: 30px; height: 60px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+
+  .site-header .sh-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--white);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.06),
+      0 0 12px rgba(255, 255, 255, 0.35);
+    animation: pulse 2.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  .site-header .sh-name {
+    color: var(--white);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .site-header .nav {
+    display: flex;
+    gap: 2rem;
+    justify-self: center;
+  }
+  .site-header .nav a {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--mid);
+    white-space: nowrap;
+    transition: color 0.15s;
+  }
+  .site-header .nav a:hover { color: var(--white); }
+  .site-header .nav a.on { color: var(--white); }
+  .site-header .nav a.on::before { content: "• "; }
+
+  .site-header .sh-telemetry {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    justify-self: end;
+  }
+  .site-header .kv {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .site-header .kv .k { color: var(--dim); }
+  .site-header .kv .v { color: var(--white); }
+
+  @media (max-width: 1100px) {
+    .site-header { gap: 16px; padding: 0 1.5rem; }
+    .site-header .sh-telemetry { gap: 16px; }
+    .site-header .nav { gap: 1.25rem; }
+  }
+
+  @media (max-width: 900px) {
+    .site-header {
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      padding: 0 1.25rem;
+    }
+    .site-header .sh-telemetry { display: none; }
+    .site-header .sh-logo { width: 42px; height: 18px; }
+    .site-header .sh-logo .logo-stage { transform: scale(0.1); }
+    .site-header .sh-name { font-size: 10px; letter-spacing: 0.2em; }
+    .site-header .nav {
+      justify-self: end;
+      gap: 0.875rem;
+      flex-wrap: wrap;
+      row-gap: 0.25rem;
+    }
+    .site-header .nav a { font-size: 10px; letter-spacing: 0.15em; }
+  }
+</style>
