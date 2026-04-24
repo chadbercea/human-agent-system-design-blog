@@ -10,7 +10,7 @@ test.describe('prototype verification — desktop 1920x1080', () => {
 
   test('shell flex: 80px header + flex stage + 80px footer, document scrolls', async ({ page }) => {
     await page.goto('/');
-    const headerH = await page.locator('.header').evaluate(
+    const headerH = await page.locator('.site-header').evaluate(
       (el) => el.getBoundingClientRect().height
     );
     const footerH = await page.locator('.footer').evaluate(
@@ -18,7 +18,7 @@ test.describe('prototype verification — desktop 1920x1080', () => {
     );
     expect(headerH).toBe(80);
     expect(footerH).toBe(80);
-    const headerPos = await page.locator('.header').evaluate(
+    const headerPos = await page.locator('.site-header').evaluate(
       (el) => getComputedStyle(el as HTMLElement).position
     );
     expect(headerPos).toBe('sticky');
@@ -43,10 +43,17 @@ test.describe('prototype verification — desktop 1920x1080', () => {
     expect(size).toBeCloseTo(1920 * 0.07, 0);
   });
 
-  test('header brand shows full text, Articles is .on with bullet', async ({ page }) => {
+  test('site-header mark + telemetry, Articles is .on with bullet', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('.brand-full')).toBeVisible();
-    await expect(page.locator('.brand-short')).toBeHidden();
+    await expect(page.locator('.site-header .sh-name')).toHaveText('HAS / DESIGN');
+    await expect(page.locator('.site-header .sh-dot')).toBeVisible();
+    await expect(page.locator('.site-header .sh-logo')).toBeVisible();
+    const kvCount = await page.locator('.site-header .sh-telemetry .kv').count();
+    expect(kvCount).toBe(3);
+    await expect(page.locator('.site-header .sh-telemetry .kv').nth(0)).toContainText('REV');
+    await expect(page.locator('.site-header .sh-telemetry .kv').nth(0)).toContainText('01.00');
+    await expect(page.locator('.site-header .sh-telemetry .kv').nth(1)).toContainText('BUILD');
+    await expect(page.locator('.site-header .sh-telemetry .kv').nth(2)).toContainText('CH');
     const onCount = await page.locator('.nav a.on').count();
     expect(onCount).toBe(1);
     const onText = await page.locator('.nav a.on').textContent();
@@ -166,10 +173,10 @@ test.describe('prototype verification — mobile 375x667', () => {
     await page.setViewportSize(MOBILE);
   });
 
-  test('stage collapses to block, brand-short shown', async ({ page }) => {
+  test('stage collapses to block, telemetry hidden on mobile', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('.brand-full')).toBeHidden();
-    await expect(page.locator('.brand-short')).toBeVisible();
+    await expect(page.locator('.site-header .sh-name')).toBeVisible();
+    await expect(page.locator('.site-header .sh-telemetry')).toBeHidden();
     const display = await page.locator('.stage').evaluate(
       (el) => getComputedStyle(el as HTMLElement).display
     );
@@ -206,7 +213,7 @@ test.describe('prototype verification — mobile 375x667', () => {
 
   test('footer uses 60px mobile row', async ({ page }) => {
     await page.goto('/');
-    const headerH = await page.locator('.header').evaluate(
+    const headerH = await page.locator('.site-header').evaluate(
       (el) => el.getBoundingClientRect().height
     );
     const footerH = await page.locator('.footer').evaluate(
