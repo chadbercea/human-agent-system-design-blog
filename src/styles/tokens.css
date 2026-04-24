@@ -22,6 +22,22 @@
   /* Type families — the two voices */
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-sans: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Motion — durations */
+  --dur-instant: 80ms;
+  --dur-fast: 160ms;
+  --dur-base: 320ms;
+  --dur-slow: 640ms;
+  --dur-cinematic: 1200ms;
+
+  /* Motion — easings */
+  --ease-out: cubic-bezier(.2, .8, .2, 1);      /* entrance */
+  --ease-in: cubic-bezier(.6, 0, .8, .2);       /* exit */
+  --ease-inout: cubic-bezier(.6, 0, .2, 1);     /* bidirectional */
+  --ease-linear: linear;                         /* telemetry / counters */
+
+  /* Motion — stagger step */
+  --stagger: 60ms;
 }
 
 /* ── Global type defaults ────────────────────────────────── */
