@@ -249,6 +249,7 @@ const siteDescription = featured?.data.description
           var activeEl = items[idx];
           if (activeEl) activeEl.classList.add('active');
           stage.classList.add('open');
+          document.body.classList.add('article-open');
           if (window.HASRails) {
             window.HASRails.set({
               tag: '// DISPATCH · ' + (data.postId || '').replace(/^\/\/\s*/, ''),
@@ -269,6 +270,7 @@ const siteDescription = featured?.data.description
 
         function closeArticle() {
           stage.classList.remove('open');
+          document.body.classList.remove('article-open');
           items.forEach(function (el) { el.classList.remove('active'); });
           currentIdx = -1;
           if (window.HASRails) window.HASRails.reset();
