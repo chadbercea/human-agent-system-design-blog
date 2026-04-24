@@ -93,6 +93,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 /* ───────────── COL 1: HERO ↔ BACK ───────────── */
 .hero-inner {
+  position: relative;
   width: 70vw;
   height: 100%;
   padding: 3rem 2.5rem;
@@ -115,21 +116,115 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   color: #858585;
   margin-bottom: 1.25rem;
 }
-.h1 {
-  font-family: var(--font-sans);
-  font-size: 7vw;
-  font-weight: 700;
-  line-height: 0.88;
-  letter-spacing: -0.04em;
-  color: #c8c8c8;
-  margin-bottom: 1.5rem;
+
+/* ───────────── HUD HERO (landing) ─────────────
+   Center stack (7-bar logo + width-matched tagline
+   SVG + slash meta) plus 4 corner telemetry blocks
+   with bracket marks. Pattern mirrors /design-system.
+   ─────────────────────────────────────────────── */
+.protocol-chip {
+  position: absolute;
+  top: 1.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--dim);
+  white-space: nowrap;
+  animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
+  animation-delay: 160ms;
 }
-.desc {
-  font-size: 1.4vw;
+
+.hud-corner {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mid);
   line-height: 1.7;
-  color: #9a9a9a;
-  font-style: italic;
+  animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
 }
+.hud-corner strong { color: var(--white); font-weight: 600; display: block; margin-bottom: 4px; }
+.hud-corner .dim { color: var(--dim); }
+.hud-corner.tl { top: 40px; left: 72px; animation-delay: 420ms; }
+.hud-corner.tr { top: 40px; right: 72px; text-align: right; animation-delay: 480ms; }
+.hud-corner.bl { bottom: 40px; left: 72px; animation-delay: 540ms; }
+.hud-corner.br { bottom: 40px; right: 72px; text-align: right; animation-delay: 600ms; }
+
+.hud-corner::before {
+  content: "";
+  position: absolute;
+  width: 14px; height: 14px;
+  border: 1px solid var(--rule-hud);
+}
+.hud-corner.tl::before { top: -22px; left: -22px; border-right: none; border-bottom: none; }
+.hud-corner.tr::before { top: -22px; right: -22px; border-left: none; border-bottom: none; }
+.hud-corner.bl::before { bottom: -22px; left: -22px; border-right: none; border-top: none; }
+.hud-corner.br::before { bottom: -22px; right: -22px; border-left: none; border-top: none; }
+
+.hero-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.hero-logo {
+  position: relative;
+  width: 275.44px;
+  height: 84.86px;
+  margin: 0 auto 14.4px;
+  animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
+}
+.hero-logo .logo-stage {
+  position: absolute;
+  top: -47.57px;
+  left: -14.57px;
+}
+
+.logo-stage {
+  position: relative;
+  width: 420px;
+  height: 180px;
+}
+.logo-stage .bar { position: absolute; background: var(--white); }
+.logo-stage .full {
+  width: 30px; height: 120px;
+  clip-path: polygon(50% 0%, 100% 12.5%, 100% 87.5%, 50% 100%, 0% 87.5%, 0% 12.5%);
+}
+.logo-stage .half {
+  width: 30px; height: 60px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.hero-sub {
+  width: 275.44px;
+  margin: 0 auto;
+  color: var(--mid);
+  animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
+  animation-delay: 220ms;
+}
+.hero-sub svg { display: block; width: 100%; height: auto; }
+
+.hero-meta {
+  margin-top: 88px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--mid);
+  text-align: center;
+  animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
+  animation-delay: 320ms;
+}
+.hero-meta span + span { margin-left: 16px; }
+.hero-meta .slash { color: var(--dim); }
 
 .back-btn {
   position: absolute;
@@ -507,12 +602,25 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     pointer-events: all;
   }
   .eyebrow { font-size: 11px; margin-bottom: 0.875rem; }
-  .h1 {
-    font-size: 44px;
-    line-height: 0.92;
-    margin-bottom: 1.25rem;
+
+  /* HUD hero — corners and chip flow into normal DOM order below
+     the center stack. Stack first so the mark lands above chrome. */
+  .protocol-chip {
+    position: static;
+    transform: none;
+    display: block;
+    text-align: center;
+    margin-bottom: 1.5rem;
   }
-  .desc { font-size: 17px; line-height: 1.55; }
+  .hud-corner {
+    position: static;
+    display: block;
+    margin-top: 1.25rem;
+    text-align: left !important;
+  }
+  .hud-corner::before { display: none; }
+  .hero-stack { margin: 0.5rem 0 2rem; }
+  .hero-meta { margin-top: 2rem; }
 
   /* Desktop back column / button: hide entirely on mobile */
   .back-btn { display: none; }
