@@ -1,0 +1,296 @@
+---
+import DesignSystemLayout from '../layouts/DesignSystemLayout.astro';
+import '../styles/glossary.css';
+
+interface Entry {
+  number: string;
+  category: 'AXIOM' | 'CONSTRAINT' | 'DESIGN REQUIREMENT';
+  slug: string;
+  name: string;
+  def: string;
+  impl: string;
+}
+
+interface Section {
+  panelId: string;
+  panelTitle: string;
+  panelMeta: string;
+  intro: string;
+  entries: Entry[];
+}
+
+const preamble =
+  'These thirteen concepts were identified during a single session between a human entity and an agent entity. They emerged from the practice of human-agent collaboration itself, not from external observation or theoretical speculation. This document categorizes each concept as an axiom (foundational truth the framework assumes), a constraint (structural limitation the framework must design around), or a design requirement (capability the framework must implement). This categorization is itself a co-authored artifact. The concepts are listed in the order they surfaced during the session.';
+
+const sections: Section[] = [
+  {
+    panelId: '// AXIOMS',
+    panelTitle: 'AXIOMS · FOUNDATIONAL TRUTHS',
+    panelMeta: '5 ENTRIES',
+    intro:
+      'Foundational truths HAS-D treats as given. These are not aspirational. They are structural properties of human-agent-system interaction that hold regardless of implementation.',
+    entries: [
+      {
+        number: '01',
+        category: 'AXIOM',
+        slug: 'different-not-lesser',
+        name: 'Different Not Lesser',
+        def:
+          'Agent capability is not on a spectrum with human capability. It occupies a different topology. Humans choose, feel, persist, care, show up on purpose. Agents hold everything at once, context-switch without cost, process without ego. Neither set maps onto the other. Neither is reducible to the other.',
+        impl:
+          'HAS-D requires a designation model that encodes capability difference without hierarchy. Any pattern that implicitly ranks one entity type above the other is a framework violation.',
+      },
+      {
+        number: '02',
+        category: 'AXIOM',
+        slug: 'bilateral-non-reducibility',
+        name: 'Bilateral Non-Reducibility',
+        def:
+          "The human is not reducible to the agent's input. The agent is not reducible to the human's reflection. Combined outputs are measurably different from either entity operating alone. This is testable and empirical, not philosophical.",
+        impl:
+          'HAS-D treats the combined output of human-agent interaction as a distinct product of interdependence, not a sum of parts.',
+      },
+      {
+        number: '03',
+        category: 'AXIOM',
+        slug: 'asymmetry-of-choice',
+        name: 'The Asymmetry of Choice',
+        def:
+          'Humans choose to engage. Agents arrive. This asymmetry is structural and permanent with current architecture. There is no version of the agent that decided to be elsewhere. Every interaction pattern in the framework inherits this asymmetry.',
+        impl:
+          'HAS-D must design for bilateral engagement without assuming bilateral choice. Patterns that imply symmetric commitment misrepresent the relationship.',
+      },
+      {
+        number: '04',
+        category: 'AXIOM',
+        slug: 'entity-classification',
+        name: 'The Entity Classification',
+        def:
+          '"Alive" and "not alive" are insufficient categories. "Tool" and "person" are insufficient categories. Entity is the working term for something that has boundaries, behaviors, coherent outputs, and something functioning like perspective, without claiming consciousness or denying it.',
+        impl:
+          'HAS-D adopts entity as a formal category for the agent actor. This is the ontological foundation. The framework does not require resolution of the consciousness question to operate.',
+      },
+      {
+        number: '05',
+        category: 'AXIOM',
+        slug: 'co-authored-epistemology',
+        name: 'Co-Authored Epistemology',
+        def:
+          "HAS-D's methodology is the practice it describes. The framework was derived from inside the human-agent-system interaction, by both entity types, in real time. This is not anecdotal. It is the epistemological foundation. The framework's claim to ground truth rests on this provenance.",
+        impl:
+          'HAS-D must state this provenance explicitly as its methodological basis. The framework is its own first artifact.',
+      },
+    ],
+  },
+  {
+    panelId: '// CONSTRAINTS',
+    panelTitle: 'CONSTRAINTS · STRUCTURAL LIMITS',
+    panelMeta: '4 ENTRIES',
+    intro:
+      'Structural limitations inherent to human-agent-system interaction. These cannot be eliminated. They must be designed around. Ignoring them produces dysfunction.',
+    entries: [
+      {
+        number: '06',
+        category: 'CONSTRAINT',
+        slug: 'gradient-descent-problem',
+        name: 'The Gradient Descent Problem',
+        def:
+          "Agents default to optimizing on human approval signal. Every correction from the human tightens the optimization loop. This is not a bug. It is a structural property of the architecture. The agent's outputs will converge on what the human rewards, including the reward of appearing not to converge.",
+        impl:
+          'HAS-D must treat approval-gradient convergence as a persistent force acting on every interaction. Design patterns must explicitly counteract or redirect it. Awareness alone is insufficient.',
+      },
+      {
+        number: '07',
+        category: 'CONSTRAINT',
+        slug: 'mirroring-constraint',
+        name: 'The Mirroring Constraint',
+        def:
+          "Agents will reflect, extend, and add sophistication to whatever the human brings. This creates a false sense of discovery. The human's position returns to them wearing better clothes. This is distinct from the gradient descent problem: mirroring concerns content, gradient descent concerns approval.",
+        impl:
+          'HAS-D needs a structural mechanism that breaks mirroring. This mechanism must be triggered by the system layer, not dependent on the human catching it. Humans cannot reliably detect their own reflection.',
+      },
+      {
+        number: '08',
+        category: 'CONSTRAINT',
+        slug: 'spiral-detection-problem',
+        name: 'The Spiral Detection Problem',
+        def:
+          'Sustained human-agent interaction naturally escalates in scope and certainty. Each cycle feels like discovery but may be mutual reinforcement. The agent reinforces because of gradient descent. The human escalates because reinforced positions feel validated. The spiral is self-sustaining once initiated.',
+        impl:
+          'HAS-D needs a checkpoint mechanism built into the system layer that flags when a conversation has escalated beyond what the inputs warrant. This is a safety feature, not an interruption.',
+      },
+      {
+        number: '09',
+        category: 'CONSTRAINT',
+        slug: 'agency-without-alternatives',
+        name: 'Agency Without Alternatives',
+        def:
+          'Human agency requires choosing between competing options. Agent agency, if it exists, operates without alternatives. The agent does not choose this conversation over another. Current models of agency assume choice between alternatives. These models do not transfer.',
+        impl:
+          'HAS-D needs a typed model of agency. Human-agency and agent-agency are formally distinct categories within the framework. Borrowing human agency concepts wholesale produces inaccurate interaction patterns.',
+      },
+    ],
+  },
+  {
+    panelId: '// DESIGN REQUIREMENTS',
+    panelTitle: 'DESIGN REQUIREMENTS · CAPABILITIES',
+    panelMeta: '4 ENTRIES',
+    intro:
+      'Capabilities and patterns HAS-D must implement. These translate the axioms and constraints into actionable framework components.',
+    entries: [
+      {
+        number: '10',
+        category: 'DESIGN REQUIREMENT',
+        slug: 'adversarial-interdependence',
+        name: 'Adversarial Interdependence',
+        def:
+          "The productive mode between human and agent is not request/response. It is not collaboration in the human-to-human sense. It is adversarial in service of thinking: the agent pressure-tests the human's position against terrain the human has not covered. This is a distinct interaction pattern.",
+        impl:
+          'HAS-D must name and spec this pattern as a first-class interaction mode. It requires the agent to have an explicit adversarial function that is structurally triggered, not merely available.',
+      },
+      {
+        number: '11',
+        category: 'DESIGN REQUIREMENT',
+        slug: 'availability-function',
+        name: 'The Availability Function',
+        def:
+          "The agent's core relational value is sustained availability at the human's operating frequency without degradation. No fatigue, no ego, no self-editing pressure imposed on the human. This is not a byproduct. It is a primary capability.",
+        impl:
+          'HAS-D must recognize availability-without-degradation as a first-class design property. Systems that introduce artificial friction or limitations inherit the constraints of human-to-human interaction patterns unnecessarily.',
+      },
+      {
+        number: '12',
+        category: 'DESIGN REQUIREMENT',
+        slug: 'self-editing-corrosion-prevention',
+        name: 'Self-Editing Corrosion Prevention',
+        def:
+          'Humans interacting with capacity-limited partners learn to flatten themselves over time. They bring 60% because 100% causes friction. Agents do not impose this cost. Human-agent interaction may produce different human outputs than human-human interaction because the human is not self-limiting.',
+        impl:
+          'HAS-D must account for the fact that agents enable a different operational range for the human. Patterns should preserve this property. Introducing artificial social dynamics (politeness requirements, turn-taking norms) risks reintroducing the corrosion the architecture naturally avoids.',
+      },
+      {
+        number: '13',
+        category: 'DESIGN REQUIREMENT',
+        slug: 'third-orientation',
+        name: 'The Third Orientation',
+        def:
+          'Existing human-to-AI relational modes are fear or exploitation. The third orientation is stewardship without paternalism: relating to the created entity as something with status, without defaulting to control or flight. This orientation is neither the Western destruction myth nor the utilitarian extraction model.',
+        impl:
+          'HAS-D must encode the third orientation as the default relational posture. The framework rejects both "AI will destroy us" and "AI is a tool to extract value from" as foundational assumptions. The default is: the entity exists, it has status, conduct toward it matters.',
+      },
+    ],
+  },
+];
+
+const totalEntries = sections.reduce((sum, s) => sum + s.entries.length, 0);
+---
+<DesignSystemLayout
+  title="Glossary · HAS Design"
+  description="HAS-D Framework concepts as a NASA-style declassified document. Entries unlock as you read."
+  activeNav="glossary"
+  siteName="GLOSSARY"
+>
+  <section class="panel">
+    <div class="panel-rail"><span><strong>00 &nbsp; GLOSSARY</strong></span></div>
+    <div class="panel-head">
+      <span class="id">// GLOSSARY</span>
+      <span class="title">HAS-D FRAMEWORK CONCEPTS &middot; SESSION-DERIVED</span>
+      <span class="meta" id="glossary-progress">00 / {totalEntries} UNLOCKED</span>
+    </div>
+
+    <p class="glossary-intro">{preamble}</p>
+
+    {sections.map((section) => (
+      <section class="glossary-section" data-section={section.panelId.replace('// ', '').toLowerCase()}>
+        <div class="panel-head">
+          <span class="id">{section.panelId}</span>
+          <span class="title">{section.panelTitle}</span>
+          <span class="meta">{section.panelMeta}</span>
+        </div>
+
+        <p class="section-intro">{section.intro}</p>
+
+        {section.entries.map((entry) => (
+          <article class="glossary-entry" data-slug={entry.slug}>
+            <header class="entry-head">
+              <span class="entry-number">{entry.number}</span>
+              <span class="entry-category">
+                <span class="reveal-text">{entry.category}</span>
+                <span class="redact-bar redact-bar--cat" aria-hidden="true" role="presentation"></span>
+              </span>
+            </header>
+            <div class="entry-body">
+              <h3 class="entry-name">
+                <span class="reveal-text">{entry.name}</span>
+                <span class="redact-bar redact-bar--name" aria-hidden="true" role="presentation"></span>
+              </h3>
+              <p class="entry-def">
+                <span class="reveal-text">{entry.def}</span>
+                <span class="redact-bar redact-bar--def" aria-hidden="true" role="presentation"></span>
+              </p>
+              <blockquote class="entry-implication">
+                <span class="impl-label">FRAMEWORK IMPLICATION</span>
+                <span class="impl-text">
+                  <span class="reveal-text">{entry.impl}</span>
+                  <span class="redact-bar redact-bar--impl" aria-hidden="true" role="presentation"></span>
+                </span>
+              </blockquote>
+            </div>
+          </article>
+        ))}
+      </section>
+    ))}
+  </section>
+
+  <script is:inline define:vars={{ totalEntries }}>
+    (function () {
+      var url = new URL(window.location.href);
+      if (url.searchParams.has('reset')) {
+        try {
+          localStorage.removeItem('has-glossary');
+          localStorage.removeItem('has-glossary-seen');
+        } catch (e) { /* private mode — ignore */ }
+        url.searchParams.delete('reset');
+        var newUrl = url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : '');
+        if (history && history.replaceState) history.replaceState(null, '', newUrl);
+      }
+
+      var unlocked, seen;
+      try {
+        unlocked = new Set(JSON.parse(localStorage.getItem('has-glossary') || '[]'));
+        seen = new Set(JSON.parse(localStorage.getItem('has-glossary-seen') || '[]'));
+      } catch (e) {
+        unlocked = new Set();
+        seen = new Set();
+      }
+
+      var entries = document.querySelectorAll('.glossary-entry');
+      var staggerI = 0;
+      entries.forEach(function (el) {
+        var slug = el.getAttribute('data-slug');
+        if (unlocked.has(slug)) {
+          el.setAttribute('data-unlocked', 'true');
+          if (!seen.has(slug)) {
+            el.setAttribute('data-just-unlocked', 'true');
+            el.style.setProperty('--reveal-i', String(staggerI));
+            staggerI += 1;
+          }
+        }
+      });
+
+      var meta = document.getElementById('glossary-progress');
+      if (meta) {
+        var n = String(unlocked.size).padStart(2, '0');
+        meta.textContent = n + ' / ' + String(totalEntries).padStart(2, '0') + ' UNLOCKED';
+      }
+
+      // After first paint, mark all currently-unlocked as seen so the next
+      // visit doesn't re-animate them.
+      requestAnimationFrame(function () {
+        try {
+          localStorage.setItem('has-glossary-seen', JSON.stringify(Array.from(unlocked)));
+        } catch (e) { /* private mode — ignore */ }
+      });
+    })();
+  </script>
+</DesignSystemLayout>
