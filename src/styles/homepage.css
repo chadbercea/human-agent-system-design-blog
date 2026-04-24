@@ -445,6 +445,14 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   word-break: break-word;
   hyphens: none;
   margin-bottom: 1.5rem;
+  clip-path: inset(0 100% 0 0);
+}
+.stage.open .art-h1 {
+  animation: reveal var(--dur-slow) var(--ease-out) var(--dur-fast) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .art-h1 { clip-path: none; }
+  .stage.open .art-h1 { animation: none; }
 }
 .art-lede {
   font-family: var(--font-sans);
