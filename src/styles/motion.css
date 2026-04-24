@@ -36,3 +36,31 @@
   from { clip-path: inset(0 100% 0 0); }
   to   { clip-path: inset(0 0 0 0); }
 }
+
+/* ── Scroll-reveal utility (ILI-734) ──────────────────────
+   Elements enter with opacity + 16px lift. `.in` is added
+   by the IntersectionObserver wire-up in src/lib/reveals.ts
+   when the element crosses 20% of the viewport. Group stagger
+   is opt-in via `--reveal-i` on each sibling (0, 1, 2, …). */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+  transition-delay: calc(var(--reveal-i, 0) * var(--stagger));
+  will-change: opacity, transform;
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

@@ -244,6 +244,11 @@ const siteDescription = featured?.data.description
           renderTags(data.tags);
           var src = document.getElementById('body-' + data.slug);
           bodyEl.innerHTML = src ? src.innerHTML : '';
+          if (window.HASReveal) {
+            window.HASReveal.apply(bodyEl, {
+              selectors: 'h2, h3, figure, pre, blockquote',
+            });
+          }
           renderFooter(idx);
           items.forEach(function (el) { el.classList.remove('active'); });
           var activeEl = items[idx];
