@@ -99,6 +99,14 @@ const {
   }
   .rail--left { left: 0; }
   .rail--right { right: 0; }
+
+  .rail--left {
+    transition: transform var(--dur-base) var(--ease-inout);
+    will-change: transform;
+  }
+  body.article-open .rail--left {
+    transform: translateX(-100%);
+  }
   .rail span { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; }
   .rail em { color: var(--white); font-style: normal; font-weight: 600; }
 
