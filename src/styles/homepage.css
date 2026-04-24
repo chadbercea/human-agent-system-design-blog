@@ -176,81 +176,74 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .hero-logo:hover .bar[style*="rotate(90deg)"]  { transform: rotate(90deg)  translateY(-1px) !important; }
 
 .hero-sub {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: nowrap;
+  width: 275.44px;
+  margin: 0 auto;
   color: var(--mid);
   animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
   animation-delay: 220ms;
 }
+.hero-sub svg { display: block; width: 100%; height: auto; }
 
-.hero-meta {
-  margin-top: 88px;
+/* ───────────── TERMINAL REVEAL (ILI-730) ─────────────
+   Three lines typed character-by-character. Steps() on width
+   (via ch units — JetBrains Mono is monospace, so one ch is
+   one character) turns a simple keyframe animation into a
+   per-char type-in. Each line holds 300ms after typing before
+   the next begins. Cursor is nested at the end of line 3; it
+   rides in with the last character and blinks there.
+   Block is width-matched to the logo and sits below the SVG
+   tagline — left edge of every line aligns to the left edge
+   of the logo. Longer lines extend to the right of the logo.
+   ───────────────────────────────────────────────────── */
+.terminal-reveal {
+  width: 275.44px;
+  margin-top: 64px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: clamp(14px, 1.4vw, 16px);
   font-weight: 500;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: var(--mid);
-  text-align: center;
-  animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
-  animation-delay: 320ms;
-}
-.hero-meta span + span { margin-left: 16px; }
-.hero-meta .slash { color: var(--dim); }
-
-/* ───────────── HERO STORY (ILI-730) ─────────────
-   Four locked lines, Lato 300 — the story is the human voice.
-   Each line reveals over var(--dur-base) (320ms) then holds 700ms
-   before the next begins (1020ms cadence, starting at t=0). The
-   cursor is nested inside the final line; it lands and blinks
-   once line 3 has finished revealing at 3380ms. No per-line
-   cursor handoff — chrome/rails own the mono voice upstream.
-   ──────────────────────────────────────────────── */
-.hero-story {
-  width: 100%;
-  margin-top: 2.25rem;
-  text-align: center;
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  text-align: left;
 }
 .type-line {
   display: block;
-  font-family: var(--font-sans);
-  font-weight: 300;
-  font-size: clamp(24px, 3vw, 36px);
-  line-height: 1.35;
-  letter-spacing: -0.02em;
-  color: var(--white);
-  clip-path: inset(0 100% 0 0);
-  animation: reveal var(--dur-base) var(--ease-out) forwards;
-  animation-delay: calc(var(--line) * 1020ms);
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  animation: type calc(var(--chars) * 40ms) steps(var(--chars)) var(--start) forwards;
 }
+/* Target width needs to account for letter-spacing 0.02em after each glyph
+   (or the final char — "." on line 3 — gets clipped) and for the trailing
+   cursor on line 3 (0.5ch + 2px margin). Extra trailing space on lines 1
+   and 2 is invisible, so one keyframe serves all three. */
+@keyframes type {
+  to { width: calc(var(--chars) * (1ch + 0.02em) + 0.5ch + 2px); }
+}
+
 .cursor {
   display: inline-block;
-  width: 0.5em;
-  height: 0.9em;
-  background: currentColor;
-  vertical-align: -0.08em;
-  margin-left: 0.2em;
-  opacity: 0;
-  animation:
-    cursor-appear 0s 3380ms forwards,
-    blink 1s 3380ms steps(2) infinite;
+  width: 0.5ch;
+  height: 1em;
+  background: var(--white);
+  vertical-align: text-bottom;
+  margin-left: 2px;
+  animation: blink 1s steps(2) infinite;
 }
-@keyframes cursor-appear { to { opacity: 1; } }
+@keyframes blink {
+  0%, 50%   { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
 
-/* Reduced motion — all four sentences painted instantly at their
-   end state, cursor visible but static (no blink). The global
-   guard (motion.css) nulls animation-duration but preserves
-   animation-delay, which would otherwise keep the cursor and the
-   later story lines invisible during their delay window. */
+/* Reduced motion — three lines painted at their full content width
+   instantly, cursor visible but static. max-content keeps the
+   terminal single-line shape (overflow: hidden + nowrap still
+   apply, but the line's box is sized to fit its text exactly so
+   nothing is clipped). */
 @media (prefers-reduced-motion: reduce) {
   .type-line {
+    width: max-content !important;
     animation: none !important;
-    clip-path: inset(0 0 0 0);
   }
   .cursor {
     animation: none !important;
