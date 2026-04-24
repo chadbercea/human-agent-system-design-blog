@@ -1,0 +1,452 @@
+{
+  "axe": {
+    "home-desktop": {
+      "url": "/",
+      "violations": 1,
+      "serious": 1,
+      "critical": 0
+    },
+    "home-mobile": {
+      "url": "/",
+      "violations": 1,
+      "serious": 1,
+      "critical": 0
+    },
+    "about-desktop": {
+      "url": "/about",
+      "violations": 1,
+      "serious": 1,
+      "critical": 0
+    },
+    "about-mobile": {
+      "url": "/about",
+      "violations": 1,
+      "serious": 1,
+      "critical": 0
+    },
+    "contact-desktop": {
+      "url": "/contact",
+      "violations": 1,
+      "serious": 1,
+      "critical": 0
+    },
+    "contact-mobile": {
+      "url": "/contact",
+      "violations": 1,
+      "serious": 1,
+      "critical": 0
+    },
+    "design-system-desktop": {
+      "url": "/design-system",
+      "violations": 1,
+      "serious": 1,
+      "critical": 0
+    },
+    "design-system-mobile": {
+      "url": "/design-system",
+      "violations": 1,
+      "serious": 1,
+      "critical": 0
+    },
+    "article-open": {
+      "url": "/ (article open)",
+      "violations": 1,
+      "serious": 1,
+      "critical": 0
+    }
+  },
+  "hscroll": {
+    "1440-home": {
+      "scrollW": 1440,
+      "innerW": 1440,
+      "overflow": false
+    },
+    "1440-about": {
+      "scrollW": 1440,
+      "innerW": 1440,
+      "overflow": false
+    },
+    "1440-contact": {
+      "scrollW": 1440,
+      "innerW": 1440,
+      "overflow": false
+    },
+    "1440-design-system": {
+      "scrollW": 1440,
+      "innerW": 1440,
+      "overflow": false
+    },
+    "1440-404": {
+      "scrollW": 1440,
+      "innerW": 1440,
+      "overflow": false
+    },
+    "1280-home": {
+      "scrollW": 1280,
+      "innerW": 1280,
+      "overflow": false
+    },
+    "1280-about": {
+      "scrollW": 1280,
+      "innerW": 1280,
+      "overflow": false
+    },
+    "1280-contact": {
+      "scrollW": 1280,
+      "innerW": 1280,
+      "overflow": false
+    },
+    "1280-design-system": {
+      "scrollW": 1280,
+      "innerW": 1280,
+      "overflow": false
+    },
+    "1280-404": {
+      "scrollW": 1280,
+      "innerW": 1280,
+      "overflow": false
+    },
+    "1024-home": {
+      "scrollW": 1024,
+      "innerW": 1024,
+      "overflow": false
+    },
+    "1024-about": {
+      "scrollW": 1024,
+      "innerW": 1024,
+      "overflow": false
+    },
+    "1024-contact": {
+      "scrollW": 1024,
+      "innerW": 1024,
+      "overflow": false
+    },
+    "1024-design-system": {
+      "scrollW": 1024,
+      "innerW": 1024,
+      "overflow": false
+    },
+    "1024-404": {
+      "scrollW": 1024,
+      "innerW": 1024,
+      "overflow": false
+    },
+    "900-home": {
+      "scrollW": 900,
+      "innerW": 900,
+      "overflow": false
+    },
+    "900-about": {
+      "scrollW": 900,
+      "innerW": 900,
+      "overflow": false
+    },
+    "900-contact": {
+      "scrollW": 900,
+      "innerW": 900,
+      "overflow": false
+    },
+    "900-design-system": {
+      "scrollW": 900,
+      "innerW": 900,
+      "overflow": false
+    },
+    "900-404": {
+      "scrollW": 900,
+      "innerW": 900,
+      "overflow": false
+    },
+    "768-home": {
+      "scrollW": 768,
+      "innerW": 768,
+      "overflow": false
+    },
+    "768-about": {
+      "scrollW": 768,
+      "innerW": 768,
+      "overflow": false
+    },
+    "768-contact": {
+      "scrollW": 768,
+      "innerW": 768,
+      "overflow": false
+    },
+    "768-design-system": {
+      "scrollW": 768,
+      "innerW": 768,
+      "overflow": false
+    },
+    "768-404": {
+      "scrollW": 768,
+      "innerW": 768,
+      "overflow": false
+    },
+    "414-home": {
+      "scrollW": 414,
+      "innerW": 414,
+      "overflow": false
+    },
+    "414-about": {
+      "scrollW": 414,
+      "innerW": 414,
+      "overflow": false
+    },
+    "414-contact": {
+      "scrollW": 414,
+      "innerW": 414,
+      "overflow": false
+    },
+    "414-design-system": {
+      "scrollW": 414,
+      "innerW": 414,
+      "overflow": false
+    },
+    "414-404": {
+      "scrollW": 414,
+      "innerW": 414,
+      "overflow": false
+    },
+    "375-home": {
+      "scrollW": 375,
+      "innerW": 375,
+      "overflow": false
+    },
+    "375-about": {
+      "scrollW": 375,
+      "innerW": 375,
+      "overflow": false
+    },
+    "375-contact": {
+      "scrollW": 375,
+      "innerW": 375,
+      "overflow": false
+    },
+    "375-design-system": {
+      "scrollW": 375,
+      "innerW": 375,
+      "overflow": false
+    },
+    "375-404": {
+      "scrollW": 375,
+      "innerW": 375,
+      "overflow": false
+    },
+    "360-home": {
+      "scrollW": 360,
+      "innerW": 360,
+      "overflow": false
+    },
+    "360-about": {
+      "scrollW": 360,
+      "innerW": 360,
+      "overflow": false
+    },
+    "360-contact": {
+      "scrollW": 360,
+      "innerW": 360,
+      "overflow": false
+    },
+    "360-design-system": {
+      "scrollW": 360,
+      "innerW": 360,
+      "overflow": false
+    },
+    "360-404": {
+      "scrollW": 360,
+      "innerW": 360,
+      "overflow": false
+    }
+  },
+  "fonts": {
+    "home": {
+      "families": [
+        "Lato, -apple-system, BlinkMacSystemFont, sans-serif",
+        "\"JetBrains Mono\", ui-monospace, SFMono-Regular, Menlo, monospace"
+      ],
+      "extra": []
+    },
+    "about": {
+      "families": [
+        "Lato, -apple-system, BlinkMacSystemFont, sans-serif",
+        "\"JetBrains Mono\", ui-monospace, SFMono-Regular, Menlo, monospace"
+      ],
+      "extra": []
+    },
+    "contact": {
+      "families": [
+        "Lato, -apple-system, BlinkMacSystemFont, sans-serif",
+        "\"JetBrains Mono\", ui-monospace, SFMono-Regular, Menlo, monospace"
+      ],
+      "extra": []
+    },
+    "design-system": {
+      "families": [
+        "Lato, -apple-system, BlinkMacSystemFont, sans-serif",
+        "\"JetBrains Mono\", ui-monospace, SFMono-Regular, Menlo, monospace"
+      ],
+      "extra": []
+    }
+  },
+  "rails": {
+    "1440-home": {
+      "leftVisible": true,
+      "rightVisible": true,
+      "expected": true
+    },
+    "1440-about": {
+      "leftVisible": true,
+      "rightVisible": true,
+      "expected": true
+    },
+    "1440-contact": {
+      "leftVisible": true,
+      "rightVisible": true,
+      "expected": true
+    },
+    "1440-design-system": {
+      "leftVisible": true,
+      "rightVisible": true,
+      "expected": true
+    },
+    "1280-home": {
+      "leftVisible": true,
+      "rightVisible": true,
+      "expected": true
+    },
+    "1280-about": {
+      "leftVisible": true,
+      "rightVisible": true,
+      "expected": true
+    },
+    "1280-contact": {
+      "leftVisible": true,
+      "rightVisible": true,
+      "expected": true
+    },
+    "1280-design-system": {
+      "leftVisible": true,
+      "rightVisible": true,
+      "expected": true
+    },
+    "1024-home": {
+      "leftVisible": true,
+      "rightVisible": true,
+      "expected": true
+    },
+    "1024-about": {
+      "leftVisible": true,
+      "rightVisible": true,
+      "expected": true
+    },
+    "1024-contact": {
+      "leftVisible": true,
+      "rightVisible": true,
+      "expected": true
+    },
+    "1024-design-system": {
+      "leftVisible": true,
+      "rightVisible": true,
+      "expected": true
+    },
+    "900-home": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "900-about": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "900-contact": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "900-design-system": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "768-home": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "768-about": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "768-contact": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "768-design-system": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "414-home": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "414-about": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "414-contact": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "414-design-system": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "375-home": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "375-about": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "375-contact": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "375-design-system": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "360-home": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "360-about": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "360-contact": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    },
+    "360-design-system": {
+      "leftVisible": false,
+      "rightVisible": false,
+      "expected": false
+    }
+  }
+}

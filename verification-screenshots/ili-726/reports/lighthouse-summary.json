@@ -1,0 +1,34 @@
+[
+  {
+    "slug": "home",
+    "url": "/",
+    "performance": 99,
+    "accessibility": 95,
+    "bestPractices": 100,
+    "seo": 100
+  },
+  {
+    "slug": "about",
+    "url": "/about",
+    "performance": 100,
+    "accessibility": 94,
+    "bestPractices": 100,
+    "seo": 100
+  },
+  {
+    "slug": "contact",
+    "url": "/contact",
+    "performance": 100,
+    "accessibility": 95,
+    "bestPractices": 100,
+    "seo": 100
+  },
+  {
+    "slug": "design-system",
+    "url": "/design-system",
+    "performance": 99,
+    "accessibility": 94,
+    "bestPractices": 100,
+    "seo": 100
+  }
+]
