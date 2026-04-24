@@ -354,66 +354,233 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   transform: translateX(0);
 }
 
-.art-eyebrow {
+/* Header strip: // POST NN · DATE · MIN READ, mono caps. */
+.art-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
   font-family: var(--font-mono);
   font-weight: 500;
   font-size: 0.75vw;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #858585;
-  margin-bottom: 0.75rem;
+  color: var(--mid);
+  margin-bottom: 1.1rem;
 }
+.art-head-id { color: var(--white); }
+.art-head-date,
+.art-head-read { color: var(--mid); }
+.art-head-sep { color: var(--dim); }
+
 .art-h1 {
   font-family: var(--font-sans);
-  font-size: 3.5vw;
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-  color: #c8c8c8;
-  margin-bottom: 1.75rem;
+  font-weight: 900;
+  font-size: clamp(48px, 6vw, 84px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--white);
+  margin-bottom: 1.5rem;
 }
 .art-lede {
-  font-size: 1.3vw;
-  line-height: 1.55;
-  font-style: italic;
-  color: #9a9a9a;
-  margin: 0 0 clamp(16px, 1.5rem, 24px);
-}
-.art-body {
-  font-size: 1.1vw;
-  line-height: 1.65;
-  color: #909090;
-}
-.art-body p { margin-bottom: clamp(14px, 1.25rem, 20px); }
-.art-body p:last-child { margin-bottom: 0; }
-.art-body h2 {
-  font-size: 1.5vw;
-  font-weight: 700;
-  line-height: 1.25;
-  color: #c8c8c8;
-  margin: clamp(28px, 2.5rem, 40px) 0 clamp(6px, 0.5rem, 8px);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: clamp(24px, 2vw, 32px);
+  line-height: 1.35;
   letter-spacing: -0.01em;
+  color: var(--light);
+  margin: 0 0 1.75rem;
 }
-.art-body h2 + p { margin-top: 0; }
+
+/* Tag row: TAGS · X · Y · Z, mono caps. */
+.art-tags {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.72vw;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--light);
+  margin-bottom: 1.5rem;
+}
+.art-tags:empty { display: none; }
+
+/* Hairline rule separating meta block from body. */
+.art-rule {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 0 0 2.25rem;
+  width: 100%;
+  max-width: 70ch;
+}
+
+/* Body: readable long-form. Cap measure for sustained reading,
+   scoped override of the "text fills column" rule. */
+.art-body {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: clamp(17px, 1.15vw, 19px);
+  line-height: 1.7;
+  color: var(--light);
+  max-width: 70ch;
+}
+.art-body p { margin-bottom: 1.2em; }
+.art-body p:last-child { margin-bottom: 0; }
+
+.art-body h2 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin: 2em 0 0.5em;
+}
+.art-body h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: clamp(22px, 2vw, 28px);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--white);
+  margin: 1.6em 0 0.4em;
+}
+.art-body h2 + p,
+.art-body h3 + p { margin-top: 0; }
+
+.art-body a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.art-body a:hover,
+.art-body a:focus-visible {
+  color: var(--white);
+  text-decoration-color: var(--white);
+}
+
 .art-body ul,
 .art-body ol {
-  padding-left: 1.5em;
-  margin: 0 0 clamp(14px, 1.25rem, 20px);
+  padding-left: 1.4em;
+  margin: 0 0 1.2em;
 }
 .art-body li {
-  margin-bottom: clamp(6px, 0.5rem, 8px);
-  line-height: 1.65;
+  margin-bottom: 0.45em;
+  line-height: 1.7;
 }
-.art-body li::marker {
-  color: #7a7a7a;
+.art-body li::marker { color: var(--dim); }
+
+.art-body blockquote {
+  border-left: 1px solid var(--rule-strong);
+  padding: 0.1em 0 0.1em 24px;
+  margin: 1.6em 0;
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-style: normal;
+  color: var(--light);
+}
+.art-body blockquote p { margin-bottom: 0.6em; }
+.art-body blockquote p:last-child { margin-bottom: 0; }
+
+.art-body code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  color: var(--white);
+  background: var(--near-black);
+  border: 1px solid var(--rule);
+  padding: 2px 6px;
+}
+.art-body pre {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  line-height: 1.55;
+  color: var(--light);
+  background: var(--near-black);
+  border: 1px solid var(--rule);
+  padding: 1rem 1.1rem;
+  margin: 1.4em 0;
+  overflow-x: auto;
+  max-width: 70ch;
+}
+.art-body pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+.art-body figure { margin: 2em 0; }
+.art-body figure img { display: block; width: 100%; height: auto; }
+.art-body figcaption {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.72vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-top: 0.75rem;
 }
 
 .art-end {
   margin-top: 4rem;
   text-align: center;
-  color: #7a7a7a;
+  color: var(--dim);
   letter-spacing: 0.5em;
   font-size: 0.85vw;
+  max-width: 70ch;
+}
+
+/* Prev / next footer: mono caps with permalink hash between. */
+.art-foot {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--rule);
+  max-width: 70ch;
+}
+.art-foot-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+  padding: 0;
+  color: var(--light);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.art-foot-btn[hidden] { display: none; }
+.art-foot-btn:hover,
+.art-foot-btn:focus-visible { color: var(--white); }
+.art-foot-next { text-align: right; align-items: flex-end; }
+.art-foot-dir {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.72vw;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mid);
+}
+.art-foot-btn:hover .art-foot-dir,
+.art-foot-btn:focus-visible .art-foot-dir { color: var(--white); }
+.art-foot-title {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: 0.95vw;
+  line-height: 1.3;
+  color: inherit;
+}
+.art-foot-hash {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.68vw;
+  letter-spacing: 0.14em;
+  color: var(--dim);
+  white-space: nowrap;
 }
 
 /* ───────────── PROSE PAGES (About / Contact) ─────────────
@@ -692,25 +859,62 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     opacity: 1;
     transform: none;
   }
-  .art-eyebrow { font-size: 12px; margin-bottom: 0.5rem; }
+  .art-head {
+    flex-wrap: wrap;
+    gap: 0.5em;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    margin-bottom: 0.9rem;
+  }
   .art-h1 {
-    font-size: 32px;
-    line-height: 1.08;
-    margin-bottom: 1.25rem;
+    font-size: 44px;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    margin-bottom: 1rem;
   }
   .art-lede {
-    font-size: 19px;
-    line-height: 1.5;
-    margin: 0 0 1.75rem;
+    font-size: 22px;
+    line-height: 1.4;
+    margin: 0 0 1.5rem;
   }
-  .art-body { font-size: 17px; line-height: 1.6; }
+  .art-tags {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    margin-bottom: 1.25rem;
+  }
+  .art-rule { margin-bottom: 1.75rem; max-width: none; }
+
+  .art-body {
+    font-size: 17px;
+    line-height: 1.7;
+    max-width: none;
+  }
   .art-body p { margin-bottom: 1.15em; }
-  .art-body h2 { font-size: 20px; line-height: 1.3; margin: 2em 0 0.5em; }
+  .art-body h2 { font-size: 24px; line-height: 1.2; margin: 1.8em 0 0.4em; }
+  .art-body h3 { font-size: 20px; line-height: 1.25; margin: 1.5em 0 0.35em; }
   .art-body ul,
-  .art-body ol {
-    padding-left: 1.25em;
+  .art-body ol { padding-left: 1.25em; }
+  .art-body blockquote { padding-left: 18px; margin: 1.4em 0; }
+  .art-body pre { max-width: none; font-size: 14px; padding: 0.85rem 1rem; }
+  .art-body figcaption { font-size: 11px; letter-spacing: 0.14em; }
+  .art-end { margin-top: 3rem; font-size: 12px; max-width: none; }
+
+  .art-foot {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 1rem;
+    column-gap: 1rem;
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
+    max-width: none;
   }
-  .art-end { margin-top: 3rem; font-size: 12px; }
+  .art-foot-hash {
+    order: 3;
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 10px;
+  }
+  .art-foot-dir { font-size: 10px; letter-spacing: 0.16em; }
+  .art-foot-title { font-size: 14px; }
 
   /* Prose pages */
   .prose-page { padding: 2rem 1.25rem; }

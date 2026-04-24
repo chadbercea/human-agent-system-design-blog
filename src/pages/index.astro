@@ -38,15 +38,15 @@ const cards = articles.map((a) => ({
   minutes: readMinutes(a.body),
 }));
 
-const articleMeta = cards.map((c) => {
-  const base = [...c.tags, formatDate(c.date)].join(' · ');
-  return {
-    slug: c.slug,
-    title: c.title,
-    lede: c.dek,
-    eyebrow: `${base} · ${c.minutes} min read`,
-  };
-});
+const articleMeta = cards.map((c, i) => ({
+  slug: c.slug,
+  title: c.title,
+  lede: c.dek,
+  postId: `// POST ${String(i + 1).padStart(2, '0')}`,
+  date: formatDate(c.date),
+  read: `${c.minutes} MIN READ`,
+  tags: c.tags.map((t) => t.toUpperCase()),
+}));
 
 const featured = articles[0];
 const siteDescription = featured?.data.description
@@ -140,11 +140,30 @@ const siteDescription = featured?.data.description
         <span>All Articles</span>
       </button>
       <article class="article-inner">
-        <div class="art-eyebrow" id="art-eyebrow"></div>
+        <div class="art-head" id="art-head">
+          <span class="art-head-id" id="art-head-id"></span>
+          <span class="art-head-sep" aria-hidden="true">·</span>
+          <span class="art-head-date" id="art-head-date"></span>
+          <span class="art-head-sep" aria-hidden="true">·</span>
+          <span class="art-head-read" id="art-head-read"></span>
+        </div>
         <h1 class="art-h1" id="art-h1"></h1>
         <p class="art-lede" id="art-lede"></p>
+        <div class="art-tags" id="art-tags"></div>
+        <hr class="art-rule" aria-hidden="true" />
         <div class="art-body" id="art-body"></div>
         <div class="art-end" aria-hidden="true">·&nbsp;·&nbsp;·</div>
+        <nav class="art-foot" aria-label="Article navigation">
+          <button class="art-foot-btn art-foot-prev" id="art-foot-prev" type="button">
+            <span class="art-foot-dir">&larr; PREV</span>
+            <span class="art-foot-title" id="art-foot-prev-title"></span>
+          </button>
+          <span class="art-foot-hash" id="art-foot-hash"></span>
+          <button class="art-foot-btn art-foot-next" id="art-foot-next" type="button">
+            <span class="art-foot-dir">NEXT &rarr;</span>
+            <span class="art-foot-title" id="art-foot-next-title"></span>
+          </button>
+        </nav>
       </article>
     </div>
   </div>
@@ -170,28 +189,75 @@ const siteDescription = featured?.data.description
         var backBtn = document.getElementById('back-btn');
         var mobileBack = document.getElementById('mobile-back');
         var colArticle = document.querySelector('.col-article');
-        var eyebrowEl = document.getElementById('art-eyebrow');
+        var headIdEl = document.getElementById('art-head-id');
+        var headDateEl = document.getElementById('art-head-date');
+        var headReadEl = document.getElementById('art-head-read');
         var h1El = document.getElementById('art-h1');
         var ledeEl = document.getElementById('art-lede');
+        var tagsEl = document.getElementById('art-tags');
         var bodyEl = document.getElementById('art-body');
+        var prevBtn = document.getElementById('art-foot-prev');
+        var nextBtn = document.getElementById('art-foot-next');
+        var prevTitleEl = document.getElementById('art-foot-prev-title');
+        var nextTitleEl = document.getElementById('art-foot-next-title');
+        var hashEl = document.getElementById('art-foot-hash');
         var savedScrollY = 0;
+        var currentIdx = -1;
 
-        function openArticle(idx) {
+        function renderTags(tags) {
+          if (!tags || !tags.length) { tagsEl.textContent = ''; return; }
+          tagsEl.textContent = 'TAGS · ' + tags.join(' · ');
+        }
+
+        function renderFooter(idx) {
+          var prev = meta[idx + 1];
+          var next = meta[idx - 1];
+          if (prev) {
+            prevBtn.hidden = false;
+            prevTitleEl.textContent = prev.title;
+          } else {
+            prevBtn.hidden = true;
+            prevTitleEl.textContent = '';
+          }
+          if (next) {
+            nextBtn.hidden = false;
+            nextTitleEl.textContent = next.title;
+          } else {
+            nextBtn.hidden = true;
+            nextTitleEl.textContent = '';
+          }
+          var cur = meta[idx];
+          hashEl.textContent = cur ? '#' + cur.slug : '';
+        }
+
+        function openArticle(idx, opts) {
           var data = meta[idx];
           if (!data) return;
           var wasOpen = stage.classList.contains('open');
           if (!wasOpen) {
             savedScrollY = window.scrollY || window.pageYOffset || 0;
           }
-          eyebrowEl.textContent = data.eyebrow;
+          currentIdx = idx;
+          headIdEl.textContent = data.postId;
+          headDateEl.textContent = data.date;
+          headReadEl.textContent = data.read;
           h1El.textContent = data.title;
-          ledeEl.textContent = data.lede;
+          ledeEl.textContent = data.lede || '';
+          renderTags(data.tags);
           var src = document.getElementById('body-' + data.slug);
           bodyEl.innerHTML = src ? src.innerHTML : '';
+          renderFooter(idx);
           items.forEach(function (el) { el.classList.remove('active'); });
           var activeEl = items[idx];
           if (activeEl) activeEl.classList.add('active');
           stage.classList.add('open');
+          if (!opts || opts.updateHash !== false) {
+            if (history && history.replaceState) {
+              history.replaceState(null, '', '#' + data.slug);
+            } else {
+              window.location.hash = data.slug;
+            }
+          }
           window.scrollTo(0, 0);
           if (colArticle) colArticle.scrollTop = 0;
         }
@@ -199,6 +265,10 @@ const siteDescription = featured?.data.description
         function closeArticle() {
           stage.classList.remove('open');
           items.forEach(function (el) { el.classList.remove('active'); });
+          currentIdx = -1;
+          if (history && history.replaceState) {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
           window.scrollTo(0, savedScrollY);
         }
 
@@ -211,9 +281,25 @@ const siteDescription = featured?.data.description
 
         if (backBtn) backBtn.addEventListener('click', closeArticle);
         if (mobileBack) mobileBack.addEventListener('click', closeArticle);
+        if (prevBtn) prevBtn.addEventListener('click', function () {
+          if (currentIdx >= 0 && meta[currentIdx + 1]) openArticle(currentIdx + 1);
+        });
+        if (nextBtn) nextBtn.addEventListener('click', function () {
+          if (currentIdx >= 0 && meta[currentIdx - 1]) openArticle(currentIdx - 1);
+        });
         document.addEventListener('keydown', function (e) {
           if (e.key === 'Escape') closeArticle();
         });
+
+        var initialHash = (window.location.hash || '').replace(/^#/, '');
+        if (initialHash) {
+          for (var i = 0; i < meta.length; i++) {
+            if (meta[i].slug === initialHash) {
+              openArticle(i, { updateHash: false });
+              break;
+            }
+          }
+        }
       })();
     </script>
   </Fragment>
