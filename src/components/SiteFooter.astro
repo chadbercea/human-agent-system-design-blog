@@ -1,0 +1,73 @@
+---
+import { execSync } from 'node:child_process';
+
+interface Props {
+  siteName?: string;
+  tagline?: string;
+}
+
+const {
+  siteName = 'HAS DESIGN',
+  tagline = 'BUILT BY HAND · ASSISTED BY AGENT',
+} = Astro.props;
+
+const now = new Date();
+const pad = (n: number) => String(n).padStart(2, '0');
+const buildStr =
+  `${now.getUTCFullYear()}.${pad(now.getUTCMonth() + 1)}.${pad(now.getUTCDate())}` +
+  `.${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}`;
+
+let hashStr = '0000-0000';
+try {
+  const sha = execSync('git rev-parse --short=8 HEAD', { stdio: ['ignore', 'pipe', 'ignore'] })
+    .toString()
+    .trim()
+    .toUpperCase();
+  if (/^[0-9A-F]{8}$/.test(sha)) {
+    hashStr = `${sha.slice(0, 4)}-${sha.slice(4)}`;
+  }
+} catch {
+  /* no git — fall back to placeholder */
+}
+---
+<footer class="site-footer">
+  <span class="sf-mark"><strong>END</strong> / {siteName}</span>
+  <span class="sf-spacer"></span>
+  <div class="kv"><span class="k">BUILD</span><span class="v">{buildStr}</span></div>
+  <div class="kv"><span class="k">HASH</span><span class="v">{hashStr}</span></div>
+  <span class="sf-tagline">{tagline}</span>
+</footer>
+
+<style is:global>
+  .site-footer {
+    position: relative;
+    z-index: 1;
+    min-height: 80px;
+    padding: 22px 96px;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto auto;
+    gap: 32px;
+    align-items: center;
+    border-top: 1px solid var(--rule);
+    background: var(--black);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    color: var(--mid);
+    text-transform: uppercase;
+  }
+  .site-footer strong { color: var(--white); font-weight: 600; }
+  .site-footer .kv { display: flex; gap: 8px; }
+  .site-footer .kv .k { color: var(--dim); }
+  .site-footer .kv .v { color: var(--white); }
+
+  @media (max-width: 900px) {
+    .site-footer {
+      padding: 20px 32px;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .site-footer .sf-spacer { display: none; }
+  }
+</style>
