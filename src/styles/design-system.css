@@ -3,9 +3,6 @@
 html, body {
   background: var(--black);
   color: var(--white);
-  font-family: var(--font-sans);
-  font-weight: 300;
-  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: geometricPrecision;
   overflow-x: hidden;
