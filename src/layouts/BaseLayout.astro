@@ -1,17 +1,19 @@
 ---
-import '../styles/fonts.css';
-import '../styles/homepage.css';
+import '../styles/tokens.css';
+import '../styles/motion.css';
 
 interface Props {
   title: string;
   description?: string;
-  activeNav?: 'articles' | 'design-system' | 'about' | 'contact';
+  railLeft?: string;
+  railRight?: string;
 }
 
 const {
   title,
-  description = 'A blog about Human-Agent-System Design. Humans, agents, and systems shipping products together.',
-  activeNav = 'articles',
+  description = 'Human-Agent-System Design.',
+  railLeft = 'HUMAN · AGENT · SYSTEM  /  PROTOCOL 001  /  PHASE ALPHA',
+  railRight = 'CH 01 · SIGNAL STRONG  /  LIVE TRANSMISSION  /  T+00:32:18',
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
@@ -24,6 +26,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   <meta name="description" content={description} />
   <link rel="canonical" href={canonical} />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Lato:wght@100;300;400;700;900&display=swap" rel="stylesheet" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="HAS Design" />
   <meta property="og:title" content={title} />
@@ -34,28 +39,84 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   <meta name="twitter:description" content={description} />
 </head>
 <body>
-  <div class="shell">
-    <header class="header">
-      <a href="/" class="brand">
-        <span class="brand-full">Human Agent System Design</span>
-        <span class="brand-short">HAS Design</span>
-      </a>
-      <nav class="nav">
-        <a href="/" class={activeNav === 'articles' ? 'on' : undefined}>Articles</a>
-        <a href="/design-system" class={activeNav === 'design-system' ? 'on' : undefined}>Design System</a>
-        <a href="/about" class={activeNav === 'about' ? 'on' : undefined}>About</a>
-        <a href="/contact" class={activeNav === 'contact' ? 'on' : undefined}>Contact</a>
-      </nav>
-    </header>
-
+  <div class="rail rail--left"><span>{railLeft}</span></div>
+  <div class="rail rail--right"><span>{railRight}</span></div>
+  <main>
     <slot />
-
-    <footer class="footer">
-      <span>HAS Design</span>
-      <span>MMXXVI</span>
-    </footer>
-  </div>
-
-  <slot name="after-shell" />
+  </main>
 </body>
 </html>
+
+<style is:global>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+    overflow-x: hidden;
+  }
+
+  main { position: relative; z-index: 1; }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(rgba(255,255,255,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px);
+    background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 3px,
+      rgba(255,255,255,0.012) 3px,
+      rgba(255,255,255,0.012) 4px
+    );
+    mix-blend-mode: overlay;
+  }
+
+  .rail {
+    position: fixed;
+    top: 0; bottom: 0;
+    width: 32px;
+    z-index: 2;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--dim);
+    border-left: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
+  }
+  .rail--left { left: 0; }
+  .rail--right { right: 0; }
+  .rail span { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; }
+  .rail em { color: var(--white); font-style: normal; font-weight: 600; }
+
+  @media (max-width: 900px) {
+    .rail { display: none; }
+  }
+</style>

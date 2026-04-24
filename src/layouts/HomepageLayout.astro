@@ -1,0 +1,61 @@
+---
+import '../styles/fonts.css';
+import '../styles/homepage.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  activeNav?: 'articles' | 'design-system' | 'about' | 'contact';
+}
+
+const {
+  title,
+  description = 'A blog about Human-Agent-System Design. Humans, agents, and systems shipping products together.',
+  activeNav = 'articles',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+---
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="HAS Design" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+</head>
+<body>
+  <div class="shell">
+    <header class="header">
+      <a href="/" class="brand">
+        <span class="brand-full">Human Agent System Design</span>
+        <span class="brand-short">HAS Design</span>
+      </a>
+      <nav class="nav">
+        <a href="/" class={activeNav === 'articles' ? 'on' : undefined}>Articles</a>
+        <a href="/design-system" class={activeNav === 'design-system' ? 'on' : undefined}>Design System</a>
+        <a href="/about" class={activeNav === 'about' ? 'on' : undefined}>About</a>
+        <a href="/contact" class={activeNav === 'contact' ? 'on' : undefined}>Contact</a>
+      </nav>
+    </header>
+
+    <slot />
+
+    <footer class="footer">
+      <span>HAS Design</span>
+      <span>MMXXVI</span>
+    </footer>
+  </div>
+
+  <slot name="after-shell" />
+</body>
+</html>
