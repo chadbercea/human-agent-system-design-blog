@@ -483,25 +483,43 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .art-body blockquote p { margin-bottom: 0.6em; }
 .art-body blockquote p:last-child { margin-bottom: 0; }
 
-.art-body code {
+/* Inline code — hairline-bordered mono chip. */
+.art-body p code,
+.art-body li code {
   font-family: var(--font-mono);
-  font-size: 0.88em;
-  color: var(--white);
+  font-size: 0.92em;
   background: var(--near-black);
   border: 1px solid var(--rule);
   padding: 2px 6px;
-}
-.art-body pre {
-  font-family: var(--font-mono);
-  font-size: 0.88em;
-  line-height: 1.55;
   color: var(--light);
+}
+
+/* Code block — terminal readout: near-black bg, strong-rule border,
+   language label in top-right corner as small mono caps. */
+.art-body pre {
+  position: relative;
   background: var(--near-black);
-  border: 1px solid var(--rule);
-  padding: 1rem 1.1rem;
-  margin: 1.4em 0;
+  border: 1px solid var(--rule-strong);
+  padding: 20px 24px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--light);
+  margin: 32px 0;
   overflow-x: auto;
   max-width: 70ch;
+}
+.art-body pre::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: var(--dim);
+  text-transform: uppercase;
 }
 .art-body pre code {
   background: none;
@@ -895,7 +913,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .art-body ul,
   .art-body ol { padding-left: 1.25em; }
   .art-body blockquote { padding-left: 18px; margin: 1.4em 0; }
-  .art-body pre { max-width: none; font-size: 14px; padding: 0.85rem 1rem; }
+  .art-body pre { max-width: none; font-size: 12px; padding: 20px 16px; margin: 24px 0; }
+  .art-body pre::before { top: 6px; right: 10px; font-size: 8px; }
   .art-body figcaption { font-size: 11px; letter-spacing: 0.14em; }
   .art-end { margin-top: 3rem; font-size: 12px; max-width: none; }
 
