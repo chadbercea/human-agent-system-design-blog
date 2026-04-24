@@ -4,6 +4,7 @@ import '../styles/motion.css';
 import '../styles/design-system.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import SiteRails from '../components/SiteRails.astro';
 
 interface Props {
   title: string;
@@ -42,8 +43,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   <meta name="twitter:description" content={description} />
 </head>
 <body>
-  <div class="rail rail--left"><span><em>HUMAN · AGENT · SYSTEM</em>&nbsp;&nbsp;/&nbsp;&nbsp;PROTOCOL 001&nbsp;&nbsp;/&nbsp;&nbsp;PHASE ALPHA</span></div>
-  <div class="rail rail--right"><span>CH 01 · SIGNAL STRONG&nbsp;&nbsp;/&nbsp;&nbsp;<em>LIVE TRANSMISSION</em>&nbsp;&nbsp;/&nbsp;&nbsp;T+00:32:18</span></div>
+  <SiteRails />
   <SiteHeader activeNav={activeNav} siteName={siteName} />
   <main>
     <slot />
