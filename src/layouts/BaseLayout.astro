@@ -7,6 +7,7 @@ interface Props {
   description?: string;
   railLeft?: string;
   railRight?: string;
+  chrome?: 'full' | 'minimal' | 'none';
 }
 
 const {
@@ -14,6 +15,7 @@ const {
   description = 'Human-Agent-System Design.',
   railLeft = 'HUMAN · AGENT · SYSTEM  /  PROTOCOL 001  /  PHASE ALPHA',
   railRight = 'CH 01 · SIGNAL STRONG  /  LIVE TRANSMISSION  /  T+00:32:18',
+  chrome = 'full',
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
@@ -38,7 +40,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
 </head>
-<body>
+<body data-chrome={chrome}>
   <div class="rail rail--left"><span>{railLeft}</span></div>
   <div class="rail rail--right"><span>{railRight}</span></div>
   <main>
@@ -112,6 +114,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   .rail--right { right: 0; }
   .rail span { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; }
   .rail em { color: var(--white); font-style: normal; font-weight: 600; }
+
+  body[data-chrome="minimal"]::after,
+  body[data-chrome="none"]::before,
+  body[data-chrome="none"]::after { display: none; }
+
+  body[data-chrome="minimal"] .rail,
+  body[data-chrome="none"] .rail { display: none; }
 
   @media (max-width: 900px) {
     .rail { display: none; }
