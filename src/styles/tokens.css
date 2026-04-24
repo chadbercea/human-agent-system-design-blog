@@ -1,6 +1,7 @@
-/* HAS Design — global tokens.
-   Source of truth for color + font custom properties.
-   Imported by every layout; no styles, no selectors beyond :root. */
+/* HAS Design — global tokens + type defaults.
+   Source of truth for color, font custom properties, and the
+   site-wide typographic system (Lato + JetBrains Mono).
+   Imported by every layout. */
 
 :root {
   /* Color — two values, zero hue, 21:1 contrast */
@@ -18,7 +19,74 @@
   --mid: #8a8a8c;
   --light: #c4c4c6;
 
-  /* Type families */
+  /* Type families — the two voices */
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-sans: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ── Global type defaults ────────────────────────────────── */
+
+html, body {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+code, kbd, pre, samp { font-family: var(--font-mono); }
+
+/* ── Heading scale ────────────────────────────────────────
+   h1–h4 are Lato display weights. h5–h6 are mono eyebrows
+   (metadata/section labels), matching .panel-head .title. */
+
+h1, h2, h3, h4 {
+  font-family: var(--font-sans);
+  color: var(--white);
+}
+
+h1 {
+  font-weight: 900;
+  font-size: clamp(48px, 6vw, 84px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+h2 {
+  font-weight: 700;
+  font-size: clamp(32px, 4vw, 52px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+h3 {
+  font-weight: 700;
+  font-size: clamp(22px, 2.6vw, 32px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+h4 {
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+h5, h6 {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--mid);
+}
+
+h5 { font-size: 13px; }
+h6 { font-size: 11px; }
+
+/* ── Mono utility — inline telemetry text ────────────────── */
+
+.mono {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
