@@ -3,16 +3,16 @@
     "id": "color-contrast",
     "impact": "serious",
     "help": "Elements must meet minimum color contrast ratio thresholds",
-    "nodes": 12,
+    "nodes": 10,
     "targets": [
-      [
-        ".rail--left > span"
-      ],
       [
         ".rail--right > span"
       ],
       [
         "span[data-rail-channel=\"\"]"
+      ],
+      [
+        "span[data-rail-trailing=\"\"]"
       ]
     ]
   }

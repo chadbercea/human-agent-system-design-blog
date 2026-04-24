@@ -4,16 +4,13 @@
     "impact": "serious",
     "help": "Elements must meet minimum color contrast ratio thresholds",
     "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
-    "nodes": 58,
+    "nodes": 2,
     "targets": [
       [
-        ".panel:nth-child(2) > .panel-head > .meta"
+        "footer > .kv:nth-child(3) > .k"
       ],
       [
-        ".triad-cell:nth-child(1) > .cell-id"
-      ],
-      [
-        ".triad-cell:nth-child(1) > dl > dt:nth-child(1)"
+        "footer > .kv:nth-child(4) > .k"
       ]
     ]
   }

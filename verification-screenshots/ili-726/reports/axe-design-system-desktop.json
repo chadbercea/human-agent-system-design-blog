@@ -4,7 +4,7 @@
     "impact": "serious",
     "help": "Elements must meet minimum color contrast ratio thresholds",
     "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
-    "nodes": 72,
+    "nodes": 17,
     "targets": [
       [
         ".rail--left > span"
