@@ -13,6 +13,9 @@ function formatDate(d: Date): string {
   return `${y}.${m}.${day}`;
 }
 
+const entryCount = String(articles.length).padStart(3, '0');
+const lastUpdated = articles.length > 0 ? formatDate(articles[0].data.date) : '—';
+
 const rendered = await Promise.all(
   articles.map(async (a) => {
     const { Content } = await a.render();
@@ -44,9 +47,60 @@ const siteDescription = featured?.data.description
   <div class="stage" id="stage">
     <div class="col col-hero">
       <div class="hero-inner">
-        <div class="eyebrow">Hello, world.</div>
-        <h1 class="h1">This is a new blog<br>all about designing<br>for the age of agents.</h1>
-        <p class="desc">Humans, agents, and systems shipping products together. Start with the first post.</p>
+        <div class="protocol-chip">PROTOCOL 001 &middot; PHASE ALPHA</div>
+
+        <div class="hero-stack">
+          <div class="hero-logo">
+            <div class="logo-stage">
+              <div class="bar full" style="top:30px;left:42px;transform:rotate(45deg)"></div>
+              <div class="bar full" style="top:30px;left:115px;transform:rotate(45deg)"></div>
+              <div class="bar half" style="top:81px;left:165px;transform:rotate(-45deg)"></div>
+              <div class="bar half" style="top:32.6px;left:220.2px;transform:rotate(90deg)"></div>
+              <div class="bar half" style="top:53.8px;left:211.4px;transform:rotate(-45deg)"></div>
+              <div class="bar half" style="top:66.2px;left:253.8px;transform:rotate(-45deg)"></div>
+              <div class="bar half" style="top:87.4px;left:245px;transform:rotate(90deg)"></div>
+            </div>
+          </div>
+
+          <div class="hero-sub">
+            <svg viewBox="0 0 275.44 15" xmlns="http://www.w3.org/2000/svg" aria-label="BUILDING IN PUBLIC · HUMAN × AGENT">
+              <text x="0" y="12" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="500" fill="currentColor" textLength="275.44" lengthAdjust="spacing">BUILDING IN PUBLIC &middot; HUMAN &times; AGENT</text>
+            </svg>
+          </div>
+
+          <div class="hero-meta">
+            <span>WRITING</span>
+            <span class="slash">/</span>
+            <span>SHIPPING</span>
+            <span class="slash">/</span>
+            <span>THINKING OUT LOUD</span>
+          </div>
+        </div>
+
+        <div class="hud-corner tl">
+          <strong>OBS // SITE</strong>
+          42.56&deg;N &middot; 114.46&deg;W<br />
+          <span class="dim">TWIN FALLS / IDAHO</span><br />
+          T+LIVE
+        </div>
+        <div class="hud-corner tr">
+          <strong>INDEX // LIVE</strong>
+          ENTRIES {entryCount}<br />
+          UPD {lastUpdated}<br />
+          <span class="dim">CH 01 / DISPATCH</span>
+        </div>
+        <div class="hud-corner bl">
+          <strong>STATUS // LINK</strong>
+          AGENT-01 &nbsp; ONLINE<br />
+          OPERATOR &nbsp; LINKED<br />
+          <span class="dim">HANDSHAKE &middot; OK</span>
+        </div>
+        <div class="hud-corner br">
+          <strong>BUILD // META</strong>
+          REV 01.00<br />
+          HASH 9F2A-8C1D<br />
+          <span class="dim">GAMMA &middot; sRGB</span>
+        </div>
       </div>
       <button class="back-btn" id="back-btn" aria-label="Back to articles">
         <span class="back-content">
