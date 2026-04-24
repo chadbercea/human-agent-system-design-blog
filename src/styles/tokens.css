@@ -1,0 +1,24 @@
+/* HAS Design — global tokens.
+   Source of truth for color + font custom properties.
+   Imported by every layout; no styles, no selectors beyond :root. */
+
+:root {
+  /* Color — two values, zero hue, 21:1 contrast */
+  --black: #000000;
+  --near-black: #050506;
+  --white: #ffffff;
+
+  /* Color — alpha rules */
+  --rule: rgba(255, 255, 255, 0.08);
+  --rule-strong: rgba(255, 255, 255, 0.22);
+  --rule-hud: rgba(255, 255, 255, 0.32);
+
+  /* Color — grayscale text tones */
+  --dim: #5a5a5c;
+  --mid: #8a8a8c;
+  --light: #c4c4c6;
+
+  /* Type families */
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+}

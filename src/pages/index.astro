@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
+import HomepageLayout from '../layouts/HomepageLayout.astro';
 
 const articles = (await getCollection('articles'))
   .filter((a) => !a.data.draft)
@@ -40,7 +40,7 @@ const featured = articles[0];
 const siteDescription = featured?.data.description
   ?? 'A blog about Human-Agent-System Design. Humans, agents, and systems shipping products together.';
 ---
-<BaseLayout title="HAS Design" description={siteDescription} activeNav="articles">
+<HomepageLayout title="HAS Design" description={siteDescription} activeNav="articles">
   <div class="stage" id="stage">
     <div class="col col-hero">
       <div class="hero-inner">
@@ -152,4 +152,4 @@ const siteDescription = featured?.data.description
       })();
     </script>
   </Fragment>
-</BaseLayout>
+</HomepageLayout>

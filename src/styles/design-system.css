@@ -1,19 +1,5 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
-  --black: #000000;
-  --near-black: #050506;
-  --white: #ffffff;
-  --rule: rgba(255,255,255,0.08);
-  --rule-strong: rgba(255,255,255,0.22);
-  --rule-hud: rgba(255,255,255,0.32);
-  --dim: #5a5a5c;
-  --mid: #8a8a8c;
-  --light: #c4c4c6;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-sans: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
 html, body {
   background: var(--black);
   color: var(--white);
@@ -225,10 +211,6 @@ body::after {
 .hud-corner.tr { animation-delay: 480ms; }
 .hud-corner.bl { animation-delay: 540ms; }
 .hud-corner.br { animation-delay: 600ms; }
-
-@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-@keyframes blink { to { opacity: 0; } }
 
 .panel {
   padding: 140px 96px;
