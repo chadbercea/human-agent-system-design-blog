@@ -2,7 +2,7 @@
 import { execSync } from 'node:child_process';
 
 interface Props {
-  activeNav?: 'articles' | 'design-system' | 'about' | 'contact';
+  activeNav?: 'articles' | 'glossary' | 'design-system' | 'about' | 'contact';
   siteName?: string;
 }
 
@@ -46,6 +46,7 @@ try {
 
   <nav class="nav">
     <a href="/" aria-current={activeNav === 'articles' ? 'page' : undefined}>Articles</a>
+    <a href="/glossary" aria-current={activeNav === 'glossary' ? 'page' : undefined}>Glossary</a>
     <a href="/design-system" aria-current={activeNav === 'design-system' ? 'page' : undefined}>Design System</a>
     <a href="/about" aria-current={activeNav === 'about' ? 'page' : undefined}>About</a>
     <a href="/contact" aria-current={activeNav === 'contact' ? 'page' : undefined}>Contact</a>
