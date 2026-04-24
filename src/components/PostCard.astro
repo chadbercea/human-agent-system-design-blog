@@ -1,0 +1,52 @@
+---
+/* HUD post card — spec-sheet look.
+   Mono // POST NN id + date header, Lato 700 title, dek,
+   mono tag + read-time footer. Hairline border brighten on
+   hover. See ILI-721. Pure vw desktop / px mobile typography
+   per CLAUDE.md non-negotiables. */
+
+export interface Props {
+  index: number;
+  slug: string;
+  title: string;
+  date: Date;
+  dek?: string;
+  tags?: string[];
+  minutes: number;
+}
+
+const { index, slug, title, date, dek, tags = [], minutes } = Astro.props;
+
+function formatDate(d: Date): string {
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}.${m}.${day}`;
+}
+
+const idLabel = `// POST ${String(index + 1).padStart(2, '0')}`;
+const dateLabel = formatDate(date);
+const tagLabel = tags.length > 0 ? tags.map((t) => t.toUpperCase()).join(' · ') : '';
+const readLabel = `${minutes} MIN READ`;
+---
+<li class="post-card" data-index={index} data-slug={slug}>
+  <div class="post-card-top">
+    <span class="post-card-id">{idLabel}</span>
+    <span class="post-card-date">{dateLabel}</span>
+  </div>
+
+  <div class="post-card-body">
+    <div class="post-card-title">{title}</div>
+    {dek && <div class="post-card-dek">{dek}</div>}
+  </div>
+
+  <div class="post-card-foot">
+    <span class="post-card-tags">
+      {tagLabel && <><span class="tag-label">TAGS:</span> {tagLabel}</>}
+    </span>
+    <span class="post-card-read">
+      <span>{readLabel}</span>
+      <span class="arrow" aria-hidden="true">&rarr;</span>
+    </span>
+  </div>
+</li>
