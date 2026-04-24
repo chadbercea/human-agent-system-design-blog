@@ -1,0 +1,240 @@
+/* HAS Design — channel transitions (ILI-738).
+   Every route navigation plays a signal-loss → swap →
+   signal-acquire envelope so the site feels like a tuner
+   retuning between channels. Per-route flourishes layer on
+   top after the envelope settles. The reduced-motion guard
+   in motion.css collapses everything to instant. */
+
+/* ── View Transitions: page swap inside the static ──────── */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur-fast);
+  animation-timing-function: var(--ease-inout);
+}
+
+::view-transition-old(root) {
+  animation-name: channel-out;
+}
+::view-transition-new(root) {
+  animation-name: channel-in;
+}
+
+@keyframes channel-out {
+  from { opacity: 1; filter: brightness(1); }
+  to   { opacity: 0; filter: brightness(2.4) contrast(1.4); }
+}
+
+@keyframes channel-in {
+  from { opacity: 0; filter: brightness(2.4) contrast(1.4); }
+  to   { opacity: 1; filter: brightness(1); }
+}
+
+/* Persistent chrome rides above the swap so the rails and
+   header stay visible while the static plays. */
+::view-transition-group(channel-chrome) {
+  animation-duration: 0ms;
+}
+
+/* ── Static / scan-line intensify ───────────────────────── */
+
+body[data-signal="loss"]::after,
+body[data-signal="acquire"]::after {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 3px,
+    rgba(255, 255, 255, 0.06) 3px,
+    rgba(255, 255, 255, 0.06) 4px
+  );
+  animation: scanline-jitter 90ms steps(2, end) infinite;
+}
+
+@keyframes scanline-jitter {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(1px); }
+  100% { transform: translateY(0); }
+}
+
+/* ── Static-noise overlay — persistent element toggled by JS */
+
+.signal-noise {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background-image:
+    radial-gradient(circle at 13% 27%, rgba(255, 255, 255, 0.18) 0, transparent 1.5px),
+    radial-gradient(circle at 71% 11%, rgba(255, 255, 255, 0.14) 0, transparent 1.5px),
+    radial-gradient(circle at 47% 83%, rgba(255, 255, 255, 0.12) 0, transparent 1.5px),
+    radial-gradient(circle at 89% 56%, rgba(255, 255, 255, 0.16) 0, transparent 1.5px),
+    radial-gradient(circle at 23% 64%, rgba(255, 255, 255, 0.10) 0, transparent 1.5px);
+  background-size: 4px 4px, 5px 5px, 3px 3px, 6px 6px, 4px 4px;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+body[data-signal="loss"] .signal-noise {
+  opacity: 0.85;
+  animation: noise-shift 80ms steps(3, end) infinite;
+}
+
+body[data-signal="acquire"] .signal-noise {
+  opacity: 0.35;
+  animation: noise-shift 90ms steps(3, end) infinite;
+}
+
+@keyframes noise-shift {
+  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
+  33%  { background-position: 2px 1px, 1px 2px, 0 1px, 2px 0, 1px 2px; }
+  66%  { background-position: 1px 3px, 2px 1px, 1px 0, 0 2px, 3px 1px; }
+  100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
+}
+
+/* ── CH scramble during transition ──────────────────────── */
+
+[data-channel-value] {
+  display: inline-block;
+}
+
+body[data-signal="loss"] [data-channel-value],
+body[data-signal="acquire"] [data-channel-value] {
+  color: var(--white);
+}
+
+/* ── Per-route flourishes ───────────────────────────────── */
+
+/* Flourishes only fire on entry. Each one has its own
+   body[data-flourish="<name>"] selector so adding routes
+   doesn't bleed across pages. The home flourish is owned by
+   the existing hero animation and only needs the envelope
+   wrapping. */
+
+/* SPEC — HUD corner brackets snap in, panels stagger
+   (extends design-system entry beyond the global rise) */
+body[data-flourish="spec"] .hud-corner {
+  animation: bracket-snap var(--dur-base) var(--ease-out) both;
+  animation-delay: calc(var(--dur-fast) + 80ms);
+}
+body[data-flourish="spec"] .hud-corner.tl { animation-delay: calc(var(--dur-fast) + 80ms); }
+body[data-flourish="spec"] .hud-corner.tr { animation-delay: calc(var(--dur-fast) + 140ms); }
+body[data-flourish="spec"] .hud-corner.bl { animation-delay: calc(var(--dur-fast) + 200ms); }
+body[data-flourish="spec"] .hud-corner.br { animation-delay: calc(var(--dur-fast) + 260ms); }
+
+@keyframes bracket-snap {
+  0%   { opacity: 0; clip-path: inset(40% 40% 40% 40%); }
+  60%  { opacity: 1; clip-path: inset(0 0 0 0); }
+  70%  { opacity: 0.4; }
+  100% { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+/* OPERATOR — profile types in. .prose-h1 + body get a
+   one-shot reveal that extends the existing rise. */
+body[data-flourish="operator"] .prose-inner .eyebrow {
+  animation: operator-eyebrow 600ms var(--ease-out) both;
+  animation-delay: calc(var(--dur-fast) + 80ms);
+}
+body[data-flourish="operator"] .prose-h1 {
+  animation: operator-type 720ms steps(28, end) both;
+  animation-delay: calc(var(--dur-fast) + 200ms);
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid var(--white);
+}
+body[data-flourish="operator"] .prose-h1.flourish-done {
+  white-space: normal;
+  border-right: none;
+  overflow: visible;
+}
+@keyframes operator-eyebrow {
+  from { opacity: 0; letter-spacing: 0.6em; }
+  to   { opacity: 1; letter-spacing: 0.3em; }
+}
+@keyframes operator-type {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+/* ARCHIVE — terminal access block prints, then wipes.
+   The block is injected by the transition runner so the
+   markup stays clean on the page itself. */
+.archive-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.78);
+  font-family: var(--font-mono);
+  color: var(--white);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  opacity: 0;
+}
+
+.archive-overlay.in {
+  animation: archive-overlay-in 1100ms var(--ease-inout) both;
+}
+
+.archive-overlay-inner {
+  border: 1px solid var(--rule-strong);
+  padding: 24px 32px;
+  background: var(--black);
+  min-width: min(520px, 80vw);
+  text-align: left;
+}
+
+.archive-overlay .ao-line {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0;
+  animation: archive-line 220ms steps(24, end) both;
+}
+.archive-overlay .ao-line:nth-child(1) { animation-delay: 80ms; }
+.archive-overlay .ao-line:nth-child(2) { animation-delay: 280ms; }
+.archive-overlay .ao-line:nth-child(3) { animation-delay: 480ms; }
+.archive-overlay .ao-line:nth-child(4) { animation-delay: 680ms; color: var(--white); }
+
+@keyframes archive-line {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+@keyframes archive-overlay-in {
+  0%   { opacity: 0; }
+  10%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ── Reduced motion ─────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+  body[data-signal="loss"] .signal-noise,
+  body[data-signal="acquire"] .signal-noise {
+    opacity: 0;
+    animation: none;
+  }
+  body[data-signal="loss"]::after,
+  body[data-signal="acquire"]::after {
+    animation: none;
+  }
+  body[data-flourish] .hud-corner,
+  body[data-flourish] .prose-h1,
+  body[data-flourish] .prose-inner .eyebrow {
+    animation: none;
+  }
+  .archive-overlay,
+  .archive-overlay.in {
+    display: none !important;
+  }
+}

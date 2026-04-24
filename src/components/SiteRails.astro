@@ -13,17 +13,19 @@ const {
 ---
 <div class="rail rail--left" aria-hidden="true">
   <span>
-    <em data-rail-tag data-rail-tag-default={tag}>{tag}</em>&nbsp;&nbsp;/&nbsp;&nbsp;PROTOCOL 001&nbsp;&nbsp;/&nbsp;&nbsp;PHASE ALPHA
+    <em data-rail-tag data-channel-tag data-rail-tag-default={tag}>{tag}</em>&nbsp;&nbsp;/&nbsp;&nbsp;PROTOCOL 001&nbsp;&nbsp;/&nbsp;&nbsp;PHASE ALPHA
   </span>
 </div>
 <div class="rail rail--right" aria-hidden="true">
   <span>
-    <span data-rail-channel data-rail-channel-default={channel}>{channel}</span>&nbsp;&nbsp;/&nbsp;&nbsp;<em data-rail-transmission data-rail-transmission-default={transmission}>{transmission}</em>&nbsp;&nbsp;/&nbsp;&nbsp;<span data-rail-trailing data-rail-trailing-default="timer">T+<span data-site-timer>00:00:00</span></span>
+    <span data-rail-channel data-channel-value="rail" data-rail-channel-default={channel}>{channel}</span>&nbsp;&nbsp;/&nbsp;&nbsp;<em data-rail-transmission data-rail-transmission-default={transmission}>{transmission}</em>&nbsp;&nbsp;/&nbsp;&nbsp;<span data-rail-trailing data-rail-trailing-default="timer">T+<span data-site-timer>00:00:00</span></span>
   </span>
 </div>
 
 <script is:inline>
   (function () {
+    if (window.__hasRailsInit) return;
+    window.__hasRailsInit = true;
     var KEY = 'has-session-start';
     var start;
     try {

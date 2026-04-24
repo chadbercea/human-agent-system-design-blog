@@ -1,13 +1,16 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import '../styles/tokens.css';
 import '../styles/chrome.css';
 import '../styles/motion.css';
 import '../styles/entry.css';
+import '../styles/transitions.css';
 import '../styles/homepage.css';
 import '../styles/hover.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteRails from '../components/SiteRails.astro';
+import { getChannelForPath } from '../lib/channels';
 
 interface Props {
   title: string;
@@ -30,6 +33,9 @@ const {
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const channel = getChannelForPath(Astro.url.pathname);
+const railChannelText = railChannel ?? `CH ${channel.id} · ${channel.signal}`;
+const railTagText = railTag ?? channel.tag;
 ---
 <html lang="en">
 <head>
@@ -50,11 +56,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
+  <ClientRouter />
 </head>
-<body data-chrome={chrome}>
-  <SiteRails tag={railTag} channel={railChannel} />
+<body data-chrome={chrome} data-channel-id={channel.id} data-channel-label={channel.label} data-flourish={channel.flourish ?? 'none'}>
+  <SiteRails tag={railTagText} channel={railChannelText} />
   <div class="shell">
-    <SiteHeader activeNav={activeNav} siteName={siteName} />
+    <SiteHeader activeNav={activeNav} siteName={siteName} channelId={channel.id} />
 
     <slot />
 
@@ -65,7 +72,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 
   <script>
     import { mountReveals } from '../lib/reveals';
+    import { mountChannelTransitions } from '../lib/channelTransition';
     mountReveals();
+    mountChannelTransitions();
   </script>
 </body>
 </html>
