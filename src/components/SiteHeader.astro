@@ -30,10 +30,10 @@ const buildStr = `${now.getUTCFullYear()}.${String(now.getUTCMonth() + 1).padSta
   </div>
 
   <nav class="nav">
-    <a href="/" class={activeNav === 'articles' ? 'on' : undefined}>Articles</a>
-    <a href="/design-system" class={activeNav === 'design-system' ? 'on' : undefined}>Design System</a>
-    <a href="/about" class={activeNav === 'about' ? 'on' : undefined}>About</a>
-    <a href="/contact" class={activeNav === 'contact' ? 'on' : undefined}>Contact</a>
+    <a href="/" aria-current={activeNav === 'articles' ? 'page' : undefined}>Articles</a>
+    <a href="/design-system" aria-current={activeNav === 'design-system' ? 'page' : undefined}>Design System</a>
+    <a href="/about" aria-current={activeNav === 'about' ? 'page' : undefined}>About</a>
+    <a href="/contact" aria-current={activeNav === 'contact' ? 'page' : undefined}>Contact</a>
   </nav>
 
   <div class="sh-telemetry">
@@ -121,15 +121,23 @@ const buildStr = `${now.getUTCFullYear()}.${String(now.getUTCMonth() + 1).padSta
     font-family: var(--font-mono);
     font-weight: 500;
     font-size: 11px;
-    letter-spacing: 0.25em;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
     color: var(--mid);
     white-space: nowrap;
-    transition: color 0.15s;
+    padding: 6px 0;
+    border-bottom: 1px solid transparent;
+    transition: color 120ms ease, border-color 120ms ease;
   }
   .site-header .nav a:hover { color: var(--white); }
-  .site-header .nav a.on { color: var(--white); }
-  .site-header .nav a.on::before { content: "• "; }
+  .site-header .nav a[aria-current="page"] {
+    color: var(--white);
+    border-bottom-color: var(--white);
+  }
+  .site-header .nav a:focus-visible {
+    outline: 1px solid var(--white);
+    outline-offset: 4px;
+  }
 
   .site-header .sh-telemetry {
     display: flex;
