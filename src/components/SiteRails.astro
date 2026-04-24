@@ -1,0 +1,108 @@
+---
+interface Props {
+  tag?: string;
+  channel?: string;
+  transmission?: string;
+}
+
+const {
+  tag = 'HUMAN · AGENT · SYSTEM',
+  channel = 'CH 01 · SIGNAL STRONG',
+  transmission = 'LIVE TRANSMISSION',
+} = Astro.props;
+---
+<div class="rail rail--left" aria-hidden="true">
+  <span>
+    <em data-rail-tag data-rail-tag-default={tag}>{tag}</em>&nbsp;&nbsp;/&nbsp;&nbsp;PROTOCOL 001&nbsp;&nbsp;/&nbsp;&nbsp;PHASE ALPHA
+  </span>
+</div>
+<div class="rail rail--right" aria-hidden="true">
+  <span>
+    <span data-rail-channel data-rail-channel-default={channel}>{channel}</span>&nbsp;&nbsp;/&nbsp;&nbsp;<em data-rail-transmission data-rail-transmission-default={transmission}>{transmission}</em>&nbsp;&nbsp;/&nbsp;&nbsp;<span data-rail-trailing data-rail-trailing-default="timer">T+<span data-site-timer>00:00:00</span></span>
+  </span>
+</div>
+
+<script is:inline>
+  (function () {
+    var KEY = 'has-session-start';
+    var start;
+    try {
+      var saved = sessionStorage.getItem(KEY);
+      start = saved ? parseInt(saved, 10) : NaN;
+      if (!isFinite(start)) {
+        start = Date.now();
+        sessionStorage.setItem(KEY, String(start));
+      }
+    } catch (e) {
+      start = Date.now();
+    }
+    var pad = function (n) { return n < 10 ? '0' + n : String(n); };
+    var tick = function () {
+      var targets = document.querySelectorAll('[data-site-timer]');
+      if (!targets.length) return;
+      var s = Math.floor((Date.now() - start) / 1000);
+      if (s < 0) s = 0;
+      var h = Math.floor(s / 3600);
+      var m = Math.floor((s % 3600) / 60);
+      var sec = s % 60;
+      var out = pad(h) + ':' + pad(m) + ':' + pad(sec);
+      for (var i = 0; i < targets.length; i++) targets[i].textContent = out;
+    };
+    tick();
+    setInterval(tick, 1000);
+
+    window.HASRails = {
+      set: function (opts) {
+        opts = opts || {};
+        var tag = document.querySelector('[data-rail-tag]');
+        var channel = document.querySelector('[data-rail-channel]');
+        var transmission = document.querySelector('[data-rail-transmission]');
+        var trailing = document.querySelector('[data-rail-trailing]');
+        if (tag && typeof opts.tag === 'string') tag.textContent = opts.tag;
+        if (channel && typeof opts.channel === 'string') channel.textContent = opts.channel;
+        if (transmission && typeof opts.transmission === 'string') transmission.textContent = opts.transmission;
+        if (trailing && typeof opts.trailing === 'string') trailing.textContent = opts.trailing;
+      },
+      reset: function () {
+        var tag = document.querySelector('[data-rail-tag]');
+        var channel = document.querySelector('[data-rail-channel]');
+        var transmission = document.querySelector('[data-rail-transmission]');
+        var trailing = document.querySelector('[data-rail-trailing]');
+        if (tag) tag.textContent = tag.getAttribute('data-rail-tag-default') || '';
+        if (channel) channel.textContent = channel.getAttribute('data-rail-channel-default') || '';
+        if (transmission) transmission.textContent = transmission.getAttribute('data-rail-transmission-default') || '';
+        if (trailing) trailing.innerHTML = 'T+<span data-site-timer>00:00:00</span>';
+        tick();
+      },
+    };
+  })();
+</script>
+
+<style is:global>
+  .rail {
+    position: fixed;
+    top: 0; bottom: 0;
+    width: 32px;
+    z-index: 2;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--dim);
+    border-left: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
+  }
+  .rail--left { left: 0; }
+  .rail--right { right: 0; }
+  .rail span { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; }
+  .rail em { color: var(--white); font-style: normal; font-weight: 600; }
+
+  @media (max-width: 900px) {
+    .rail { display: none; }
+  }
+</style>

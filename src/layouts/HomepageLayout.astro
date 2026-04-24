@@ -4,12 +4,15 @@ import '../styles/motion.css';
 import '../styles/homepage.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import SiteRails from '../components/SiteRails.astro';
 
 interface Props {
   title: string;
   description?: string;
   activeNav?: 'articles' | 'design-system' | 'about' | 'contact';
   siteName?: string;
+  railTag?: string;
+  railChannel?: string;
 }
 
 const {
@@ -17,6 +20,8 @@ const {
   description = 'A blog about Human-Agent-System Design. Humans, agents, and systems shipping products together.',
   activeNav = 'articles',
   siteName = 'DESIGN',
+  railTag,
+  railChannel,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
@@ -42,6 +47,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   <meta name="twitter:description" content={description} />
 </head>
 <body>
+  <SiteRails tag={railTag} channel={railChannel} />
   <div class="shell">
     <SiteHeader activeNav={activeNav} siteName={siteName} />
 
