@@ -4,11 +4,13 @@ import { execSync } from 'node:child_process';
 interface Props {
   activeNav?: 'articles' | 'glossary' | 'design-system' | 'about' | 'contact';
   siteName?: string;
+  channelId?: string;
 }
 
 const {
   activeNav = 'articles',
   siteName = 'DESIGN',
+  channelId = '01',
 } = Astro.props;
 
 const now = new Date();
@@ -56,7 +58,7 @@ try {
     <div class="kv"><span class="k">REV</span><span class="v">01.00</span></div>
     <div class="kv"><span class="k">BUILD</span><span class="v">{buildStr}</span></div>
     <div class="kv kv-hash"><span class="k">HASH</span><span class="v">{hashStr}</span></div>
-    <div class="kv"><span class="k">CH</span><span class="v">01</span></div>
+    <div class="kv"><span class="k">CH</span><span class="v" data-channel-value="header">{channelId}</span></div>
   </div>
 </header>
 
