@@ -706,7 +706,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 
 .prose-h1 {
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-size: 4vw;
   font-weight: 700;
   line-height: 1.03;

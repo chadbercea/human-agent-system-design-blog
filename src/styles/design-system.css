@@ -655,7 +655,7 @@ html, body {
    transitions.css applies automatically. */
 
 .prose-h1 {
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-size: 4vw;
   font-weight: 700;
   line-height: 1.03;
