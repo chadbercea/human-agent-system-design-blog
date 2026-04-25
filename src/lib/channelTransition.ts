@@ -99,17 +99,59 @@ function runFlourish(): void {
     showArchiveOverlay();
   }
 
-  if (channel.flourish === 'operator' && !prefersReducedMotion()) {
-    const h1 = document.querySelector<HTMLElement>('.prose-h1');
-    if (h1) {
-      h1.classList.remove('flourish-done');
-      h1.addEventListener(
-        'animationend',
-        () => h1.classList.add('flourish-done'),
-        { once: true },
-      );
+  primePageH1Typewriter();
+}
+
+const H1_STEP_MS = 45;
+const h1Runners: WeakMap<HTMLElement, () => void> = new WeakMap();
+
+function primePageH1Typewriter(): void {
+  const h1s = document.querySelectorAll<HTMLElement>('h1.prose-h1');
+  h1s.forEach((h1) => {
+    const original = (h1.dataset.h1Original || h1.textContent || '').trim();
+    if (!original) return;
+
+    // Cache the original once so subsequent re-runs (revisits) don't
+    // pick up the per-frame typed text as the new "original".
+    if (!h1.dataset.h1Original) h1.dataset.h1Original = original;
+
+    if (prefersReducedMotion()) {
+      h1.classList.remove('h1-pending');
+      h1.classList.add('h1-typing');
+      h1.textContent = original;
+      return;
     }
-  }
+
+    // Build the typing structure: <span class="h1-typed"></span><span class="h1-cursor"></span>.
+    const typed = document.createElement('span');
+    typed.className = 'h1-typed';
+    const cursor = document.createElement('span');
+    cursor.className = 'h1-cursor';
+    cursor.setAttribute('aria-hidden', 'true');
+
+    h1.textContent = '';
+    h1.appendChild(typed);
+    h1.appendChild(cursor);
+    h1.classList.remove('h1-pending');
+    h1.classList.add('h1-typing');
+
+    // Cancel any prior in-flight typing run.
+    const prev = h1Runners.get(h1);
+    if (prev) prev();
+
+    let i = 0;
+    let cancelled = false;
+    const tick = () => {
+      if (cancelled) return;
+      if (i >= original.length) return;
+      i += 1;
+      typed.textContent = original.slice(0, i);
+      window.setTimeout(tick, H1_STEP_MS);
+    };
+    window.setTimeout(tick, 60);
+
+    h1Runners.set(h1, () => { cancelled = true; });
+  });
 }
 
 function showArchiveOverlay(): void {

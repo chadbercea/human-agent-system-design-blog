@@ -129,31 +129,55 @@ body[data-flourish="spec"] .hud-corner.br { animation-delay: calc(var(--dur-fast
   100% { opacity: 1; clip-path: inset(0 0 0 0); }
 }
 
-/* OPERATOR — profile types in. .prose-h1 + body get a
-   one-shot reveal that extends the existing rise. */
+/* OPERATOR — eyebrow tightens into place above the h1.
+   The h1 itself is handled by the generic page-h1 typewriter
+   below so every page-h1 across the site reads the same. */
 body[data-flourish="operator"] .prose-inner .eyebrow {
   animation: operator-eyebrow 600ms var(--ease-out) both;
   animation-delay: calc(var(--dur-fast) + 80ms);
-}
-body[data-flourish="operator"] .prose-h1 {
-  animation: operator-type 720ms steps(28, end) both;
-  animation-delay: calc(var(--dur-fast) + 200ms);
-  overflow: hidden;
-  white-space: nowrap;
-  border-right: 2px solid var(--white);
-}
-body[data-flourish="operator"] .prose-h1.flourish-done {
-  white-space: normal;
-  border-right: none;
-  overflow: visible;
 }
 @keyframes operator-eyebrow {
   from { opacity: 0; letter-spacing: 0.6em; }
   to   { opacity: 1; letter-spacing: 0.3em; }
 }
-@keyframes operator-type {
-  from { width: 0; }
-  to   { width: 100%; }
+
+/* ── Page H1 typewriter ─────────────────────────────────
+   Any h1.prose-h1 types in like a terminal on every page
+   load (fresh or view-transition revisit). The block cursor
+   keeps blinking after the text settles. JS owns the per-
+   character reveal (width-based CSS animations get throttled
+   by the browser for non-composited properties on first
+   paint, so the animation stutters); CSS only handles the
+   cursor blink.
+
+   `.h1-pending` is the server-rendered hidden state — JS
+   reveals once it has measured and set up the type runtime.
+   Reduced motion bypasses both and shows the title statically. */
+.prose-h1.h1-pending {
+  visibility: hidden;
+}
+
+.prose-h1.h1-typing {
+  white-space: normal;
+}
+
+.prose-h1 .h1-typed {
+  white-space: pre;
+}
+
+.prose-h1 .h1-cursor {
+  display: inline-block;
+  width: 0.45ch;
+  height: 0.78em;
+  background: var(--white);
+  vertical-align: baseline;
+  margin-left: 0.04em;
+  transform: translateY(0.04em);
+  animation: cursor-blink 0.85s step-end infinite;
+}
+
+@keyframes cursor-blink {
+  50% { background-color: transparent; }
 }
 
 /* ARCHIVE — terminal access block prints, then wipes.
@@ -229,9 +253,14 @@ body[data-flourish="operator"] .prose-h1.flourish-done {
     animation: none;
   }
   body[data-flourish] .hud-corner,
-  body[data-flourish] .prose-h1,
   body[data-flourish] .prose-inner .eyebrow {
     animation: none;
+  }
+  .prose-h1.h1-pending {
+    visibility: visible;
+  }
+  .prose-h1 .h1-cursor {
+    display: none;
   }
   .archive-overlay,
   .archive-overlay.in {
