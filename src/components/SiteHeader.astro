@@ -60,7 +60,129 @@ try {
     <div class="kv kv-hash"><span class="k">HASH</span><span class="v">{hashStr}</span></div>
     <div class="kv"><span class="k">CH</span><span class="v" data-channel-value="header">{channelId}</span></div>
   </div>
+
+  <button class="sh-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="sh-drawer" data-sh-burger>
+    <span class="sh-burger-line"></span>
+    <span class="sh-burger-line"></span>
+    <span class="sh-burger-line"></span>
+  </button>
 </header>
+
+<div class="sh-drawer" id="sh-drawer" data-sh-drawer>
+  <div class="sh-drawer-backdrop" data-sh-close></div>
+  <div class="sh-drawer-panel">
+    <div class="sh-drawer-mark" aria-hidden="true">
+      <div class="sh-drawer-logo">
+        <div class="logo-stage">
+          <div class="bar full" style="top:30px;left:42px;transform:rotate(45deg)"></div>
+          <div class="bar full" style="top:30px;left:115px;transform:rotate(45deg)"></div>
+          <div class="bar half" style="top:81px;left:165px;transform:rotate(-45deg)"></div>
+          <div class="bar half" style="top:32.6px;left:220.2px;transform:rotate(90deg)"></div>
+          <div class="bar half" style="top:53.8px;left:211.4px;transform:rotate(-45deg)"></div>
+          <div class="bar half" style="top:66.2px;left:253.8px;transform:rotate(-45deg)"></div>
+          <div class="bar half" style="top:87.4px;left:245px;transform:rotate(90deg)"></div>
+        </div>
+      </div>
+      <div class="sh-drawer-tagline">
+        <svg viewBox="0 0 275.44 15" xmlns="http://www.w3.org/2000/svg" aria-label="HUMAN AGENT SYSTEM DESIGN">
+          <text x="0" y="12" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="500" fill="currentColor" textLength="275.44" lengthAdjust="spacing">HUMAN AGENT SYSTEM DESIGN</text>
+        </svg>
+      </div>
+    </div>
+    <nav class="sh-drawer-nav" aria-label="Primary">
+      <a href="/" data-text="Articles" aria-current={activeNav === 'articles' ? 'page' : undefined}>Articles</a>
+      <a href="/glossary" data-text="Glossary" aria-current={activeNav === 'glossary' ? 'page' : undefined}>Glossary</a>
+      <a href="/design-system" data-text="Design System" aria-current={activeNav === 'design-system' ? 'page' : undefined}>Design System</a>
+      <a href="/about" data-text="About" aria-current={activeNav === 'about' ? 'page' : undefined}>About</a>
+      <a href="/contact" data-text="Contact" aria-current={activeNav === 'contact' ? 'page' : undefined}>Contact</a>
+    </nav>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var burger = document.querySelector('[data-sh-burger]');
+    var drawer = document.querySelector('[data-sh-drawer]');
+    if (!burger || !drawer) return;
+    var closers = drawer.querySelectorAll('[data-sh-close], a');
+    var links = drawer.querySelectorAll('.sh-drawer-nav a');
+    var STEP_MS = 22;       // per-char interval
+    var GAP_MS = 60;        // pause between items
+    var typeTimers = [];
+
+    function clearTypeTimers() {
+      typeTimers.forEach(function (id) { window.clearTimeout(id); });
+      typeTimers = [];
+    }
+
+    function typeLinks() {
+      // Empty every link's text + add the cursor scaffolding once. Only
+      // the link currently typing carries `.is-typing` (which makes its
+      // cursor visible), so unstarted items render as blank space and
+      // typed items lose their cursor immediately on completion.
+      links.forEach(function (a) {
+        a.classList.remove('is-typing');
+        a.classList.remove('is-typed');
+        a.innerHTML = '<span class="link-typed"></span><span class="link-cursor" aria-hidden="true"></span>';
+      });
+
+      function typeOne(idx) {
+        if (idx >= links.length) return;
+        var a = links[idx];
+        var text = a.dataset.text || '';
+        var typed = a.querySelector('.link-typed');
+        a.classList.add('is-typing');
+        var i = 0;
+        function tick() {
+          i += 1;
+          typed.textContent = text.slice(0, i);
+          if (i < text.length) {
+            typeTimers.push(window.setTimeout(tick, STEP_MS));
+          } else {
+            a.classList.remove('is-typing');
+            a.classList.add('is-typed');
+            typeTimers.push(window.setTimeout(function () { typeOne(idx + 1); }, GAP_MS));
+          }
+        }
+        tick();
+      }
+      typeOne(0);
+    }
+
+    function resetLinks() {
+      clearTypeTimers();
+      links.forEach(function (a) {
+        a.classList.remove('is-typing');
+        a.classList.remove('is-typed');
+        a.textContent = a.dataset.text || a.textContent;
+      });
+    }
+
+    function open() {
+      drawer.classList.add('is-open');
+      burger.classList.add('is-open');
+      burger.setAttribute('aria-expanded', 'true');
+      document.documentElement.style.overflow = 'hidden';
+      typeTimers.push(window.setTimeout(typeLinks, 80));
+    }
+    function close() {
+      drawer.classList.remove('is-open');
+      burger.classList.remove('is-open');
+      burger.setAttribute('aria-expanded', 'false');
+      document.documentElement.style.overflow = '';
+      window.setTimeout(function () {
+        if (!drawer.classList.contains('is-open')) resetLinks();
+      }, 280);
+    }
+    burger.addEventListener('click', function () {
+      if (drawer.classList.contains('is-open')) close(); else open();
+    });
+    closers.forEach(function (el) { el.addEventListener('click', close); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && drawer.classList.contains('is-open')) close();
+    });
+  })();
+</script>
 
 <style is:global>
   .site-header {
@@ -192,22 +314,214 @@ try {
     .site-header .nav { gap: 1.25rem; }
   }
 
+  /* Hamburger button — visible only at mobile breakpoint. */
+  .site-header .sh-burger {
+    display: none;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: 1px solid var(--rule-strong);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    justify-self: end;
+  }
+  .site-header .sh-burger-line {
+    position: absolute;
+    left: 9px;
+    right: 9px;
+    height: 1px;
+    background: var(--white);
+    transition:
+      transform var(--dur-fast) var(--ease-out),
+      opacity var(--dur-fast) var(--ease-out),
+      top var(--dur-fast) var(--ease-out);
+  }
+  .site-header .sh-burger-line:nth-child(1) { top: 13px; }
+  .site-header .sh-burger-line:nth-child(2) { top: 19px; }
+  .site-header .sh-burger-line:nth-child(3) { top: 25px; }
+  .site-header .sh-burger.is-open .sh-burger-line:nth-child(1) {
+    top: 19px; transform: rotate(45deg);
+  }
+  .site-header .sh-burger.is-open .sh-burger-line:nth-child(2) {
+    opacity: 0;
+  }
+  .site-header .sh-burger.is-open .sh-burger-line:nth-child(3) {
+    top: 19px; transform: rotate(-45deg);
+  }
+
+  /* Slide-out drawer. Always in DOM; toggled via visibility + the
+     panel/backdrop transitions. The previous [hidden]-attribute toggle
+     raced with the close timer and made the burger feel sticky. */
+  .sh-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    visibility: hidden;
+    transition: visibility 0s linear var(--dur-base);
+  }
+  .sh-drawer.is-open {
+    visibility: visible;
+    transition: visibility 0s linear 0s;
+  }
+  .sh-drawer-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--ease-out);
+  }
+  .sh-drawer.is-open .sh-drawer-backdrop { opacity: 1; }
+
+  .sh-drawer-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(82vw, 360px);
+    background: var(--black);
+    border-left: 1px solid var(--rule-strong);
+    padding: 56px 32px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    transform: translateX(100%);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .sh-drawer.is-open .sh-drawer-panel { transform: translateX(0); }
+
+  /* Four corner L-brackets — same vocabulary as hero hud-corner brackets,
+     drawn as a single ::before with 8 layered gradient lines so we don't
+     need 4 extra DOM nodes. */
+  .sh-drawer-panel::before {
+    content: "";
+    position: absolute;
+    inset: 16px;
+    pointer-events: none;
+    background-image:
+      linear-gradient(var(--rule-hud), var(--rule-hud)),
+      linear-gradient(var(--rule-hud), var(--rule-hud)),
+      linear-gradient(var(--rule-hud), var(--rule-hud)),
+      linear-gradient(var(--rule-hud), var(--rule-hud)),
+      linear-gradient(var(--rule-hud), var(--rule-hud)),
+      linear-gradient(var(--rule-hud), var(--rule-hud)),
+      linear-gradient(var(--rule-hud), var(--rule-hud)),
+      linear-gradient(var(--rule-hud), var(--rule-hud));
+    background-size:
+      14px 1px, 1px 14px,
+      14px 1px, 1px 14px,
+      14px 1px, 1px 14px,
+      14px 1px, 1px 14px;
+    background-position:
+      0 0, 0 0,
+      100% 0, 100% 0,
+      0 100%, 0 100%,
+      100% 100%, 100% 100%;
+    background-repeat: no-repeat;
+  }
+
+  /* Mark — small logo + tagline pair, hero vocabulary at drawer scale. */
+  .sh-drawer-mark {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 20px 0 12px;
+  }
+  /* 0.5× scale of the hero logo — exact proportional crop so the bars
+     render in the right place. Width / height / offsets are the hero
+     numbers (275.44 × 84.86, top -47.57, left -14.57) × 0.5. */
+  .sh-drawer-logo {
+    position: relative;
+    width: 137.72px;
+    height: 42.43px;
+    overflow: hidden;
+  }
+  .sh-drawer-logo .logo-stage {
+    position: absolute;
+    top: -23.79px;
+    left: -7.29px;
+    width: 420px;
+    height: 180px;
+    transform: scale(0.5);
+    transform-origin: top left;
+  }
+  .sh-drawer-logo .bar { position: absolute; background: var(--white); }
+  .sh-drawer-logo .full {
+    width: 30px; height: 120px;
+    clip-path: polygon(50% 0%, 100% 12.5%, 100% 87.5%, 50% 100%, 0% 87.5%, 0% 12.5%);
+  }
+  .sh-drawer-logo .half {
+    width: 30px; height: 60px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+  .sh-drawer-tagline {
+    width: 137.72px;
+    color: var(--mid);
+  }
+  .sh-drawer-tagline svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Nav links + per-link typewriter. */
+  .sh-drawer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .sh-drawer-nav a {
+    position: relative;
+    display: block;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--light);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .sh-drawer-nav a:hover,
+  .sh-drawer-nav a:focus-visible,
+  .sh-drawer-nav a[aria-current="page"] { color: var(--white); }
+  .sh-drawer-nav a .link-typed { white-space: pre; }
+  .sh-drawer-nav a .link-cursor {
+    display: none;
+    width: 0.45ch;
+    height: 0.78em;
+    margin-left: 0.05em;
+    background: var(--white);
+    vertical-align: baseline;
+    transform: translateY(0.04em);
+    animation: cursor-blink 0.6s step-end infinite;
+  }
+  .sh-drawer-nav a.is-typing .link-cursor { display: inline-block; }
+  @keyframes cursor-blink {
+    50% { background-color: transparent; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sh-drawer-nav a .link-cursor { animation: none; }
+  }
+
   @media (max-width: 900px) {
     .site-header {
-      grid-template-columns: auto 1fr;
+      grid-template-columns: auto 1fr auto;
       gap: 12px;
       padding: 0 1.25rem;
     }
     .site-header .sh-telemetry { display: none; }
-    .site-header .sh-logo { width: 42px; height: 18px; }
-    .site-header .sh-logo .logo-stage { transform: scale(0.1); }
+    .site-header .nav { display: none; }
+    .site-header .sh-burger { display: block; }
     .site-header .sh-name { font-size: 10px; letter-spacing: 0.2em; }
-    .site-header .nav {
-      justify-self: end;
-      gap: 0.875rem;
-      flex-wrap: wrap;
-      row-gap: 0.25rem;
-    }
-    .site-header .nav a { font-size: 10px; letter-spacing: 0.15em; }
+  }
+
+  @media (min-width: 901px) {
+    .sh-drawer { display: none; }
   }
 </style>

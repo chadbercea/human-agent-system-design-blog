@@ -236,6 +236,29 @@ body[data-flourish="operator"] .prose-inner .eyebrow {
   100% { opacity: 0; }
 }
 
+/* ── Mobile ─────────────────────────────────────────────
+   Drop the full-screen transition theatre on phones — the
+   noise overlay + archive print don't read at small scale
+   and just delay the page swap. */
+@media (max-width: 900px) {
+  body[data-signal="loss"] .signal-noise,
+  body[data-signal="acquire"] .signal-noise {
+    opacity: 0;
+    animation: none;
+  }
+  body[data-signal="loss"]::after,
+  body[data-signal="acquire"]::after {
+    animation: none;
+  }
+  .archive-overlay,
+  .archive-overlay.in {
+    display: none !important;
+  }
+  body[data-flourish] .hud-corner {
+    animation: none;
+  }
+}
+
 /* ── Reduced motion ─────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {

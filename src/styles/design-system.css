@@ -605,24 +605,47 @@ html, body {
 }
 
 @media (max-width: 900px) {
-  .panel { padding: 80px 32px; }
-  .hero { padding: 100px 32px 100px; }
-  .hud-corner { position: static; display: block; margin-top: 20px; text-align: left !important; }
-  .hud-corner::before { display: none; }
-  .triad { grid-template-columns: 1fr; }
-  .footnotes { grid-template-columns: 1fr; }
-  .spec-meta { grid-template-columns: repeat(2, 1fr); }
-  .spec-weights, .spec-weights--mono { grid-template-columns: repeat(2, 1fr); }
-  .spec-display .codepoint { writing-mode: horizontal-tb; flex-basis: 100%; letter-spacing: 0.2em; white-space: normal; }
-  .palette-grid { grid-template-columns: 1fr; }
-  .palette-meta { grid-template-columns: repeat(2, 1fr); }
-  .scales-bed { gap: 48px; padding: 80px 20px 90px; }
-  .variants { grid-template-columns: 1fr; }
-  .logo-spec { grid-template-columns: repeat(2, 1fr); }
-  .term-head { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .term-body { padding: 20px 16px; font-size: 11px; overflow-x: auto; }
-  .term-line { grid-template-columns: 60px 52px 1fr; gap: 12px; }
-  .term-foot { flex-direction: column; align-items: flex-start; gap: 6px; }
+  /* Strip the design-system showcase to readable content. The desktop
+     layout is a brand specimen — typography weight grids, logo scales,
+     swatch panels, terminal readouts. None of those read on a phone, and
+     several use fixed pixel widths (420px logo stage, 520px archive
+     overlay) that bust the viewport. Keep the principles panel + page
+     headings; hide the rest. */
+  .panel { padding: 56px 20px; }
+  .hero { padding: 80px 24px 60px; }
+
+  /* Three-column panel head (id · title · meta) collapses to a stacked
+     stack on mobile. Otherwise the title wraps mid-word into 8-row
+     orphan stacks. */
+  .panel-head {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-bottom: 40px;
+    padding-bottom: 16px;
+  }
+  .panel-head .id,
+  .panel-head .title,
+  .panel-head .meta { white-space: normal; }
+
+  /* HUD corners — desktop chrome theatre. Drop entirely on mobile;
+     the page H1 carries the page identity. */
+  .hud-corner { display: none; }
+  .hero-meta { display: none; }
+
+  /* Principles panel: readable copy, single-column triad, 1-column footnotes. */
+  .principles-quote { font-size: 28px; line-height: 1.2; margin-bottom: 48px; max-width: none; }
+  .triad { grid-template-columns: 1fr; margin-bottom: 48px; }
+  .triad-cell { padding: 32px 24px; min-height: 0; gap: 16px; }
+  .triad-cell .cell-name { font-size: 40px; }
+  .triad-cell .cell-def { font-size: 16px; }
+  .footnotes { grid-template-columns: 1fr; gap: 24px; padding-top: 24px; }
+  .fn { font-size: 11px; line-height: 1.7; }
+
+  /* Hide visual showcase panels — typography specimen, palette,
+     logo system, terminal readout. The panel-head + outer wrapper
+     ride along since they're decorative without their visualization
+     content. Panel 2 (PRINCIPLES) is content; panels 3-6 are theatre. */
+  main > section.panel:nth-of-type(n+3) { display: none; }
 }
 
 /* ── Page H1 ──────────────────────────────────────────
