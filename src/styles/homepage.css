@@ -810,10 +810,13 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 @media (max-width: 900px) {
 
   html, body {
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow-x: clip;
     height: auto;
   }
+  /* html owns the document scroll; body must NOT be a scroll container
+     or `position: sticky` on the header pins to body (which doesn't
+     scroll) instead of the viewport. */
+  html { overflow-y: auto; }
 
   .shell {
     height: auto;

@@ -55,6 +55,10 @@ body[data-chrome="none"]::after { display: none; }
 @media (max-width: 900px) {
   body::before,
   body::after { display: none; }
-  html, body { overflow-x: hidden; }
+  /* `clip` (not `hidden`) — `overflow-x: hidden` on body forces
+     `overflow-y: auto`, which makes body its own scroll container and
+     breaks `position: sticky` for descendants (body doesn't scroll, html
+     does, so the sticky pin moves with the page). */
+  html, body { overflow-x: clip; }
   main { overflow-x: clip; }
 }
