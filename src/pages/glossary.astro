@@ -243,6 +243,18 @@ const totalEntries = sections.reduce((sum, s) => sum + s.entries.length, 0);
     ))}
   </section>
 
+  <div
+    id="redacted-toast"
+    class="redacted-toast"
+    role="status"
+    aria-live="polite"
+    data-visible="false"
+  >
+    <span class="redacted-toast__bracket">[</span>
+    <span class="redacted-toast__text">Intel currently REDACTED</span>
+    <span class="redacted-toast__bracket">]</span>
+  </div>
+
   <script is:inline define:vars={{ totalEntries }}>
     (function () {
       var url = new URL(window.location.href);
@@ -292,6 +304,45 @@ const totalEntries = sections.reduce((sum, s) => sum + s.entries.length, 0);
           localStorage.setItem('has-glossary-seen', JSON.stringify(Array.from(unlocked)));
         } catch (e) { /* private mode — ignore */ }
       });
+
+      // ── Redacted-bar interaction ─────────────────────────
+      // Tap / click / hover on a still-redacted bar surfaces a toast
+      // reminding the reader the intel is locked until they read the
+      // article that reveals it.
+      var toast = document.getElementById('redacted-toast');
+      if (toast) {
+        var hideTimer = null;
+        var hoverCooldown = false;
+
+        function showToast() {
+          if (hideTimer) clearTimeout(hideTimer);
+          toast.setAttribute('data-visible', 'true');
+          hideTimer = setTimeout(function () {
+            toast.setAttribute('data-visible', 'false');
+            hideTimer = null;
+          }, 1800);
+        }
+
+        function isLocked(bar) {
+          var entry = bar.closest('.glossary-entry');
+          return entry && entry.getAttribute('data-unlocked') !== 'true';
+        }
+
+        document.addEventListener('click', function (e) {
+          var bar = e.target.closest && e.target.closest('.redact-bar');
+          if (!bar || !isLocked(bar)) return;
+          showToast();
+        });
+
+        document.addEventListener('mouseover', function (e) {
+          var bar = e.target.closest && e.target.closest('.redact-bar');
+          if (!bar || !isLocked(bar)) return;
+          if (hoverCooldown) return;
+          hoverCooldown = true;
+          showToast();
+          setTimeout(function () { hoverCooldown = false; }, 2000);
+        });
+      }
     })();
   </script>
 </DesignSystemLayout>

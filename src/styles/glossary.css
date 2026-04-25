@@ -201,6 +201,56 @@
   }
 }
 
+/* ── Redacted toast ───────────────────────────────────────
+   Surfaces "[Intel currently REDACTED]" when a reader taps,
+   clicks, or hovers a still-redacted bar. Bottom-center,
+   mono, declassified-document aesthetic. */
+
+.redacted-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translate(-50%, 12px);
+  z-index: 1000;
+  /* Opt out of the page-entry `rise` animation in entry.css —
+     it targets `main > *:not(.reveal)` and would clobber the
+     translate(-50%, …) positioning. */
+  animation: none !important;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 12px 18px;
+  background: var(--near-black);
+  border: 1px solid var(--rule-hud);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--white);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+
+.redacted-toast[data-visible="true"] {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.redacted-toast__bracket {
+  color: var(--mid);
+  font-weight: 500;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .redacted-toast { transition: opacity var(--dur-fast) linear; }
+  .redacted-toast[data-visible="true"] { transform: translate(-50%, 0); }
+}
+
 /* ── Mobile ───────────────────────────────────────────────── */
 
 @media (max-width: 900px) {
@@ -220,4 +270,10 @@
   .section-intro { margin-bottom: 36px; font-size: 16px; }
   .entry-def { font-size: 16px; }
   .impl-text { font-size: 15px; }
+
+  .redacted-toast {
+    bottom: 80px;
+    font-size: 11px;
+    padding: 10px 14px;
+  }
 }
