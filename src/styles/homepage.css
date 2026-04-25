@@ -185,73 +185,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 .hero-sub svg { display: block; width: 100%; height: auto; }
 
-/* ───────────── TERMINAL REVEAL (ILI-730) ─────────────
-   Three lines typed character-by-character. Steps() on width
-   (via ch units — JetBrains Mono is monospace, so one ch is
-   one character) turns a simple keyframe animation into a
-   per-char type-in. Each line holds 300ms after typing before
-   the next begins. Cursor is nested at the end of line 3; it
-   rides in with the last character and blinks there.
-   Block is width-matched to the logo and sits below the SVG
-   tagline — left edge of every line aligns to the left edge
-   of the logo. Longer lines extend to the right of the logo.
-   ───────────────────────────────────────────────────── */
-.terminal-reveal {
-  width: 275.44px;
-  margin-top: 64px;
-  font-family: var(--font-mono);
-  font-size: clamp(14px, 1.4vw, 16px);
-  font-weight: 500;
-  line-height: 1.8;
-  letter-spacing: 0.02em;
-  color: var(--white);
-  text-align: left;
-}
-.type-line {
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  width: 0;
-  animation: type calc(var(--chars) * 40ms) steps(var(--chars)) var(--start) forwards;
-}
-/* Target width needs to account for letter-spacing 0.02em after each glyph
-   (or the final char — "." on line 3 — gets clipped) and for the trailing
-   cursor on line 3 (0.5ch + 2px margin). Extra trailing space on lines 1
-   and 2 is invisible, so one keyframe serves all three. */
-@keyframes type {
-  to { width: calc(var(--chars) * (1ch + 0.02em) + 0.5ch + 2px); }
-}
-
-.cursor {
-  display: inline-block;
-  width: 0.5ch;
-  height: 1em;
-  background: var(--white);
-  vertical-align: text-bottom;
-  margin-left: 2px;
-  animation: blink 1s steps(2) infinite;
-}
-@keyframes blink {
-  0%, 50%   { opacity: 1; }
-  51%, 100% { opacity: 0; }
-}
-
-/* Reduced motion — three lines painted at their full content width
-   instantly, cursor visible but static. max-content keeps the
-   terminal single-line shape (overflow: hidden + nowrap still
-   apply, but the line's box is sized to fit its text exactly so
-   nothing is clipped). */
-@media (prefers-reduced-motion: reduce) {
-  .type-line {
-    width: max-content !important;
-    animation: none !important;
-  }
-  .cursor {
-    animation: none !important;
-    opacity: 1;
-  }
-}
-
 .back-btn {
   position: absolute;
   inset: 0;
@@ -886,7 +819,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   /* Mobile chrome strip — the HUD-style decoration (telemetry corners,
      protocol chip) is desktop-only theatre that crowds out the actual
      headline + post list on phones. Drop it; keep the logo + tagline
-     + terminal reveal as the hero. */
+     as the hero. */
   .protocol-chip { display: none; }
   .hud-corner { display: none; }
   .hero-stack { margin: 0.5rem 0 2rem; }
