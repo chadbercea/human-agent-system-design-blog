@@ -100,10 +100,57 @@ try {
 </div>
 
 <script is:inline data-astro-rerun>
+  // Mobile shrink-on-scroll. Header collapses to half height once the user
+  // has scrolled past the header itself; restores when they scroll up by
+  // 20px cumulative (or return near the top). Desktop is a no-op because
+  // the .is-condensed CSS only kicks in under the 900px media query.
+  (function () {
+    if (window.__shScrollMounted) return;
+    window.__shScrollMounted = true;
+    var COLLAPSE_AFTER = 80;   // px scrolled before condensing
+    var EXPAND_BY = 20;        // px of upward travel needed to expand again
+    var lastY = window.scrollY || 0;
+    var upAccum = 0;
+    var ticking = false;
+
+    function apply() {
+      ticking = false;
+      var root = document.documentElement;
+      var y = window.scrollY || 0;
+      var dy = y - lastY;
+      lastY = y;
+
+      if (y < 8) {
+        root.classList.remove('sh-condensed');
+        upAccum = 0;
+        return;
+      }
+      if (dy > 0) {
+        upAccum = 0;
+        if (y > COLLAPSE_AFTER) root.classList.add('sh-condensed');
+      } else if (dy < 0) {
+        upAccum += -dy;
+        if (upAccum >= EXPAND_BY) {
+          root.classList.remove('sh-condensed');
+          upAccum = 0;
+        }
+      }
+    }
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(apply);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+  })();
+
   (function () {
     var burger = document.querySelector('[data-sh-burger]');
     var drawer = document.querySelector('[data-sh-drawer]');
     if (!burger || !drawer) return;
+    // Reset condensed state on page transition so a deep-scrolled article
+    // doesn't leave the next page with a half header before the user scrolls.
+    document.documentElement.classList.remove('sh-condensed');
     // Re-running after a view transition can leave html overflow stuck
     // hidden if the previous page was unloaded with the drawer open.
     document.documentElement.style.overflow = '';
@@ -188,6 +235,8 @@ try {
 </script>
 
 <style is:global>
+  :root { --header-h: 80px; }
+
   .site-header {
     position: sticky;
     top: 0;
@@ -196,10 +245,11 @@ try {
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 32px;
-    height: 80px;
+    height: var(--header-h);
     padding: 0 2.5rem;
     background: var(--black);
     border-bottom: 1px solid var(--rule);
+    transition: height var(--dur-fast) var(--ease-out);
   }
 
   .site-header .sh-mark {
@@ -330,6 +380,11 @@ try {
     position: relative;
     flex-shrink: 0;
     justify-self: end;
+  }
+  .site-header .sh-burger {
+    transform: scale(var(--burger-scale, 1));
+    transform-origin: center;
+    transition: transform var(--dur-fast) var(--ease-out);
   }
   .site-header .sh-burger-line {
     position: absolute;
@@ -522,6 +577,14 @@ try {
     .site-header .nav { display: none; }
     .site-header .sh-burger { display: block; }
     .site-header .sh-name { font-size: 10px; letter-spacing: 0.2em; }
+
+    /* Shrink-on-scroll: half-height header + scaled hamburger. Class
+       lives on <html> so --header-h cascades to siblings of the header
+       (e.g. .mobile-back's sticky `top` tracks the shrinking header). */
+    html.sh-condensed {
+      --header-h: 40px;
+      --burger-scale: 0.6;
+    }
   }
 
   @media (min-width: 901px) {
