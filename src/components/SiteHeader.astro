@@ -109,8 +109,16 @@ try {
     window.__shScrollMounted = true;
     var COLLAPSE_AFTER = 80;   // px scrolled before condensing
     var EXPAND_BY = 20;        // px of upward travel needed to expand again
+    // Two-frame momentum recoil during a downward fling (e.g. scroll-deltas
+    // like +5,+5,-12,-15) used to total > EXPAND_BY across two frames and
+    // bounced the header off, then the next +5 re-condensed it — flutter.
+    // Require either a single decisive upward delta (≥ EXPAND_BY in one
+    // frame, the discrete-jump case the test hits) OR sustained upward
+    // motion across this many consecutive frames before honoring upAccum.
+    var SUSTAINED_UP_FRAMES = 3;
     var lastY = window.scrollY || 0;
     var upAccum = 0;
+    var upFrames = 0;
     var ticking = false;
 
     function apply() {
@@ -123,16 +131,21 @@ try {
       if (y < 8) {
         root.classList.remove('sh-condensed');
         upAccum = 0;
+        upFrames = 0;
         return;
       }
       if (dy > 0) {
         upAccum = 0;
+        upFrames = 0;
         if (y > COLLAPSE_AFTER) root.classList.add('sh-condensed');
       } else if (dy < 0) {
         upAccum += -dy;
-        if (upAccum >= EXPAND_BY) {
+        upFrames += 1;
+        var decisive = -dy >= EXPAND_BY;
+        if (upAccum >= EXPAND_BY && (decisive || upFrames >= SUSTAINED_UP_FRAMES)) {
           root.classList.remove('sh-condensed');
           upAccum = 0;
+          upFrames = 0;
         }
       }
     }
