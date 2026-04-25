@@ -355,12 +355,16 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .post-card-body { margin-bottom: 0.95rem; }
 .post-card-title {
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 1.5vw;
-  line-height: 1.2;
-  letter-spacing: -0.03em;
-  color: var(--light);
+  font-size: clamp(20px, 2.4vw, 28px);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--white);
+  max-width: 24ch;
+  word-break: break-word;
+  hyphens: none;
   transition: color 0.2s ease;
 }
 .post-card:hover .post-card-title,
@@ -908,10 +912,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     margin-bottom: 0.7rem;
   }
   .post-card-body { margin-bottom: 0.75rem; }
-  .post-card-title {
-    font-size: 22px;
-    line-height: 1.2;
-  }
   .post-card-dek {
     font-size: 14px;
     line-height: 1.5;
@@ -1061,6 +1061,13 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
    phones — fall back to Lato display for the article title below 480px. */
 @media (max-width: 480px) {
   .art-h1 {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    text-transform: none;
+    letter-spacing: -0.03em;
+    max-width: none;
+  }
+  .post-card-title {
     font-family: var(--font-sans);
     font-weight: 900;
     text-transform: none;
