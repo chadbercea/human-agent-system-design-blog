@@ -624,3 +624,30 @@ html, body {
   .term-line { grid-template-columns: 60px 52px 1fr; gap: 12px; }
   .term-foot { flex-direction: column; align-items: flex-start; gap: 6px; }
 }
+
+/* ── Page H1 ──────────────────────────────────────────
+   Mirrors the prose-h1 from homepage.css so pages on
+   DesignSystemLayout (glossary) get the same page-level
+   heading typography. The typewriter behavior in
+   transitions.css applies automatically. */
+
+.prose-h1 {
+  font-family: var(--font-sans);
+  font-size: 4vw;
+  font-weight: 700;
+  line-height: 1.03;
+  letter-spacing: -0.03em;
+  color: #c8c8c8;
+  margin-bottom: 1.5rem;
+}
+
+.glossary-h1 {
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 900px) {
+  .glossary-h1 {
+    font-size: 32px;
+    line-height: 1.05;
+  }
+}
