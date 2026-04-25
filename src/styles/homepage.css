@@ -869,22 +869,12 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   }
   .eyebrow { font-size: 11px; margin-bottom: 0.875rem; }
 
-  /* HUD hero — corners and chip flow into normal DOM order below
-     the center stack. Stack first so the mark lands above chrome. */
-  .protocol-chip {
-    position: static;
-    transform: none;
-    display: block;
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-  .hud-corner {
-    position: static;
-    display: block;
-    margin-top: 1.25rem;
-    text-align: left !important;
-  }
-  .hud-corner::before { display: none; }
+  /* Mobile chrome strip — the HUD-style decoration (telemetry corners,
+     protocol chip) is desktop-only theatre that crowds out the actual
+     headline + post list on phones. Drop it; keep the logo + tagline
+     + terminal reveal as the hero. */
+  .protocol-chip { display: none; }
+  .hud-corner { display: none; }
   .hero-stack { margin: 0.5rem 0 2rem; }
   .hero-meta { margin-top: 2rem; }
 

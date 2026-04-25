@@ -47,3 +47,14 @@ body::after {
 body[data-chrome="minimal"]::after,
 body[data-chrome="none"]::before,
 body[data-chrome="none"]::after { display: none; }
+
+/* Mobile: drop the grid + shimmer entirely. The decoration was tuned
+   for desktop reading — at phone scale it just adds noise behind text.
+   Also clip horizontally so off-canvas chrome (slide-out reader, the
+   logo's wider construction stage) can't leak past the viewport. */
+@media (max-width: 900px) {
+  body::before,
+  body::after { display: none; }
+  html, body { overflow-x: hidden; }
+  main { overflow-x: clip; }
+}

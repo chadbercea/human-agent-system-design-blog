@@ -60,7 +60,59 @@ try {
     <div class="kv kv-hash"><span class="k">HASH</span><span class="v">{hashStr}</span></div>
     <div class="kv"><span class="k">CH</span><span class="v" data-channel-value="header">{channelId}</span></div>
   </div>
+
+  <button class="sh-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="sh-drawer" data-sh-burger>
+    <span class="sh-burger-line"></span>
+    <span class="sh-burger-line"></span>
+    <span class="sh-burger-line"></span>
+  </button>
 </header>
+
+<div class="sh-drawer" id="sh-drawer" data-sh-drawer hidden>
+  <div class="sh-drawer-backdrop" data-sh-close></div>
+  <nav class="sh-drawer-nav" aria-label="Primary">
+    <a href="/" aria-current={activeNav === 'articles' ? 'page' : undefined}>Articles</a>
+    <a href="/glossary" aria-current={activeNav === 'glossary' ? 'page' : undefined}>Glossary</a>
+    <a href="/design-system" aria-current={activeNav === 'design-system' ? 'page' : undefined}>Design System</a>
+    <a href="/about" aria-current={activeNav === 'about' ? 'page' : undefined}>About</a>
+    <a href="/contact" aria-current={activeNav === 'contact' ? 'page' : undefined}>Contact</a>
+  </nav>
+</div>
+
+<script is:inline>
+  (function () {
+    var burger = document.querySelector('[data-sh-burger]');
+    var drawer = document.querySelector('[data-sh-drawer]');
+    if (!burger || !drawer) return;
+    var closers = drawer.querySelectorAll('[data-sh-close], a');
+    function open() {
+      drawer.hidden = false;
+      // Force reflow so the transition can run from the hidden state.
+      void drawer.offsetWidth;
+      drawer.classList.add('is-open');
+      burger.classList.add('is-open');
+      burger.setAttribute('aria-expanded', 'true');
+      document.documentElement.style.overflow = 'hidden';
+    }
+    function close() {
+      drawer.classList.remove('is-open');
+      burger.classList.remove('is-open');
+      burger.setAttribute('aria-expanded', 'false');
+      document.documentElement.style.overflow = '';
+      // Wait for transition before hiding from a11y tree.
+      window.setTimeout(function () {
+        if (!drawer.classList.contains('is-open')) drawer.hidden = true;
+      }, 280);
+    }
+    burger.addEventListener('click', function () {
+      if (drawer.classList.contains('is-open')) close(); else open();
+    });
+    closers.forEach(function (el) { el.addEventListener('click', close); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && drawer.classList.contains('is-open')) close();
+    });
+  })();
+</script>
 
 <style is:global>
   .site-header {
@@ -192,22 +244,105 @@ try {
     .site-header .nav { gap: 1.25rem; }
   }
 
+  /* Hamburger button — visible only at mobile breakpoint. */
+  .site-header .sh-burger {
+    display: none;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: 1px solid var(--rule-strong);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    justify-self: end;
+  }
+  .site-header .sh-burger-line {
+    position: absolute;
+    left: 9px;
+    right: 9px;
+    height: 1px;
+    background: var(--white);
+    transition:
+      transform var(--dur-fast) var(--ease-out),
+      opacity var(--dur-fast) var(--ease-out),
+      top var(--dur-fast) var(--ease-out);
+  }
+  .site-header .sh-burger-line:nth-child(1) { top: 13px; }
+  .site-header .sh-burger-line:nth-child(2) { top: 19px; }
+  .site-header .sh-burger-line:nth-child(3) { top: 25px; }
+  .site-header .sh-burger.is-open .sh-burger-line:nth-child(1) {
+    top: 19px; transform: rotate(45deg);
+  }
+  .site-header .sh-burger.is-open .sh-burger-line:nth-child(2) {
+    opacity: 0;
+  }
+  .site-header .sh-burger.is-open .sh-burger-line:nth-child(3) {
+    top: 19px; transform: rotate(-45deg);
+  }
+
+  /* Slide-out drawer. */
+  .sh-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+  }
+  .sh-drawer-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--ease-out);
+  }
+  .sh-drawer.is-open .sh-drawer-backdrop { opacity: 1; }
+  .sh-drawer-nav {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(82vw, 360px);
+    background: var(--black);
+    border-left: 1px solid var(--rule-strong);
+    padding: 96px 32px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transform: translateX(100%);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .sh-drawer.is-open .sh-drawer-nav { transform: translateX(0); }
+  .sh-drawer-nav a {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--light);
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .sh-drawer-nav a:hover,
+  .sh-drawer-nav a:focus-visible,
+  .sh-drawer-nav a[aria-current="page"] { color: var(--white); }
+
   @media (max-width: 900px) {
     .site-header {
-      grid-template-columns: auto 1fr;
+      grid-template-columns: auto 1fr auto;
       gap: 12px;
       padding: 0 1.25rem;
     }
     .site-header .sh-telemetry { display: none; }
+    .site-header .nav { display: none; }
+    .site-header .sh-burger { display: block; }
     .site-header .sh-logo { width: 42px; height: 18px; }
     .site-header .sh-logo .logo-stage { transform: scale(0.1); }
     .site-header .sh-name { font-size: 10px; letter-spacing: 0.2em; }
-    .site-header .nav {
-      justify-self: end;
-      gap: 0.875rem;
-      flex-wrap: wrap;
-      row-gap: 0.25rem;
-    }
-    .site-header .nav a { font-size: 10px; letter-spacing: 0.15em; }
+  }
+
+  @media (min-width: 901px) {
+    .sh-drawer { display: none; }
   }
 </style>
