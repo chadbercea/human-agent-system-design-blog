@@ -109,6 +109,7 @@ try {
     window.__shScrollMounted = true;
     var COLLAPSE_AFTER = 80;   // px scrolled before condensing
     var EXPAND_BY = 20;        // px of upward travel needed to expand again
+    var COLLAPSE_DELTA = 40;   // header height shrinks 80 → 40 on condense
     // Two-frame momentum recoil during a downward fling (e.g. scroll-deltas
     // like +5,+5,-12,-15) used to total > EXPAND_BY across two frames and
     // bounced the header off, then the next +5 re-condensed it — flutter.
@@ -120,6 +121,19 @@ try {
     var upAccum = 0;
     var upFrames = 0;
     var ticking = false;
+
+    // Refuse to condense when the page is barely taller than the viewport.
+    // Condensing shrinks the document by COLLAPSE_DELTA, which can clamp
+    // scrollY below the y < 8 reset threshold — header expands, page grows,
+    // user scrolls again, repeat: flutter. Only condense when there's
+    // enough room to stay scrolled past the reset threshold afterward.
+    // Homepage triggered this; article/glossary have plenty of body length.
+    function hasRoomToCondense(currentY) {
+      var docHeight = document.documentElement.scrollHeight;
+      var viewportHeight = window.innerHeight;
+      var postCondenseMaxScroll = (docHeight - COLLAPSE_DELTA) - viewportHeight;
+      return postCondenseMaxScroll >= currentY;
+    }
 
     function apply() {
       ticking = false;
@@ -137,7 +151,9 @@ try {
       if (dy > 0) {
         upAccum = 0;
         upFrames = 0;
-        if (y > COLLAPSE_AFTER) root.classList.add('sh-condensed');
+        if (y > COLLAPSE_AFTER && hasRoomToCondense(y)) {
+          root.classList.add('sh-condensed');
+        }
       } else if (dy < 0) {
         upAccum += -dy;
         upFrames += 1;
