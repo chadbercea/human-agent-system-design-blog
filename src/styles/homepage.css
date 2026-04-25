@@ -840,8 +840,15 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     top: auto;
     overflow: visible;
   }
+  /* Must NOT be a scroll container on mobile. overflow:auto here
+     made .col-article the sticky-containing-block for .mobile-back,
+     so its `top: 80px` was measured from inside this column instead
+     of the viewport — the back button rendered ~80px lower than the
+     header and floated over the article H1. It also intercepted
+     touch scroll, since a nested scroller swallows wheel/swipe even
+     when its content fits exactly. Let the body own the scroll. */
   .stage.open .col-article {
-    overflow-y: auto;
+    overflow: visible;
     height: auto;
   }
 

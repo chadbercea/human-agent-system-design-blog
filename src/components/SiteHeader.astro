@@ -99,11 +99,14 @@ try {
   </div>
 </div>
 
-<script is:inline>
+<script is:inline data-astro-rerun>
   (function () {
     var burger = document.querySelector('[data-sh-burger]');
     var drawer = document.querySelector('[data-sh-drawer]');
     if (!burger || !drawer) return;
+    // Re-running after a view transition can leave html overflow stuck
+    // hidden if the previous page was unloaded with the drawer open.
+    document.documentElement.style.overflow = '';
     var closers = drawer.querySelectorAll('[data-sh-close], a');
     var links = drawer.querySelectorAll('.sh-drawer-nav a');
     var STEP_MS = 22;       // per-char interval
