@@ -75,6 +75,7 @@ const railTagText = railTag ?? channel.tag;
     import { mountChannelTransitions } from '../lib/channelTransition';
     mountReveals();
     mountChannelTransitions();
+    document.addEventListener('astro:page-load', () => mountReveals());
   </script>
 </body>
 </html>

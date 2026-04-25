@@ -66,6 +66,7 @@ const railChannelText = `CH ${channel.id} · ${channel.signal}`;
     import { mountChannelTransitions } from '../lib/channelTransition';
     mountReveals();
     mountChannelTransitions();
+    document.addEventListener('astro:page-load', () => mountReveals());
   </script>
 </body>
 </html>
