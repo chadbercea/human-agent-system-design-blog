@@ -4,7 +4,12 @@ html, body {
   color: var(--white);
   -webkit-font-smoothing: antialiased;
   text-rendering: geometricPrecision;
-  overflow-x: hidden;
+  /* `clip`, not `hidden` — `overflow-x: hidden` on body silently coerces
+     `overflow-y: auto`, which makes body its own scroll container. The
+     document scroll lives on <html>, so a sticky-positioned header pinned
+     against body never sticks (body doesn't actually scroll). Same trap
+     hit on the homepage layout in the prior shrink-on-scroll work. */
+  overflow-x: clip;
 }
 
 /* Body canvas color, grid overlay, and shimmer live in src/styles/chrome.css. */
