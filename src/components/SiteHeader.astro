@@ -68,7 +68,7 @@ try {
   </button>
 </header>
 
-<div class="sh-drawer" id="sh-drawer" data-sh-drawer hidden>
+<div class="sh-drawer" id="sh-drawer" data-sh-drawer>
   <div class="sh-drawer-backdrop" data-sh-close></div>
   <div class="sh-drawer-panel">
     <div class="sh-drawer-mark" aria-hidden="true">
@@ -159,13 +159,10 @@ try {
     }
 
     function open() {
-      drawer.hidden = false;
-      void drawer.offsetWidth;
       drawer.classList.add('is-open');
       burger.classList.add('is-open');
       burger.setAttribute('aria-expanded', 'true');
       document.documentElement.style.overflow = 'hidden';
-      // Start typing once the panel transition has begun (~slide settles fast enough).
       typeTimers.push(window.setTimeout(typeLinks, 80));
     }
     function close() {
@@ -174,10 +171,7 @@ try {
       burger.setAttribute('aria-expanded', 'false');
       document.documentElement.style.overflow = '';
       window.setTimeout(function () {
-        if (!drawer.classList.contains('is-open')) {
-          drawer.hidden = true;
-          resetLinks();
-        }
+        if (!drawer.classList.contains('is-open')) resetLinks();
       }, 280);
     }
     burger.addEventListener('click', function () {
@@ -358,11 +352,19 @@ try {
     top: 19px; transform: rotate(-45deg);
   }
 
-  /* Slide-out drawer. */
+  /* Slide-out drawer. Always in DOM; toggled via visibility + the
+     panel/backdrop transitions. The previous [hidden]-attribute toggle
+     raced with the close timer and made the burger feel sticky. */
   .sh-drawer {
     position: fixed;
     inset: 0;
     z-index: 200;
+    visibility: hidden;
+    transition: visibility 0s linear var(--dur-base);
+  }
+  .sh-drawer.is-open {
+    visibility: visible;
+    transition: visibility 0s linear 0s;
   }
   .sh-drawer-backdrop {
     position: absolute;
@@ -516,8 +518,6 @@ try {
     .site-header .sh-telemetry { display: none; }
     .site-header .nav { display: none; }
     .site-header .sh-burger { display: block; }
-    .site-header .sh-logo { width: 42px; height: 18px; }
-    .site-header .sh-logo .logo-stage { transform: scale(0.1); }
     .site-header .sh-name { font-size: 10px; letter-spacing: 0.2em; }
   }
 
