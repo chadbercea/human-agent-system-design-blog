@@ -61,4 +61,11 @@ body[data-chrome="none"]::after { display: none; }
      does, so the sticky pin moves with the page). */
   html, body { overflow-x: clip; }
   main { overflow-x: clip; }
+  /* The shrink-on-scroll header changes its sticky height during a 160ms
+     transition, which is exactly the kind of layout shift the browser's
+     scroll anchoring tries to absorb by adjusting scrollY. Those synthetic
+     dy events looked like an upward scroll and bounced the header back —
+     ILI-742 flutter. Disable scroll anchoring on mobile so only real
+     touch-driven scroll updates `scrollY`. */
+  html { overflow-anchor: none; }
 }
