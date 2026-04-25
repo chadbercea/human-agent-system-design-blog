@@ -220,10 +220,4 @@
   .section-intro { margin-bottom: 36px; font-size: 16px; }
   .entry-def { font-size: 16px; }
   .impl-text { font-size: 15px; }
-
-  /* Drop the redaction conceit on mobile — the white bars stack as
-     huge whitespace blocks at phone width and obscure the text we
-     want readable. Show definitions directly. */
-  .glossary-entry .reveal-text { visibility: visible !important; }
-  .glossary-entry .redact-bar { display: none !important; }
 }
