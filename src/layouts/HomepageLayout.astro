@@ -1,5 +1,6 @@
 ---
 import { ClientRouter } from 'astro:transitions';
+import Analytics from '@vercel/analytics/astro';
 import '../styles/tokens.css';
 import '../styles/chrome.css';
 import '../styles/motion.css';
@@ -69,6 +70,8 @@ const railTagText = railTag ?? channel.tag;
   </div>
 
   <slot name="after-shell" />
+
+  <Analytics />
 
   <script>
     import { mountReveals } from '../lib/reveals';
