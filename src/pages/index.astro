@@ -36,7 +36,6 @@ const cards = articles.map((a) => ({
   dek: a.data.description ?? '',
   tags: a.data.tags ?? [],
   minutes: readMinutes(a.body),
-  reveals: a.data.reveals ?? [],
 }));
 
 const articleMeta = cards.map((c, i) => ({
@@ -47,7 +46,6 @@ const articleMeta = cards.map((c, i) => ({
   date: formatDate(c.date),
   read: `${c.minutes} MIN READ`,
   tags: c.tags.map((t) => t.toUpperCase()),
-  reveals: c.reveals,
 }));
 
 const featured = articles[0];
@@ -224,19 +222,6 @@ const siteDescription = featured?.data.description
           hashEl.textContent = cur ? '#' + cur.slug : '';
         }
 
-        function recordReveals(reveals) {
-          if (!reveals || !reveals.length) return;
-          try {
-            var raw = localStorage.getItem('has-glossary') || '[]';
-            var set = new Set(JSON.parse(raw));
-            var changed = false;
-            for (var i = 0; i < reveals.length; i++) {
-              if (!set.has(reveals[i])) { set.add(reveals[i]); changed = true; }
-            }
-            if (changed) localStorage.setItem('has-glossary', JSON.stringify(Array.from(set)));
-          } catch (e) { /* private mode — ignore */ }
-        }
-
         function openArticle(idx, opts) {
           var data = meta[idx];
           if (!data) return;
@@ -245,7 +230,6 @@ const siteDescription = featured?.data.description
             savedScrollY = window.scrollY || window.pageYOffset || 0;
           }
           currentIdx = idx;
-          recordReveals(data.reveals);
           headIdEl.textContent = data.postId;
           headDateEl.textContent = data.date;
           headReadEl.textContent = data.read;

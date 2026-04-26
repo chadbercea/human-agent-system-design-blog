@@ -46,6 +46,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   <main>
     <slot />
   </main>
+  <script>
+    try {
+      localStorage.removeItem('has-glossary');
+      localStorage.removeItem('has-glossary-seen');
+    } catch (e) { /* private mode — ignore */ }
+  </script>
 </body>
 </html>
 
