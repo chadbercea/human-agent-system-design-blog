@@ -1,5 +1,7 @@
 ---
+import { getCollection } from 'astro:content';
 import DesignSystemLayout from '../layouts/DesignSystemLayout.astro';
+import { conceptReferences } from '../lib/glossary-references';
 import '../styles/glossary.css';
 
 interface Entry {
@@ -9,6 +11,12 @@ interface Entry {
   name: string;
   def: string;
   impl: string;
+}
+
+interface ArticleRef {
+  slug: string;
+  title: string;
+  postId: string;
 }
 
 interface Section {
@@ -183,6 +191,30 @@ const sections: Section[] = [
 ];
 
 const totalEntries = sections.reduce((sum, s) => sum + s.entries.length, 0);
+
+// Build slug → {title, postId} from the published articles, ordered the
+// same way the homepage does (date desc) so post numbers match.
+const publishedArticles = (await getCollection('articles'))
+  .filter((a) => !a.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const articlesBySlug = new Map<string, ArticleRef>(
+  publishedArticles.map((a, i) => [
+    a.slug,
+    {
+      slug: a.slug,
+      title: a.data.title,
+      postId: `// POST ${String(i + 1).padStart(2, '0')}`,
+    },
+  ])
+);
+
+function resolveReferences(conceptSlug: string): ArticleRef[] {
+  const slugs = conceptReferences[conceptSlug] ?? [];
+  return slugs
+    .map((s) => articlesBySlug.get(s))
+    .filter((a): a is ArticleRef => Boolean(a));
+}
 ---
 <DesignSystemLayout
   title="Glossary · HAS Design"
@@ -211,22 +243,42 @@ const totalEntries = sections.reduce((sum, s) => sum + s.entries.length, 0);
 
         <p class="section-intro">{section.intro}</p>
 
-        {section.entries.map((entry) => (
-          <article class="glossary-entry" data-slug={entry.slug}>
-            <header class="entry-head">
-              <span class="entry-number">{entry.number}</span>
-              <span class="entry-category">{entry.category}</span>
-            </header>
-            <div class="entry-body">
-              <h3 class="entry-name">{entry.name}</h3>
-              <p class="entry-def">{entry.def}</p>
-              <blockquote class="entry-implication">
-                <span class="impl-label">FRAMEWORK IMPLICATION</span>
-                <span class="impl-text">{entry.impl}</span>
-              </blockquote>
-            </div>
-          </article>
-        ))}
+        {section.entries.map((entry) => {
+          const refs = resolveReferences(entry.slug);
+          return (
+            <article class="glossary-entry" data-slug={entry.slug}>
+              <header class="entry-head">
+                <span class="entry-number">{entry.number}</span>
+                <span class="entry-category">{entry.category}</span>
+              </header>
+              <div class="entry-body">
+                <h3 class="entry-name">{entry.name}</h3>
+                <p class="entry-def">{entry.def}</p>
+                <blockquote class="entry-implication">
+                  <span class="impl-label">FRAMEWORK IMPLICATION</span>
+                  <span class="impl-text">{entry.impl}</span>
+                </blockquote>
+                {refs.length > 0 && (
+                  <div class="entry-references">
+                    <span class="ref-label">REFERENCED IN</span>
+                    <ul class="ref-list">
+                      {refs.map((r) => (
+                        <li class="ref-item">
+                          <a class="ref-link" href={`/#${r.slug}`}>
+                            <span class="ref-arrow" aria-hidden="true">&rarr;</span>
+                            <span class="ref-num">{r.postId}</span>
+                            <span class="ref-sep" aria-hidden="true">&mdash;</span>
+                            <span class="ref-title">{r.title}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </article>
+          );
+        })}
       </section>
     ))}
   </section>
