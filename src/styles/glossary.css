@@ -118,6 +118,77 @@
   color: var(--light);
 }
 
+/* Referenced In — optional backlink block (ILI-753).
+   Inverse of the killed unlock mechanic: glossary entries surface the
+   articles that engage with them. Mono caps label, mono post id, Lato
+   title, hover-underline grow per ILI-733. */
+.entry-references {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 70ch;
+  padding-top: 4px;
+}
+.ref-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: var(--mid);
+  text-transform: uppercase;
+}
+.ref-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ref-item { margin: 0; }
+.ref-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  text-decoration: none;
+  color: var(--light);
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+.ref-link:where(:hover, :focus-visible) {
+  color: var(--white);
+  border-bottom-color: var(--white);
+}
+.ref-arrow {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--dim);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.ref-link:where(:hover, :focus-visible) .ref-arrow { color: var(--white); }
+.ref-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--white);
+  text-transform: uppercase;
+}
+.ref-sep {
+  font-family: var(--font-sans);
+  color: var(--dim);
+}
+.ref-title {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: inherit;
+}
+
 /* ── Mobile ───────────────────────────────────────────────── */
 
 @media (max-width: 900px) {
@@ -137,4 +208,5 @@
   .section-intro { margin-bottom: 36px; font-size: 16px; }
   .entry-def { font-size: 16px; }
   .impl-text { font-size: 15px; }
+  .ref-title { font-size: 15px; }
 }
