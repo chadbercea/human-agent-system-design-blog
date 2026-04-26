@@ -1,14 +1,6 @@
 /* HAS Design — /glossary
-   NASA-style declassified document. Entries start fully redacted with
-   opaque white bars; visiting an article that declares `reveals: [slug]`
-   in its frontmatter writes to localStorage['has-glossary'], and on
-   return to /glossary the named entries un-redact (newly-unlocked items
-   wipe left-to-right; previously-seen-unlocked render statically).
-
-   Accessibility: redaction is a visual conceit only. `.reveal-text`
-   uses `visibility: hidden` (not display:none, not aria-hidden) so
-   screen readers always read the full content. `.redact-bar` is
-   decorative — `aria-hidden="true"`, `role="presentation"`. */
+   Plain readable reference page for the 13 HAS-D framework concepts,
+   grouped by category (axioms, constraints, design requirements). */
 
 .glossary-intro {
   max-width: 70ch;
@@ -62,7 +54,6 @@
   color: var(--white);
 }
 .entry-category {
-  position: relative;
   display: inline-block;
   font-family: var(--font-mono);
   font-size: 10px;
@@ -82,8 +73,6 @@
 }
 
 .entry-name {
-  position: relative;
-  display: inline-block;
   align-self: start;
   font-family: var(--font-sans);
   font-weight: 700;
@@ -95,7 +84,6 @@
 }
 
 .entry-def {
-  position: relative;
   font-family: var(--font-sans);
   font-weight: 300;
   font-size: 17px;
@@ -105,7 +93,6 @@
 }
 
 .entry-implication {
-  position: relative;
   display: grid;
   grid-template-columns: auto;
   gap: 8px;
@@ -123,132 +110,12 @@
   text-transform: uppercase;
 }
 .impl-text {
-  position: relative;
   display: block;
   font-family: var(--font-sans);
   font-weight: 300;
   font-size: 16px;
   line-height: 1.6;
   color: var(--light);
-}
-
-/* ── Redaction primitives ─────────────────────────────────── */
-
-.glossary-entry .reveal-text {
-  visibility: hidden;
-}
-.glossary-entry .redact-bar {
-  position: absolute;
-  inset: 0;
-  background: var(--white);
-  display: block;
-  pointer-events: auto;
-  transform-origin: left center;
-}
-
-/* Unlocked: text visible, bar gone */
-.glossary-entry[data-unlocked="true"] .reveal-text {
-  visibility: visible;
-}
-.glossary-entry[data-unlocked="true"] .redact-bar {
-  display: none;
-}
-
-/* Newly unlocked: bar wipes left-to-right; reveal underneath */
-.glossary-entry[data-just-unlocked="true"] .reveal-text {
-  visibility: visible;
-}
-.glossary-entry[data-just-unlocked="true"] .redact-bar {
-  display: block;
-  animation: redact-wipe var(--dur-cinematic) var(--ease-out) forwards;
-  animation-delay: calc(var(--reveal-i, 0) * var(--stagger));
-}
-
-@keyframes redact-wipe {
-  from { transform: scaleX(1); }
-  to { transform: scaleX(0); }
-}
-
-/* Redacted-bar shimmer on hover — subtle scan over the white bar */
-.glossary-entry:not([data-unlocked="true"]) .redact-bar {
-  cursor: help;
-}
-.glossary-entry:not([data-unlocked="true"]) .redact-bar:hover {
-  background: linear-gradient(
-    90deg,
-    var(--white) 0%,
-    var(--light) 50%,
-    var(--white) 100%
-  );
-  background-size: 200% 100%;
-  animation: glossary-scan 1.6s var(--ease-linear) infinite;
-}
-
-@keyframes glossary-scan {
-  to { background-position: -200% 0; }
-}
-
-/* ── Reduced motion ───────────────────────────────────────── */
-
-@media (prefers-reduced-motion: reduce) {
-  .glossary-entry[data-just-unlocked="true"] .redact-bar {
-    animation: none !important;
-    display: none !important;
-  }
-  .glossary-entry:not([data-unlocked="true"]) .redact-bar:hover {
-    animation: none !important;
-    background: var(--white);
-  }
-}
-
-/* ── Redacted toast ───────────────────────────────────────
-   Surfaces "[Intel currently REDACTED]" when a reader taps,
-   clicks, or hovers a still-redacted bar. Bottom-center,
-   mono, declassified-document aesthetic. */
-
-.redacted-toast {
-  position: fixed;
-  left: 50%;
-  bottom: 96px;
-  transform: translate(-50%, 12px);
-  z-index: 1000;
-  /* Opt out of the page-entry `rise` animation in entry.css —
-     it targets `main > *:not(.reveal)` and would clobber the
-     translate(-50%, …) positioning. */
-  animation: none !important;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-  padding: 12px 18px;
-  background: var(--near-black);
-  border: 1px solid var(--rule-hud);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--white);
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity var(--dur-fast) var(--ease-out),
-    transform var(--dur-base) var(--ease-out);
-}
-
-.redacted-toast[data-visible="true"] {
-  opacity: 1;
-  transform: translate(-50%, 0);
-}
-
-.redacted-toast__bracket {
-  color: var(--mid);
-  font-weight: 500;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .redacted-toast { transition: opacity var(--dur-fast) linear; }
-  .redacted-toast[data-visible="true"] { transform: translate(-50%, 0); }
 }
 
 /* ── Mobile ───────────────────────────────────────────────── */
@@ -270,10 +137,4 @@
   .section-intro { margin-bottom: 36px; font-size: 16px; }
   .entry-def { font-size: 16px; }
   .impl-text { font-size: 15px; }
-
-  .redacted-toast {
-    bottom: 80px;
-    font-size: 11px;
-    padding: 10px 14px;
-  }
 }

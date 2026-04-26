@@ -186,7 +186,7 @@ const totalEntries = sections.reduce((sum, s) => sum + s.entries.length, 0);
 ---
 <DesignSystemLayout
   title="Glossary · HAS Design"
-  description="HAS-D Framework concepts as a NASA-style declassified document. Entries unlock as you read."
+  description="HAS-D Framework concepts — axioms, constraints, and design requirements."
   activeNav="glossary"
   siteName="GLOSSARY"
 >
@@ -196,7 +196,7 @@ const totalEntries = sections.reduce((sum, s) => sum + s.entries.length, 0);
     <div class="panel-head">
       <span class="id">// GLOSSARY</span>
       <span class="title">HAS-D FRAMEWORK CONCEPTS &middot; SESSION-DERIVED</span>
-      <span class="meta" id="glossary-progress">00 / {totalEntries} UNLOCKED</span>
+      <span class="meta">{String(totalEntries).padStart(2, '0')} ENTRIES &middot; {String(sections.length).padStart(2, '0')} CATEGORIES</span>
     </div>
 
     <p class="glossary-intro">{preamble}</p>
@@ -215,26 +215,14 @@ const totalEntries = sections.reduce((sum, s) => sum + s.entries.length, 0);
           <article class="glossary-entry" data-slug={entry.slug}>
             <header class="entry-head">
               <span class="entry-number">{entry.number}</span>
-              <span class="entry-category">
-                <span class="reveal-text">{entry.category}</span>
-                <span class="redact-bar redact-bar--cat" aria-hidden="true" role="presentation"></span>
-              </span>
+              <span class="entry-category">{entry.category}</span>
             </header>
             <div class="entry-body">
-              <h3 class="entry-name">
-                <span class="reveal-text">{entry.name}</span>
-                <span class="redact-bar redact-bar--name" aria-hidden="true" role="presentation"></span>
-              </h3>
-              <p class="entry-def">
-                <span class="reveal-text">{entry.def}</span>
-                <span class="redact-bar redact-bar--def" aria-hidden="true" role="presentation"></span>
-              </p>
+              <h3 class="entry-name">{entry.name}</h3>
+              <p class="entry-def">{entry.def}</p>
               <blockquote class="entry-implication">
                 <span class="impl-label">FRAMEWORK IMPLICATION</span>
-                <span class="impl-text">
-                  <span class="reveal-text">{entry.impl}</span>
-                  <span class="redact-bar redact-bar--impl" aria-hidden="true" role="presentation"></span>
-                </span>
+                <span class="impl-text">{entry.impl}</span>
               </blockquote>
             </div>
           </article>
@@ -242,107 +230,4 @@ const totalEntries = sections.reduce((sum, s) => sum + s.entries.length, 0);
       </section>
     ))}
   </section>
-
-  <div
-    id="redacted-toast"
-    class="redacted-toast"
-    role="status"
-    aria-live="polite"
-    data-visible="false"
-  >
-    <span class="redacted-toast__bracket">[</span>
-    <span class="redacted-toast__text">Intel currently REDACTED</span>
-    <span class="redacted-toast__bracket">]</span>
-  </div>
-
-  <script is:inline define:vars={{ totalEntries }}>
-    (function () {
-      var url = new URL(window.location.href);
-      if (url.searchParams.has('reset')) {
-        try {
-          localStorage.removeItem('has-glossary');
-          localStorage.removeItem('has-glossary-seen');
-        } catch (e) { /* private mode — ignore */ }
-        url.searchParams.delete('reset');
-        var newUrl = url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : '');
-        if (history && history.replaceState) history.replaceState(null, '', newUrl);
-      }
-
-      var unlocked, seen;
-      try {
-        unlocked = new Set(JSON.parse(localStorage.getItem('has-glossary') || '[]'));
-        seen = new Set(JSON.parse(localStorage.getItem('has-glossary-seen') || '[]'));
-      } catch (e) {
-        unlocked = new Set();
-        seen = new Set();
-      }
-
-      var entries = document.querySelectorAll('.glossary-entry');
-      var staggerI = 0;
-      entries.forEach(function (el) {
-        var slug = el.getAttribute('data-slug');
-        if (unlocked.has(slug)) {
-          el.setAttribute('data-unlocked', 'true');
-          if (!seen.has(slug)) {
-            el.setAttribute('data-just-unlocked', 'true');
-            el.style.setProperty('--reveal-i', String(staggerI));
-            staggerI += 1;
-          }
-        }
-      });
-
-      var meta = document.getElementById('glossary-progress');
-      if (meta) {
-        var n = String(unlocked.size).padStart(2, '0');
-        meta.textContent = n + ' / ' + String(totalEntries).padStart(2, '0') + ' UNLOCKED';
-      }
-
-      // After first paint, mark all currently-unlocked as seen so the next
-      // visit doesn't re-animate them.
-      requestAnimationFrame(function () {
-        try {
-          localStorage.setItem('has-glossary-seen', JSON.stringify(Array.from(unlocked)));
-        } catch (e) { /* private mode — ignore */ }
-      });
-
-      // ── Redacted-bar interaction ─────────────────────────
-      // Tap / click / hover on a still-redacted bar surfaces a toast
-      // reminding the reader the intel is locked until they read the
-      // article that reveals it.
-      var toast = document.getElementById('redacted-toast');
-      if (toast) {
-        var hideTimer = null;
-        var hoverCooldown = false;
-
-        function showToast() {
-          if (hideTimer) clearTimeout(hideTimer);
-          toast.setAttribute('data-visible', 'true');
-          hideTimer = setTimeout(function () {
-            toast.setAttribute('data-visible', 'false');
-            hideTimer = null;
-          }, 1800);
-        }
-
-        function isLocked(bar) {
-          var entry = bar.closest('.glossary-entry');
-          return entry && entry.getAttribute('data-unlocked') !== 'true';
-        }
-
-        document.addEventListener('click', function (e) {
-          var bar = e.target.closest && e.target.closest('.redact-bar');
-          if (!bar || !isLocked(bar)) return;
-          showToast();
-        });
-
-        document.addEventListener('mouseover', function (e) {
-          var bar = e.target.closest && e.target.closest('.redact-bar');
-          if (!bar || !isLocked(bar)) return;
-          if (hoverCooldown) return;
-          hoverCooldown = true;
-          showToast();
-          setTimeout(function () { hoverCooldown = false; }, 2000);
-        });
-      }
-    })();
-  </script>
 </DesignSystemLayout>
