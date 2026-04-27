@@ -12,7 +12,7 @@ test.describe('ILI-721 — post card HUD styling', () => {
 
     const first = page.locator('.post-card').first();
     await expect(first).toBeVisible();
-    await expect(first.locator('.post-card-id')).toHaveText('// POST 01');
+    await expect(first.locator('.post-card-id')).toHaveText('// POST 02');
     await expect(first.locator('.post-card-date')).toContainText('2026.');
     await expect(first.locator('.post-card-title')).toBeVisible();
     await expect(first.locator('.post-card-read')).toContainText('MIN READ');

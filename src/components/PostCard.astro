@@ -7,6 +7,7 @@
 
 export interface Props {
   index: number;
+  postNumber: number;
   slug: string;
   title: string;
   date: Date;
@@ -15,7 +16,7 @@ export interface Props {
   minutes: number;
 }
 
-const { index, slug, title, date, dek, tags = [], minutes } = Astro.props;
+const { index, postNumber, slug, title, date, dek, tags = [], minutes } = Astro.props;
 
 function formatDate(d: Date): string {
   const y = d.getUTCFullYear();
@@ -24,7 +25,7 @@ function formatDate(d: Date): string {
   return `${y}.${m}.${day}`;
 }
 
-const idLabel = `// POST ${String(index + 1).padStart(2, '0')}`;
+const idLabel = `// POST ${String(postNumber).padStart(2, '0')}`;
 const dateLabel = formatDate(date);
 const tagLabel = tags.length > 0 ? tags.map((t) => t.toUpperCase()).join(' · ') : '';
 const readLabel = `${minutes} MIN READ`;

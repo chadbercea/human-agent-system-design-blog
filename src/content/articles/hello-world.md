@@ -4,6 +4,7 @@ date: 2026-04-22
 description: "This is a new blog all about designing for the age of agents. Humans, agents, and systems shipping products together."
 tags: ["HAS-D"]
 draft: false
+postNumber: 1
 ---
 
 There's no shortage of writing about AI right now. Most of it is about prompts. Most of it is about chat interfaces. Most of it treats "AI design" as a UX problem for a single conversation between a person and a model. That's not what this is.

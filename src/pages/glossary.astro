@@ -192,19 +192,17 @@ const sections: Section[] = [
 
 const totalEntries = sections.reduce((sum, s) => sum + s.entries.length, 0);
 
-// Build slug → {title, postId} from the published articles, ordered the
-// same way the homepage does (date desc) so post numbers match.
-const publishedArticles = (await getCollection('articles'))
-  .filter((a) => !a.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+// Build slug → {title, postId} from the published articles. postNumber is
+// a stable frontmatter field, so labels survive resorts/republishing.
+const publishedArticles = (await getCollection('articles')).filter((a) => !a.data.draft);
 
 const articlesBySlug = new Map<string, ArticleRef>(
-  publishedArticles.map((a, i) => [
+  publishedArticles.map((a) => [
     a.slug,
     {
       slug: a.slug,
       title: a.data.title,
-      postId: `// POST ${String(i + 1).padStart(2, '0')}`,
+      postId: `// POST ${String(a.data.postNumber).padStart(2, '0')}`,
     },
   ])
 );
