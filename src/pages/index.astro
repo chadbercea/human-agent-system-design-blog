@@ -36,13 +36,14 @@ const cards = articles.map((a) => ({
   dek: a.data.description ?? '',
   tags: a.data.tags ?? [],
   minutes: readMinutes(a.body),
+  postNumber: a.data.postNumber,
 }));
 
-const articleMeta = cards.map((c, i) => ({
+const articleMeta = cards.map((c) => ({
   slug: c.slug,
   title: c.title,
   lede: c.dek,
-  postId: `// POST ${String(i + 1).padStart(2, '0')}`,
+  postId: `// POST ${String(c.postNumber).padStart(2, '0')}`,
   date: formatDate(c.date),
   read: `${c.minutes} MIN READ`,
   tags: c.tags.map((t) => t.toUpperCase()),
@@ -116,6 +117,7 @@ const siteDescription = featured?.data.description
         {cards.map((c, i) => (
           <PostCard
             index={i}
+            postNumber={c.postNumber}
             slug={c.slug}
             title={c.title}
             date={c.date}

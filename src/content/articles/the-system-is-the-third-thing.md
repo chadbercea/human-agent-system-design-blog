@@ -4,6 +4,7 @@ date: 2026-04-26
 description: "Every agent product has three design objects, not two. The system — the persistent, structured environment both human and agent act on — is the one your team isn't designing."
 tags: ["HAS-D"]
 draft: false
+postNumber: 2
 ---
 
 There are three objects in every agent product. Most designers see two.
