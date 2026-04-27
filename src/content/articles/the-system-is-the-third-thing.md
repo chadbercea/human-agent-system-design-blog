@@ -1,88 +1,152 @@
 ---
-title: "The System Is the Third Thing"
+title: "We're Assuming the System"
 date: 2026-04-26
-description: "Every agent product has three design objects, not two. The system is the persistent, structured environment both human and agent act on. It's the one your team isn't designing."
+description: "Chat is a good place to start. It is a terrible place to stay. Human-Agent-System Design is the discipline for what comes next: designing the system the conversation was supposed to operate on."
 tags: ["HAS-D"]
 draft: false
 postNumber: 2
 ---
 
-There are three objects in every agent product. Most designers see two.
+At Docker, Javier Alfonso and I built the first version of an agent builder for developers. We shipped it as a chat app. We scrapped it.
 
-The two you see are the human and the agent. The human asks for something. The agent does something. You design the conversation between them.
+People did not want a chat app. They wanted agents that lived inside their Docker workflows. Generated, configured, native to the technology they already used. Chat was a familiar surface. Familiar was not the same as useful.
 
-The third object is the system. People hear "system" and think backend, or infrastructure. The system is the persistent, structured environment both the human and the agent act on. The tickets, the files, the state machines, the shared documents, the event logs. The stuff that still exists after both parties walk away from the session.
+So we pivoted. The next version was a tool for generating and configuring agents that lived where the work happened. From there, agentic inroads into Docker Desktop. Security-focused AI tooling. The pattern repeated. Chat was the demo. The system was the product.
 
-I've spent fifteen years building that layer. CI/CD. Observability. Containers. Design systems. All of it system work. All of it the third object. Making it durable. Making it legible. Making it behave. The current agent-design conversation treats that layer as substrate. Backend's job. "Just has to be there."
+I now am a lead designer on AI developer tools at Atlassian. My team is building agents for code review, planning, ticketing, and the surrounding work. We call it "left and right of code-gen." Meaningful automation shipped to enterprise customers globally. Same pattern. The chat is where the demo runs. The system is where the value compounds.
 
-It's killing your product.
+Chat is a good place to start. It is a terrible place to stay.
 
-## Why the system hides
+This article is about what comes after, and why I want to pitch an emerging child of the parent HCI. I am calling it "Human Agent System Design." Let's get into it!
 
-The system is everything durable. Every record the agent writes. Every state change it commits. Every artifact that will still exist at the end of the month. It holds the history. It holds the rules.
+## The chat trap
 
-It hides because it doesn't have a surface. You can't screenshot it. You can't hand a PM a Figma file of it. It shows up in your product the way gravity shows up in a room. You don't see it. Everything falls the way it says.
+Most agent products are stuck in the same place. A team ships an AI feature as a chat UI. The metrics look fine. Then the product stops growing, or never finds its audience, or feature after feature gets bolted onto the same surface and nothing compounds.
 
-The moment you try to draw it, you realize it has all the properties of a design object. It has boundaries. It has rules. It has interfaces. It has versions. Someone decided those things. Almost always an engineer working a local problem. You get architecture by accident.
+The diagnosis is the same nearly every time. The team designed the conversation. They did not design the system the conversation was supposed to operate on.
 
-## Why unnamed design objects break
+Designers are rendering the eighth version of the same chat UI. PMs are reviewing roadmaps that end at "improve the chat experience." Engineers are stitching together model calls and praying the prompt holds. Nobody is designing the system the agent is supposed to live inside.
 
-Here's what's actually broken: when you design an interface without naming what the interface is for, you get bad interfaces. Same thing happens with systems. Unnamed systems get designed by accident.
+The work to escape this is not interface work. It is system work. And the discipline for system work, when humans and agents both act on the system, has a name most teams have not heard.
 
-The unreliability people attribute to AI is almost entirely system-layer failure. The agent wrote half a record. The agent changed a field and the audit log lost track of who did it. The agent chained five actions and the third one failed and nobody knows what to roll back. The model is fine. The system is underspecified.
+Human-Agent-System Design.
 
-You can polish the interface until it gleams. The product will still feel broken. Because the thing that's broken is below the interface, in the layer nobody on the team thinks is their job.
+## What the sh\*t is Human-Agent-System Design?
+
+[Human-Computer Interaction](https://en.wikipedia.org/wiki/Human%E2%80%93computer_interaction) was built on a single foundational assumption. There is one intentional actor in the product, and that actor is human. The computer is a tool. It responds. It executes. It does not decide.
+
+That assumption held for forty years. It is no longer the best descriptor or set of principles for what's happening today. HCI is critical but it needs a child.
+
+If Human-Computer Interaction is the first parent, then the second parent is [Actor-Network Theory](https://en.wikipedia.org/wiki/Actor%E2%80%93network_theory):
+
+> Actor-Network Theory (ANT) is **a theoretical and methodological framework developed by Bruno Latour, Michel Callon, and John Law that treats both human and non-human entities (objects, technology, ideas) as equally important "actors" or "actants" in shaping social reality**. It maps how these actors connect in networks, proposing that social order is a continuous, precarious accomplishment formed by the heterogeneous networks they form.
+>
+> [www.sciencedirect.com](http://www.sciencedirect.com)
+
+Human-Agent-System Design takes the core of Human-Computer Interaction and merges Latour's work on Actor-Network Theory to create this gestalt third thing.
+
+An agent decides. It initiates work. It chains actions. It reasons across context. It coordinates with other agents and other systems while no human is watching. The "one intentional actor" assumption breaks. Every method built on top of it bends or snaps when applied to agentic products. Personas do not describe agents. Journey maps do not describe orchestrations. Empathy maps do not apply to entities that have no psychology.
+
+Agents are tier-1 citizens on the internet now. The design conversation has not caught up.
+
+HCI is essential at the human edge of any agent product. HCI is incomplete in this new case of agents acting upon systems orchestrated by humans. It cannot describe the agent layer. It cannot describe the system layer. It cannot describe the seams between all three. And when we try to force HCI principles and frameworks on agents, the result is a mess.
+
+Human-Agent-System Design is the child discipline that completes it. Same parent. New territory. HAS-Design treats three actor types as co-equal design objects. A proper Triad.
+
+**Humans** are designed with HCI methods. Personas, jobs-to-be-done, mental models, trust calibration. The human edge is HCI's home turf. HAS-Design inherits those methods rather than replacing them.
+
+**Agents** are designed with specifications. Capability envelope, action grammar, archetype, constraints. Agents have defined behavior. They have capability without psychology. They require their own vocabulary and their own artifacts.
+
+**Systems** are designed with primitives. State machines, event logs, action authority models, identity persistence, audit surfaces, rollback semantics. The system is the persistent, structured environment humans and agents both act on. Not the backend. Not the infrastructure. The durable design object the framework's name commits to.
+
+The output of HAS-Design practice is agentic orchestration: what happens when three actor types coordinate through designed interactions to produce outcomes none of them could produce alone.
+
+## Back to Blueprints, not Maps
+
+The primary artifact is the service blueprint. A blueprint can represent the human frontstage, the agent backstage, the support systems, and the handoffs between them. A journey map cannot. A journey map traces a primary human and its counterparts and human-helpers through a system. An orchestration is not any of that.
+
+**This is the discipline. This is what you reach for when chat is no longer the answer.**
 
 ## The triad
 
-HAS-D, Human-Agent-System Design, treats all three as co-equal design objects.
+Three actors. Three design objects. Three places the work has to land. Miss one and the product falls apart at that seam.
 
-**Human.** The person who initiates, reviews, governs. Designed the way humans have always been designed for: personas, jobs-to-be-done, cognitive load, trust calibration. Nothing new here. [HCI](https://en.wikipedia.org/wiki/Human%E2%80%93computer_interaction) works.
+### The Human.
 
-**Agent.** The autonomous or semi-autonomous actor. Designed through specifications. You don't empathy-map an agent. You define its capabilities, its constraints, its action grammar. What it can do. What it's forbidden to do. What it has to prove before it's allowed to try.
+The person initiating the work, configuring the agent, governing the outcome. You initiate. You configure. You govern. You review. You intervene when the agent goes off course. You steer. Designer, PM, developer. The role varies. The position does not. You are the intentional actor at the human edge, and the judgment that cannot be delegated.
 
-**System.** The persistent, structured, shared environment the other two act on. Designed through state machines, event logs, action authority models, identity and persistence primitives, rollback semantics. Every one of those is a design deliverable. You own them.
+### The Agent.
 
-Treating human and non-human entities as co-equal actors isn't new. [Actor-network theory](https://en.wikipedia.org/wiki/Actor%E2%80%93network_theory) has been making that move since [Latour](https://global.oup.com/academic/product/reassembling-the-social-9780199256051), in the eighties. HAS-D adds a third term. The System as a design object. A thing you specify, version, and ship. Designing it is a discipline of its own.
+A specified actor. The agent has a capability envelope: what it can do, what it cannot do, what it has to verify before it acts. The agent has an action grammar: the explicit list of moves available to it. Some agents are configured for general chat. Some for code generation. Some for design review. Some for planning, ticketing, research, or QA. Within those constraints, an agent is whatever you specified.
 
-These three sit beside each other. Equal terrain. The human acts on the system directly. The agent acts on the system directly. The human acts on the agent. Every edge is a design surface. Miss one and the product falls apart at that seam.
+The human's job is to specify the agent for the work in front of it. A code-generation agent assigned to produce UI inside a screen design tool is set up to fail. The model is fine. The specification was wrong. A user-experience agent is specified differently. It pulls from interaction design. It applies research through heuristic evaluation. Same model underneath. Different agent because the human specified it differently.
 
-## You already did this with design systems
+### The System.
 
-If you've worked on a design system, you've already built a HAS-D triad. You just didn't call it that.
+The persistent, structured, shared environment the other two act on. Not the IDE. Not Conductor. Not Emdash. Those are consoles you orchestrate the system from. The system itself is the skills, the MCP connections, the APIs, the repositories, the records that exist when no one is in session. The test is simple. If you selected it, configured it, or wired it in, it is part of your system. If it shipped in the console by default and you never touched it, it is part of the console. You design the system layer. You version it. You change it deliberately.
 
-The humans are the designers and engineers who consume the system. Personas, workflows, adoption problems.
+Designed deliberately, the system carries the product. Designed by accident, the system carries the failure. There is no third option.
 
-The agents are the build tools. [Style Dictionary](https://styledictionary.com/) transforming tokens into code. Linters enforcing component usage. CI pipelines catching drift. They execute work without a person watching each step.
+## What you build with it
 
-The system is the token definitions, the component library, the canonical repository. Persistent. Structured. Shared.
+A line Javier and I landed on:
 
-When it's underspecified, the whole thing breaks. Tokens with no naming rules. Components with no versioning. No canonical source. The tools misfire. The designers fight the build. The consuming team gives up and builds their own local copy.
+> Agents live in yaml, think in JSON, and go to work in MCPs.
 
-Every hard problem in agentic products right now is a problem design systems already solved, in miniature form. Canonical identity. Referential stability. Versioning. Authority. Drift detection.
+The yaml is the agent's specification. The JSON is the structured exchange the model runs on. The MCPs are the systems the agents reach into to do their work. That is the geography of a basic agent product.
 
-The tools for designing that layer already exist. They were just never called system design.
+The system you build inside that geography is a spider-web. Each node is something you connected on purpose: a skill you wrote or installed, an MCP connection you authorized, an API you designed or wired in, a service the agent can reach. The web is bounded. You can name every node. You can audit every connection. You can swap a node without rebuilding the whole thing.
 
-## What HAS-D is for
+The spider-web metaphor is the picture. The deeper work follows: what each node is allowed to do, who authored which change, what state survives a session, what gets rolled back when something breaks. The framework supplies the vocabulary for those answers.
 
-So what does this mean? HAS-D gives you the vocabulary to design all three objects at once. [HCI](https://en.wikipedia.org/wiki/Human%E2%80%93computer_interaction) still runs the human edge. The interface work happening across the agent-UX conversation runs the human-agent edge. HAS-D runs the system edge, and the seams between all three.
+In practice, the web takes shape in stages. Most designers and PMs will recognize at least one of these. Developers live here already.
 
-You reach for it when your agent product feels broken at the foundation. The ground everything else is standing on.
+**A model and a chat window.** Useful. Most readers are here today. You write something. The model writes back. The model is good. The system is the Internet, assumed and unreviewed. There is nothing for the framework to design at this layer. Stay here for what it is good for: drafts, research, brainstorming. Do not build a product on it.
+
+**A model, an agent, and a set of skills.** Open Cursor. Add an `AGENTS.md` file. The agent has a specification. Add skills. The agent has a library of capabilities. The model is still the model. The system is small. It is also visible. Three pieces sitting next to each other: model, agent definition, skills. The triad is small. It is real. The framework starts here.
+
+**A configured toolset for actual work.** This is where the framework earns its keep. At Atlassian my team is building agents that live inside the work. Code review agents that read the diff. Planning agents that read the roadmap. Jira agents that read and write the tickets. Each agent has a yaml specification. Each is wired to a system: MCP connections to the code host, to Jira, to Confluence, to Sentry, to internal tooling. Skills sit on top. Agent instructions sit on top of those. Agents run in parallel. The system holds state across sessions. Nothing falls on the floor between conversations because there is a designed surface holding the work.
+
+This is not a chat product with extra features. It is a system product with multiple interfaces, one of which happens to be conversational.
+
+That is the difference HAS-Design names.
+
+## Five signs you are stuck in the chat trap
+
+If you are shipping or trying to ship an agent product and it feels stuck, check it against these. Each one is a system-layer failure. The model is not the problem.
+
+### The product is a chat window with ambition.
+
+A human, a model, a text box, and a roadmap that depends on the conversation outlasting the conversation. State dies when the session ends. Decisions made in chat never wrote to a record. The product is a transcript with a logo on it.
+
+### Wrong agent for the job.
+
+The system handed the agent work it was not specified for. A general-chat agent assigned to write production code. A code-generation agent assigned to produce UI inside a screen design tool. The model is fine. The agent specification does not match the work. That is a system-layer mismatch, not a model failure.
+
+### System defined as the console.
+
+The team says the system is Cursor, or Conductor, or the IDE. Those are consoles. The system is what the consoles reach into: the skills, the MCPs, the repositories, the services. If nobody on the team can list those nodes, the system has not been designed. It has been assumed.
+
+### Architecture by accident.
+
+Skills installed by default and never reviewed. MCP connections inherited from a tutorial. Permissions granted once and forgotten. Authentications still live for services no one is using. The web exists. Nobody drew it. The system is doing work nobody specified.
+
+### State that dies with the session.
+
+Work the agent did that nobody can find tomorrow. Audit gaps. Actions with no rollback. Things falling on the floor between sessions. The system is not holding state because there is no system holding state.
+
+If you recognized your product in any of these, the work is at the system layer. Not the prompt. Not the interface. The system.
 
 ## Where to start
 
-Draw your triad. Write down the human touchpoints. Write down the agent's action grammar. Then write down the system they both act on. All of it. The state machines. The event logs. The records. The rules. The audit surface. The rollback semantics. Everything that outlasts a session.
+You will not design a complete system on the first pass. Nobody does. The work starts with one project. One human. One agent. One slice of the system you can name today.
 
-Most teams discover two things when they do this.
+Pick a project you are about to start. Open the worksheet. Write down the human in the seat. Write down the agent and what you have specified for it to do. Write down the system: every skill, every MCP connection, every authentication, every service the agent will reach into. Draw the web.
 
-First: the system is underspecified.
+Look at what you wrote down. Most teams discover two things. The system was underspecified. The person who should have been designing it was nobody.
 
-Second: the person who should be designing it is nobody.
+If that sounds like you, the worksheet is where you start.
 
-HAS-D says that person is you.
-
-## References
-
-Latour, Bruno. *Reassembling the Social: An Introduction to Actor-Network Theory.* Oxford University Press, 2005. [https://global.oup.com/academic/product/reassembling-the-social-9780199256051](https://global.oup.com/academic/product/reassembling-the-social-9780199256051)
-
-**Further reading:** [Style Dictionary](https://styledictionary.com/) · [Human–computer interaction](https://en.wikipedia.org/wiki/Human%E2%80%93computer_interaction) · [Actor-network theory](https://en.wikipedia.org/wiki/Actor%E2%80%93network_theory)
+> **[PLACEHOLDER — PDF worksheet]**
+>
+> Downloadable PDF worksheet to help readers plan their first Human Agent System framework and project. Maps the human, the agent, and the system for one concrete project the reader is starting on. To be designed and attached.
