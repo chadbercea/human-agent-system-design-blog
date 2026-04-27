@@ -1071,21 +1071,3 @@ body.hero-hover .hud-corner.br::before { transform: translate(-56.57px, -56.57px
   .contact-send { font-size: 11px; padding: 0.9rem 1.5rem; }
 }
 
-/* Mono caps at large sizes wrap into ugly orphan stacks on narrow
-   phones — fall back to Lato display for the article title below 480px. */
-@media (max-width: 480px) {
-  .art-h1 {
-    font-family: var(--font-sans);
-    font-weight: 900;
-    text-transform: none;
-    letter-spacing: -0.03em;
-    max-width: none;
-  }
-  .post-card-title {
-    font-family: var(--font-sans);
-    font-weight: 900;
-    text-transform: none;
-    letter-spacing: -0.03em;
-    max-width: none;
-  }
-}
