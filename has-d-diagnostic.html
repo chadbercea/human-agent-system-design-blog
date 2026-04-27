@@ -41,6 +41,10 @@
 
 html, body { background: var(--paper); color: var(--ink); }
 
+/* Print-only nodes are hidden on screen. The matching screen-only nodes
+   are hidden under @media print further down. */
+.print-only { display: none; }
+
 body {
   font-family: var(--serif);
   font-size: 18px;
@@ -443,40 +447,296 @@ h1.title {
 }
 
 /* ─────────────────────────────────────────────
-   Print — collapse track, render selected copy
-   as a static printout. Hide buttons.
+   Print — designed PDF artifact. The user's
+   slider state on the live page is mirrored
+   into a static, single-(or two-)page layout.
    ───────────────────────────────────────────── */
-@media print {
-  :root { --paper: #ffffff; --paper-line: transparent; }
-  body { background: #fff; background-image: none; }
-  .page { max-width: 100%; padding: 24px; }
-  .actions, .range, .ticks, .track-labels { display: none !important; }
-  .track-wrap { padding: 0; }
-  .slider-block { page-break-inside: avoid; padding: 16px 0; }
-  .copy-card {
-    margin-top: 8px;
-    border-color: #1a1a1a;
-    box-shadow: none !important;
-    animation: none !important;
-    border-color: var(--hairline) !important;
+@page {
+  size: auto;
+  margin: 0.5in 0.55in 0.6in;
+
+  @bottom-left {
+    content: "humanagentsystem.design";
+    font-family: "IBM Plex Mono", "Courier New", monospace;
+    font-size: 8.5pt;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6b6660;
   }
-  .copy-card::before {
-    content: "Selected: tick " attr(data-tick) " of 5";
-    display: block;
+  @bottom-center {
+    content: "Companion to \201CWe\2019re Assuming the System\201D";
+    font-family: "IBM Plex Mono", "Courier New", monospace;
+    font-size: 8.5pt;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b6660;
+  }
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font-family: "IBM Plex Mono", "Courier New", monospace;
+    font-size: 8.5pt;
+    letter-spacing: 0.08em;
+    color: #6b6660;
+  }
+}
+
+@media print {
+  /* Force light background regardless of system theme */
+  :root {
+    color-scheme: light;
+    --paper: #ffffff;
+    --paper-line: transparent;
+    --ink: #1a1a1a;
+    --ink-soft: #2a2a2a;
+    --muted: #6b6660;
+    --hairline: #1a1a1a;
+    --hairline-soft: #c8c0b0;
+  }
+
+  html, body {
+    background: #ffffff;
+    color: #1a1a1a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body { background-image: none; font-size: 10.5pt; line-height: 1.45; }
+
+  /* Page shell — let the @page margins handle the bleed */
+  .page { max-width: 100%; margin: 0; padding: 0; }
+
+  /* Hide everything that is interactive or screen-only */
+  header,
+  .actions,
+  .colophon,
+  .diagnosis,
+  .slider-block .slider-head,
+  .slider-block .track-wrap,
+  .copy-card { display: none !important; }
+
+  /* Reveal the print-only render */
+  .print-only { display: block; }
+
+  /* ─── Print header (page 1 only) ─── */
+  .print-header {
+    border-bottom: 1px solid #1a1a1a;
+    padding-bottom: 10pt;
+    margin-bottom: 12pt;
+  }
+  .print-eyebrow {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 8pt;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #6b6660;
+    margin-bottom: 8pt;
+  }
+  .print-title {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 22pt;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin-bottom: 4pt;
+  }
+  .print-score-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18pt;
+    margin-top: 6pt;
+  }
+  .print-score {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 44pt;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: #1a1a1a;
+    flex: 0 0 auto;
+  }
+  .print-score .of {
+    font-size: 16pt;
+    color: #6b6660;
+    margin-left: 4pt;
+    letter-spacing: 0;
+  }
+  .print-diag {
+    flex: 1;
+    text-align: right;
+  }
+  .print-diag-headline {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 14pt;
+    line-height: 1.2;
+    color: #1a1a1a;
+    margin-bottom: 4pt;
+  }
+  .print-diag-sub {
+    font-family: var(--mono);
+    font-size: 8pt;
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: #6b6660;
+    max-width: 38ch;
+    margin-left: auto;
+  }
+
+  /* ─── Slider sections ─── */
+  .slider-block {
+    border: none !important;
+    padding: 5pt 0 !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    border-top: 0.5pt solid #c8c0b0 !important;
+  }
+  .slider-block:first-of-type { border-top: 0.5pt solid #1a1a1a !important; }
+
+  .print-slider {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4pt;
+  }
+  .print-slider-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12pt;
+  }
+  .print-slider-num {
+    font-family: var(--mono);
+    font-size: 8pt;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #6b6660;
+    white-space: nowrap;
+  }
+  .print-slider-name {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 14pt;
+    line-height: 1.15;
+    letter-spacing: -0.005em;
+    flex: 1;
+  }
+  .print-slider-sign {
+    font-family: var(--mono);
+    font-size: 7.5pt;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b6660;
+    white-space: nowrap;
+  }
+
+  /* Static track */
+  .print-track {
+    position: relative;
+    height: 18pt;
+    margin: 4pt 0 2pt;
+  }
+  .print-track-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 4pt;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    border: 0.5pt solid #1a1a1a;
+    background: linear-gradient(
+      to right,
+      #c0392b 0%,
+      #d4a017 25%,
+      #9a9a9a 50%,
+      #6db89c 75%,
+      #2e7d50 100%
+    );
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print-track-tick {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 11pt;
+    height: 11pt;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 0.75pt solid #1a1a1a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* Selected tick — filled with the gradient stop color, plus a heavier
+     ring so the choice survives B&W printing where color is gone. */
+  .print-track-tick[data-active="true"] {
+    width: 14pt;
+    height: 14pt;
+    border-width: 1.5pt;
+    box-shadow: 0 0 0 1.5pt #ffffff inset;
+  }
+  .print-track-tick[data-active="true"][data-n="1"] { background: #c0392b; }
+  .print-track-tick[data-active="true"][data-n="2"] { background: #d4a017; }
+  .print-track-tick[data-active="true"][data-n="3"] { background: #9a9a9a; }
+  .print-track-tick[data-active="true"][data-n="4"] { background: #6db89c; }
+  .print-track-tick[data-active="true"][data-n="5"] { background: #2e7d50; }
+
+  .print-track-numbers {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: -10pt;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 7pt;
+    letter-spacing: 0.1em;
+    color: #6b6660;
+  }
+  .print-track-numbers span[data-active="true"] {
+    color: #1a1a1a;
+    font-weight: 600;
+  }
+
+  .print-tick-label {
+    margin-top: 8pt;
+    font-family: var(--mono);
+    font-size: 7.5pt;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: #6b6660;
-    margin-bottom: 8px;
   }
-  .diagnosis { border-top: 2px solid #1a1a1a; }
-  .colophon { display: none; }
+  .print-copy {
+    font-family: var(--serif);
+    font-size: 10pt;
+    line-height: 1.4;
+    color: #1a1a1a;
+    margin-top: 2pt;
+    max-width: 64ch;
+  }
+
 }
 </style>
 </head>
 <body>
 <main class="page">
+
+  <section class="print-only print-header" aria-hidden="true">
+    <div class="print-eyebrow">
+      <span>HAS-D Diagnostic / Form 001</span>
+      <span id="print-date">—</span>
+    </div>
+    <h1 class="print-title">The HAS-D Diagnostic</h1>
+    <div class="print-score-row">
+      <p class="print-score" id="print-score">15<span class="of">/ 25</span></p>
+      <div class="print-diag">
+        <p class="print-diag-headline" id="print-diag-headline">Halfway out of the chat trap.</p>
+        <p class="print-diag-sub" id="print-diag-sub">Some of the system is real. Some of it is still vibes.</p>
+      </div>
+    </div>
+  </section>
 
   <header>
     <div class="form-id">
@@ -512,7 +772,7 @@ h1.title {
 
   <div class="actions">
     <button type="button" class="btn" id="btn-reset">Reset</button>
-    <button type="button" class="btn btn-primary" id="btn-print">Print</button>
+    <button type="button" class="btn btn-primary" id="btn-print">Print / Save PDF</button>
   </div>
 
   <p class="colophon">
@@ -608,6 +868,10 @@ function buildBlock(idx) {
   const inputId = `slider-${idx}`;
   const copyId = `copy-${idx}`;
 
+  const printCopyId = `print-copy-${idx}`;
+  const printTickLabelId = `print-tick-label-${idx}`;
+  const printTrackId = `print-track-${idx}`;
+
   block.innerHTML = `
     <div class="slider-head">
       <div>
@@ -645,11 +909,41 @@ function buildBlock(idx) {
     <div class="copy-card" id="${copyId}" data-tick="3" aria-live="polite">
       ${data.copy[2]}
     </div>
+
+    <div class="print-only print-slider" aria-hidden="true">
+      <div class="print-slider-head">
+        <span class="print-slider-num">${pad(idx + 1)} / 05</span>
+        <span class="print-slider-name">${data.name}</span>
+        <span class="print-slider-sign">Sign ${pad(idx + 1)} / ${data.sign}</span>
+      </div>
+      <div class="print-track" id="${printTrackId}">
+        <div class="print-track-line"></div>
+        ${[1,2,3,4,5].map(n => {
+          const pct = ((n - 1) / 4) * 100;
+          return `<div class="print-track-tick" data-n="${n}" style="left:${pct}%"></div>`;
+        }).join("")}
+        <div class="print-track-numbers">
+          ${[1,2,3,4,5].map(n => `<span data-n="${n}">${n}</span>`).join("")}
+        </div>
+      </div>
+      <p class="print-tick-label" id="${printTickLabelId}">Selected: tick 3 of 5 — ${TRACK_LABELS[1]}</p>
+      <p class="print-copy" id="${printCopyId}">${data.copy[2]}</p>
+    </div>
   `;
 
   const input = block.querySelector(".range");
   const card  = block.querySelector(".copy-card");
   const ticks = block.querySelectorAll(".tick");
+  const printTicks = block.querySelectorAll(".print-track-tick");
+  const printTickNums = block.querySelectorAll(".print-track-numbers span");
+  const printCopy = block.querySelector(`#${printCopyId}`);
+  const printTickLabel = block.querySelector(`#${printTickLabelId}`);
+
+  function tickLabelFor(v) {
+    if (v <= 2) return TRACK_LABELS[0];
+    if (v === 3) return TRACK_LABELS[1];
+    return TRACK_LABELS[2];
+  }
 
   function applyTick(value) {
     const v = parseInt(value, 10);
@@ -663,6 +957,15 @@ function buildBlock(idx) {
     ticks.forEach(t => {
       t.dataset.active = t.dataset.n === String(v) ? "true" : "false";
     });
+
+    printTicks.forEach(t => {
+      t.dataset.active = t.dataset.n === String(v) ? "true" : "false";
+    });
+    printTickNums.forEach(s => {
+      s.dataset.active = s.dataset.n === String(v) ? "true" : "false";
+    });
+    printCopy.textContent = data.copy[v - 1];
+    printTickLabel.textContent = `Selected: tick ${v} of 5 — ${tickLabelFor(v)}`;
 
     input.setAttribute("aria-valuetext", `Tick ${v} of 5: ${data.copy[v - 1]}`);
     updateScore();
@@ -690,7 +993,36 @@ function updateScore() {
     `${total}<span class="of">/ 25</span>`;
   document.getElementById("diagnosis-headline").textContent = out.headline;
   document.getElementById("diagnosis-sub").textContent = out.sub;
+
+  document.getElementById("print-score").innerHTML =
+    `${total}<span class="of">/ 25</span>`;
+  document.getElementById("print-diag-headline").textContent = out.headline;
+  document.getElementById("print-diag-sub").textContent = out.sub;
 }
+
+function isoDate() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+const ORIGINAL_TITLE = document.title;
+function preparePrintTitle() {
+  const stamp = isoDate();
+  document.getElementById("print-date").textContent = stamp;
+  document.title = `HAS-D Diagnostic — Score ${currentScore()} of 25 — ${stamp}`;
+}
+function restorePrintTitle() {
+  document.title = ORIGINAL_TITLE;
+}
+window.addEventListener("beforeprint", preparePrintTitle);
+window.addEventListener("afterprint", restorePrintTitle);
+
+// Prime the date stamp on load so a screen-emulated print preview also
+// renders the current date even before the print dialog opens.
+document.getElementById("print-date").textContent = isoDate();
 
 function reset() {
   for (let i = 0; i < SLIDERS.length; i++) {
@@ -703,7 +1035,10 @@ function reset() {
 for (let i = 0; i < SLIDERS.length; i++) buildBlock(i);
 
 document.getElementById("btn-reset").addEventListener("click", reset);
-document.getElementById("btn-print").addEventListener("click", () => window.print());
+document.getElementById("btn-print").addEventListener("click", () => {
+  preparePrintTitle();
+  window.print();
+});
 </script>
 </body>
 </html>
