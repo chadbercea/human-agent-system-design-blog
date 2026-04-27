@@ -80,28 +80,36 @@ const siteDescription = featured?.data.description
         </div>
 
         <div class="hud-corner tl">
-          <strong>OBS // SITE</strong>
-          42.56&deg;N &middot; 114.46&deg;W<br />
-          <span class="dim">TWIN FALLS / IDAHO</span><br />
-          <span id="hud-t">T+00:00:00</span>
+          <span class="hud-corner-text">
+            <strong>OBS // SITE</strong>
+            42.56&deg;N &middot; 114.46&deg;W<br />
+            <span class="dim">TWIN FALLS / IDAHO</span><br />
+            <span id="hud-t">T+00:00:00</span>
+          </span>
         </div>
         <div class="hud-corner tr">
-          <strong>INDEX // LIVE</strong>
-          ENTRIES <span id="hud-entries" data-target={articles.length}>{entryCount}</span><br />
-          UPD {lastUpdated}<br />
-          <span class="dim">CH 01 / DISPATCH</span>
+          <span class="hud-corner-text">
+            <strong>INDEX // LIVE</strong>
+            ENTRIES <span id="hud-entries" data-target={articles.length}>{entryCount}</span><br />
+            UPD {lastUpdated}<br />
+            <span class="dim">CH 01 / DISPATCH</span>
+          </span>
         </div>
         <div class="hud-corner bl">
-          <strong>STATUS // LINK</strong>
-          AGENT-01 &nbsp; ONLINE<br />
-          OPERATOR &nbsp; LINKED<br />
-          <span class="dim">HANDSHAKE &middot; OK</span>
+          <span class="hud-corner-text">
+            <strong>STATUS // LINK</strong>
+            AGENT-01 &nbsp; ONLINE<br />
+            OPERATOR &nbsp; LINKED<br />
+            <span class="dim">HANDSHAKE &middot; OK</span>
+          </span>
         </div>
         <div class="hud-corner br">
-          <strong>BUILD // META</strong>
-          REV 01.00<br />
-          HASH <span id="hud-hash" data-target="9F2A-8C1D">9F2A-8C1D</span><br />
-          <span class="dim">GAMMA &middot; sRGB</span>
+          <span class="hud-corner-text">
+            <strong>BUILD // META</strong>
+            REV 01.00<br />
+            HASH <span id="hud-hash" data-target="9F2A-8C1D">9F2A-8C1D</span><br />
+            <span class="dim">GAMMA &middot; sRGB</span>
+          </span>
         </div>
       </div>
       <button class="back-btn" id="back-btn" aria-label="Back to articles">
@@ -309,6 +317,76 @@ const siteDescription = featured?.data.description
             }
           }
         }
+      })();
+    </script>
+
+    <script is:inline data-astro-rerun>
+      // ILI-756 — desktop hero hover: cursor-driven parallax tilt on the
+      // logo + viewport grid, hero text fade, corner-bracket pull-in.
+      // Sets `--hero-cx` / `--hero-cy` (-1..1) on body and toggles
+      // `body.hero-hover`. CSS rules in homepage.css consume both.
+      (function () {
+        var heroCol = document.querySelector('.col-hero');
+        var stage = document.getElementById('stage');
+        if (!heroCol || !stage) return;
+
+        var desktop = window.matchMedia('(min-width: 901px) and (hover: hover) and (pointer: fine)');
+        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+        var rafId = 0;
+        var nx = 0, ny = 0;
+
+        function flush() {
+          rafId = 0;
+          document.body.style.setProperty('--hero-cx', nx.toFixed(3));
+          document.body.style.setProperty('--hero-cy', ny.toFixed(3));
+        }
+
+        function schedule() {
+          if (!rafId) rafId = requestAnimationFrame(flush);
+        }
+
+        function eligible() {
+          return desktop.matches && !reduced.matches && !stage.classList.contains('open');
+        }
+
+        function onMove(e) {
+          if (!eligible()) return;
+          var rect = heroCol.getBoundingClientRect();
+          if (rect.width <= 0 || rect.height <= 0) return;
+          var x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          var y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+          nx = x < -1 ? -1 : x > 1 ? 1 : x;
+          ny = y < -1 ? -1 : y > 1 ? 1 : y;
+          schedule();
+        }
+
+        function onEnter() {
+          if (!eligible()) return;
+          document.body.classList.add('hero-hover');
+        }
+
+        function reset() {
+          document.body.classList.remove('hero-hover');
+          nx = 0; ny = 0;
+          schedule();
+        }
+
+        heroCol.addEventListener('mouseenter', onEnter);
+        heroCol.addEventListener('mousemove', onMove);
+        heroCol.addEventListener('mouseleave', reset);
+
+        // Tear down if the viewport drops below the desktop breakpoint or
+        // reduced-motion turns on mid-session, and when the article reader
+        // opens (the hero collapses to an 80px back column).
+        function onGuardChange() { if (!eligible()) reset(); }
+        desktop.addEventListener('change', onGuardChange);
+        reduced.addEventListener('change', onGuardChange);
+
+        var stageObserver = new MutationObserver(function () {
+          if (stage.classList.contains('open')) reset();
+        });
+        stageObserver.observe(stage, { attributes: true, attributeFilter: ['class'] });
       })();
     </script>
 
