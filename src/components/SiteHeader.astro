@@ -1,33 +1,9 @@
 ---
-import { execSync } from 'node:child_process';
-
 interface Props {
   activeNav?: 'articles' | 'glossary' | 'design-system' | 'about' | 'contact';
-  siteName?: string;
-  channelId?: string;
 }
 
-const {
-  activeNav = 'articles',
-  siteName = 'DESIGN',
-  channelId = '01',
-} = Astro.props;
-
-const now = new Date();
-const buildStr = `${now.getUTCFullYear()}.${String(now.getUTCMonth() + 1).padStart(2, '0')}.${String(now.getUTCDate()).padStart(2, '0')}`;
-
-let hashStr = '0000-0000';
-try {
-  const sha = execSync('git rev-parse --short=8 HEAD', { stdio: ['ignore', 'pipe', 'ignore'] })
-    .toString()
-    .trim()
-    .toUpperCase();
-  if (/^[0-9A-F]{8}$/.test(sha)) {
-    hashStr = `${sha.slice(0, 4)}-${sha.slice(4)}`;
-  }
-} catch {
-  /* no git — fall back to placeholder */
-}
+const { activeNav = 'articles' } = Astro.props;
 ---
 <header class="site-header">
   <div class="sh-mark">
@@ -43,7 +19,7 @@ try {
       </div>
     </a>
     <span class="sh-dot" aria-hidden="true"></span>
-    <span class="sh-name">HAS / {siteName}</span>
+    <span class="sh-name">ONLINE</span>
   </div>
 
   <nav class="nav">
@@ -53,13 +29,6 @@ try {
     <a href="/about" aria-current={activeNav === 'about' ? 'page' : undefined}>About</a>
     <a href="/contact" aria-current={activeNav === 'contact' ? 'page' : undefined}>Contact</a>
   </nav>
-
-  <div class="sh-telemetry">
-    <div class="kv"><span class="k">REV</span><span class="v">01.00</span></div>
-    <div class="kv"><span class="k">BUILD</span><span class="v">{buildStr}</span></div>
-    <div class="kv kv-hash"><span class="k">HASH</span><span class="v">{hashStr}</span></div>
-    <div class="kv"><span class="k">CH</span><span class="v" data-channel-value="header">{channelId}</span></div>
-  </div>
 
   <button class="sh-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="sh-drawer" data-sh-burger>
     <span class="sh-burger-line"></span>
@@ -271,7 +240,7 @@ try {
     top: 0;
     z-index: 100;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr;
     align-items: center;
     gap: 32px;
     height: var(--header-h);
@@ -326,10 +295,10 @@ try {
   }
 
   .site-header .sh-name {
-    color: var(--white);
+    color: var(--mid);
     font-family: var(--font-mono);
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 300;
     letter-spacing: 0.3em;
     text-transform: uppercase;
     white-space: nowrap;
@@ -338,7 +307,7 @@ try {
   .site-header .nav {
     display: flex;
     gap: 2rem;
-    justify-self: center;
+    justify-self: end;
   }
   .site-header .nav a {
     font-family: var(--font-mono);
@@ -366,33 +335,8 @@ try {
     outline: none;
   }
 
-  .site-header .sh-telemetry {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    justify-self: end;
-  }
-  .site-header .kv {
-    display: flex;
-    gap: 8px;
-    align-items: baseline;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-  .site-header .kv .k { color: var(--dim); }
-  .site-header .kv .v { color: var(--white); }
-
-  @media (max-width: 1280px) {
-    .site-header .kv-hash { display: none; }
-  }
-
   @media (max-width: 1100px) {
     .site-header { gap: 16px; padding: 0 1.5rem; }
-    .site-header .sh-telemetry { gap: 16px; }
     .site-header .nav { gap: 1.25rem; }
   }
 
@@ -598,11 +542,9 @@ try {
 
   @media (max-width: 900px) {
     .site-header {
-      grid-template-columns: auto 1fr auto;
       gap: 12px;
       padding: 0 1.25rem;
     }
-    .site-header .sh-telemetry { display: none; }
     .site-header .nav { display: none; }
     .site-header .sh-burger { display: block; }
     .site-header .sh-name { font-size: 10px; letter-spacing: 0.2em; }
