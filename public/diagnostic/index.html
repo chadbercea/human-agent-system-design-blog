@@ -564,7 +564,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .share-card .wordmark-zone {
   text-align: center;
-  margin: 96px 0 0;
+  margin: 24px 0 0;
 }
 .share-card .wordmark-bbox {
   width: 745px;
@@ -600,12 +600,12 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   margin: 8px auto 0;
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
-  font-size: 44px;
+  font-size: 50px;
   line-height: 1;
   text-transform: uppercase;
-  text-align: justify;
-  text-align-last: justify;
-  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .share-card .mid {
@@ -613,7 +613,14 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   grid-template-columns: 200px 1fr;
   gap: 32px;
   padding: 0 32px;
-  margin-top: 96px;
+  margin-top: 24px;
+  align-items: stretch;
+}
+
+.share-card .left-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .share-card .signal-stack {
@@ -631,8 +638,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   top: 50%;
   left: 0;
   right: 0;
-  height: 1px;
-  background: #c0c0c0;
+  height: 2px;
+  background: #808080;
   transform: translateY(-50%);
 }
 .share-card .sc-slider-thumb {
@@ -643,6 +650,29 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   background: #fff;
   border-radius: 50%;
   transform: translate(-50%, -50%);
+}
+
+.share-card .vertical-wrapper {
+  flex: 1;
+  min-height: 0;
+  container-type: size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 32px;
+}
+.share-card .vertical-label {
+  writing-mode: vertical-rl;
+  text-orientation: sideways;
+  -webkit-text-orientation: sideways;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 14cqh;
+  line-height: 1;
+  color: #fff;
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: 0;
 }
 
 .share-card .diagnosis {
@@ -875,12 +905,18 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
       </div>
 
       <div class="mid">
-        <div class="signal-stack" id="sc-signal-stack">
-          <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
-          <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
-          <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
-          <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
-          <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
+        <div class="left-col">
+          <div class="signal-stack" id="sc-signal-stack">
+            <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
+            <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
+            <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
+            <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
+            <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
+          </div>
+
+          <div class="vertical-wrapper">
+            <div class="vertical-label">DIAGNOSTIC</div>
+          </div>
         </div>
 
         <div>
