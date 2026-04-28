@@ -128,6 +128,11 @@ const title = `HAS Design${pageSuffix}`;
           <span>Back</span>
         </span>
       </button>
+      <div class="hero-tooltip" id="hero-tooltip" aria-hidden="true">
+        <span class="hero-tooltip-line">&gt; VISITOR ACQUIRED</span>
+        <span class="hero-tooltip-line">&gt; TELEMETRY NOMINAL</span>
+        <span class="hero-tooltip-line">&gt; ARCHIVE STANDING BY</span>
+      </div>
     </div>
     <div class="col col-list">
       <span class="list-label">Published Articles</span>
@@ -349,70 +354,116 @@ const title = `HAS Design${pageSuffix}`;
     </script>
 
     <script is:inline data-astro-rerun>
-      // ILI-756 — desktop hero hover: cursor-driven parallax tilt on the
-      // logo + viewport grid, hero text fade, corner-bracket pull-in.
-      // Sets `--hero-cx` / `--hero-cy` (-1..1) on body and toggles
-      // `body.hero-hover`. CSS rules in homepage.css consume both.
+      // ILI-776 — hero hover: corner-shift "lock on" + mouse-following
+      // welcome tooltip. Toggles `body.hero-hover` (CSS shifts the four
+      // corners inward as a unit) and translates `#hero-tooltip` to
+      // trail the cursor with a small offset, flipping against the
+      // viewport edges. Touch and reduced-motion paths short-circuit
+      // the cursor logic.
       (function () {
         var heroCol = document.querySelector('.col-hero');
         var stage = document.getElementById('stage');
-        if (!heroCol || !stage) return;
+        var tooltip = document.getElementById('hero-tooltip');
+        if (!heroCol || !stage || !tooltip) return;
 
         var desktop = window.matchMedia('(min-width: 901px) and (hover: hover) and (pointer: fine)');
         var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+        var touch = window.matchMedia('(hover: none), (pointer: coarse)');
+
+        if (touch.matches) {
+          // No hover anchor on touch — pin the readout to the hero corner.
+          tooltip.classList.add('hero-tooltip--static', 'is-visible');
+          return;
+        }
 
         var rafId = 0;
-        var nx = 0, ny = 0;
+        var targetX = 0, targetY = 0;
+        var currentX = 0, currentY = 0;
+        var hasFrame = false;
+        var inside = false;
 
-        function flush() {
+        function eligible() {
+          return desktop.matches && !stage.classList.contains('open');
+        }
+
+        function setStaticPosition() {
+          tooltip.style.transform = '';
+        }
+
+        function tick() {
           rafId = 0;
-          document.body.style.setProperty('--hero-cx', nx.toFixed(3));
-          document.body.style.setProperty('--hero-cy', ny.toFixed(3));
+          if (hasFrame) {
+            currentX += (targetX - currentX) * 0.32;
+            currentY += (targetY - currentY) * 0.32;
+          } else {
+            currentX = targetX;
+            currentY = targetY;
+            hasFrame = true;
+          }
+          tooltip.style.transform =
+            'translate3d(' + currentX.toFixed(1) + 'px,' + currentY.toFixed(1) + 'px,0)';
+          if (Math.abs(targetX - currentX) > 0.4 || Math.abs(targetY - currentY) > 0.4) {
+            rafId = requestAnimationFrame(tick);
+          }
         }
 
         function schedule() {
-          if (!rafId) rafId = requestAnimationFrame(flush);
-        }
-
-        function eligible() {
-          return desktop.matches && !reduced.matches && !stage.classList.contains('open');
-        }
-
-        function onMove(e) {
-          if (!eligible()) return;
-          var rect = heroCol.getBoundingClientRect();
-          if (rect.width <= 0 || rect.height <= 0) return;
-          var x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-          var y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-          nx = x < -1 ? -1 : x > 1 ? 1 : x;
-          ny = y < -1 ? -1 : y > 1 ? 1 : y;
-          schedule();
+          if (!rafId) rafId = requestAnimationFrame(tick);
         }
 
         function onEnter() {
           if (!eligible()) return;
+          inside = true;
           document.body.classList.add('hero-hover');
+          tooltip.classList.add('is-visible');
+          if (reduced.matches) {
+            tooltip.classList.add('hero-tooltip--pinned');
+            setStaticPosition();
+          }
         }
 
-        function reset() {
+        function onLeave() {
+          inside = false;
           document.body.classList.remove('hero-hover');
-          nx = 0; ny = 0;
+          tooltip.classList.remove('is-visible', 'hero-tooltip--pinned');
+          hasFrame = false;
+          if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+        }
+
+        function onMove(e) {
+          if (!eligible() || !inside || reduced.matches) return;
+          var rect = heroCol.getBoundingClientRect();
+          if (rect.width <= 0 || rect.height <= 0) return;
+          var cx = e.clientX - rect.left;
+          var cy = e.clientY - rect.top;
+          var ttW = tooltip.offsetWidth;
+          var ttH = tooltip.offsetHeight;
+          var pad = 8;
+          var offX = 16;
+          var offY = 20;
+          var px = cx + offX;
+          var py = cy + offY;
+          if (px + ttW > rect.width - pad) px = cx - ttW - offX;
+          if (py + ttH > rect.height - pad) py = cy - ttH - offY;
+          if (px < pad) px = pad;
+          if (py < pad) py = pad;
+          targetX = px;
+          targetY = py;
           schedule();
         }
 
         heroCol.addEventListener('mouseenter', onEnter);
+        heroCol.addEventListener('mouseleave', onLeave);
         heroCol.addEventListener('mousemove', onMove);
-        heroCol.addEventListener('mouseleave', reset);
 
-        // Tear down if the viewport drops below the desktop breakpoint or
-        // reduced-motion turns on mid-session, and when the article reader
-        // opens (the hero collapses to an 80px back column).
-        function onGuardChange() { if (!eligible()) reset(); }
+        function onGuardChange() {
+          if (!eligible()) onLeave();
+        }
         desktop.addEventListener('change', onGuardChange);
         reduced.addEventListener('change', onGuardChange);
 
         var stageObserver = new MutationObserver(function () {
-          if (stage.classList.contains('open')) reset();
+          if (stage.classList.contains('open')) onLeave();
         });
         stageObserver.observe(stage, { attributes: true, attributeFilter: ['class'] });
       })();
