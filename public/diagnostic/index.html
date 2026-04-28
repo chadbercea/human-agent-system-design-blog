@@ -9,7 +9,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" />
 
 <style>
 :root {
@@ -52,33 +52,33 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .panel-head {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 24px;
   padding-bottom: 16px;
   margin-bottom: 40px;
   border-bottom: 1px solid var(--rule);
 }
-.panel-head .id    { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.3em; color: var(--white); text-transform: uppercase; }
-.panel-head .title { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.4em; color: var(--mid);   text-transform: uppercase; }
-.panel-head .meta  { font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.3em; color: var(--dim);   text-transform: uppercase; }
+.panel-head .title { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.4em; color: var(--mid); text-transform: uppercase; }
+.panel-head .meta  { font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.3em; color: var(--dim); text-transform: uppercase; }
 
 /* ── Title + help ────────────────────────────────────── */
 .diag-title {
-  font-family: var(--font-sans);
-  font-weight: 900;
-  font-size: clamp(36px, 5vw, 64px);
-  line-height: 1.0;
-  letter-spacing: -0.04em;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: clamp(30px, 4.2vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
   color: var(--white);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .diag-help {
   font-family: var(--font-sans);
   font-weight: 300;
-  font-size: clamp(16px, 1.4vw, 19px);
-  line-height: 1.5;
+  font-size: clamp(26px, 2.1vw, 28px);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
   color: var(--light);
   margin-bottom: 56px;
 }
@@ -87,60 +87,75 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .sliders { display: flex; flex-direction: column; gap: 0; }
 
 .slider {
-  padding: 28px 0 32px;
+  padding: 18px 0 16px;
   border-top: 1px solid var(--rule);
 }
 .slider:last-child { border-bottom: 1px solid var(--rule); }
 
 .slider-head {
   display: flex;
-  align-items: baseline;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-.slider-id {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  color: var(--dim);
-  text-transform: uppercase;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 14px;
 }
 .slider-label {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: clamp(20px, 2vw, 24px);
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: clamp(22px, 2.2vw, 28px);
+  line-height: 1.0;
+  letter-spacing: 0.01em;
   color: var(--white);
+  text-transform: uppercase;
+}
+.slider-prompt {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: clamp(26px, 2.1vw, 28px);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--light);
 }
 
 .slider-track {
   position: relative;
   width: 100%;
+  height: 20px;
 }
 
-.segments {
-  display: block;
-  width: 100%;
-  height: 56px;
+.slider-vis {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-.segments .seg {
-  fill: transparent;
-  stroke: var(--white);
-  stroke-width: 1.5;
-  cursor: pointer;
-  transition: fill 120ms linear;
+.slider-rail {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--white);
+  transform: translateY(-50%);
 }
-.segments .seg[data-active="true"] {
-  fill: var(--white);
+
+.slider-tick {
+  position: absolute;
+  top: 50%;
+  width: 1px;
+  height: 6px;
+  background: var(--white);
+  transform: translate(-50%, -50%);
 }
-.segments .seg:hover {
-  fill: var(--rule-strong);
-}
-.segments .seg[data-active="true"]:hover {
-  fill: var(--white);
+
+.slider-thumb {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 20px;
+  background: var(--white);
+  clip-path: polygon(12.5% 0, 87.5% 0, 100% 50%, 87.5% 100%, 12.5% 100%, 0 50%);
+  transform: translate(-50%, -50%);
+  transition: left 120ms ease-out, box-shadow 120ms linear;
 }
 
 .slider-input {
@@ -153,62 +168,81 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   opacity: 0;
   cursor: pointer;
   z-index: 2;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
 }
-.slider-input:focus-visible + .segments .seg[data-active="true"] {
-  stroke: var(--white);
-  stroke-width: 2.5;
+.slider-input:focus-visible {
+  outline: none;
+}
+.slider-input:focus-visible ~ .slider-vis .slider-thumb {
+  box-shadow: 0 0 0 2px var(--bg-canvas), 0 0 0 4px var(--white);
 }
 
 .segment-numbers {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  margin-top: 8px;
+  position: relative;
+  display: block;
+  margin-top: 4px;
+  height: 12px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 500;
   letter-spacing: 0.25em;
   color: var(--dim);
   text-transform: uppercase;
 }
 .segment-numbers span {
-  text-align: center;
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  cursor: pointer;
 }
 .segment-numbers span[data-active="true"] {
   color: var(--white);
   font-weight: 600;
 }
 
+/* ── Two-column layout (sliders | diagnosis) ─────────── */
+.diag-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  margin-bottom: 48px;
+}
+.diag-grid > .sliders        { grid-column: 1; grid-row: 1; min-width: 0; }
+.diag-grid > .paragraph-block { grid-column: 2; grid-row: 1; min-width: 0; }
+
 /* ── Paragraph readout ───────────────────────────────── */
 .paragraph-block {
-  margin-top: 56px;
-  padding: 24px 0 0;
-  border-top: 1px solid var(--rule-strong);
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
-.paragraph-eyebrow {
-  display: block;
+.diagnosis-title {
   font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.4em;
-  color: var(--mid);
-  text-transform: uppercase;
-  margin-bottom: 20px;
+  font-weight: 700;
+  font-size: clamp(40px, 5.5vw, 72px);
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: 28px;
 }
 .paragraph {
   font-family: var(--font-sans);
   font-weight: 300;
-  font-size: clamp(18px, 1.7vw, 22px);
-  line-height: 1.55;
-  letter-spacing: -0.01em;
+  font-size: clamp(20px, 2vw, 26px);
+  line-height: 1.4;
+  letter-spacing: -0.015em;
   color: var(--white);
 }
+.paragraph.paragraph--zero { color: var(--mid); }
 
 /* ── Actions ─────────────────────────────────────────── */
 .actions {
   display: flex;
   gap: 12px;
-  margin-top: 48px;
-  padding-top: 24px;
+  margin-top: 32px;
+  padding-top: 20px;
   border-top: 1px solid var(--rule);
 }
 
@@ -222,13 +256,19 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   border: 1px solid var(--white);
   background: transparent;
   color: var(--white);
-  transition: background 120ms linear, color 120ms linear;
+  transition: background 120ms linear, color 120ms linear, opacity 120ms linear;
 }
 .btn:hover  { background: var(--white); color: var(--black); }
 .btn:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
 
 .btn-primary { background: var(--white); color: var(--black); }
 .btn-primary:hover { background: transparent; color: var(--white); }
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 
 /* ── Footer chrome ───────────────────────────────────── */
 .diag-foot {
@@ -256,12 +296,22 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     gap: 6px;
     margin-bottom: 28px;
   }
-  .diag-title { font-size: 32px; }
-  .diag-help  { font-size: 16px; margin-bottom: 36px; }
-  .slider-head { flex-direction: column; gap: 4px; align-items: flex-start; }
-  .segments { height: 44px; }
-  .paragraph-block { margin-top: 36px; }
-  .paragraph { font-size: 17px; line-height: 1.55; }
+  .diag-title { font-size: 26px; }
+  .diag-help  { font-size: 22px; margin-bottom: 36px; }
+  .slider-head { gap: 4px; margin-bottom: 10px; }
+  .slider-label { font-size: 20px; }
+  .slider-prompt { font-size: 22px; }
+  .slider-track { height: 18px; }
+  .slider-thumb { width: 12px; height: 18px; }
+  .diag-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    margin-bottom: 32px;
+  }
+  .diag-grid > .sliders,
+  .diag-grid > .paragraph-block { grid-column: 1; grid-row: auto; }
+  .diagnosis-title { font-size: 44px; margin-bottom: 20px; }
+  .paragraph { font-size: 19px; line-height: 1.45; }
   .actions { flex-wrap: wrap; }
   .btn { flex: 1; min-width: 140px; }
   .diag-foot { font-size: 9px; gap: 12px; }
@@ -340,29 +390,29 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 <main>
   <section class="diag-panel">
     <div class="panel-head">
-      <span class="id">// 06</span>
       <span class="title">DIAGNOSTIC · HAS-D · LIVE READOUT</span>
       <span class="meta">5 SLIDERS · 5 SENTENCES</span>
     </div>
 
     <h1 class="diag-title">HAS-D Diagnostic</h1>
-    <p class="diag-help">Move each slider to where your product is today. The paragraph below updates as you go. Save your result when you're done.</p>
+    <p class="diag-help">Rate your agentic system on five dimensions. 1 means nothing in place. 5 means mature and intentional. The diagnosis updates as you slide. Save when you're done.</p>
 
-    <div class="sliders" id="sliders"></div>
+    <div class="diag-grid">
+      <div class="paragraph-block">
+        <h2 class="diagnosis-title">Diagnosis</h2>
+        <p class="paragraph" id="paragraph" aria-live="polite"></p>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btn-save" disabled>SAVE · PDF</button>
+          <button type="button" class="btn" id="btn-reset" disabled>RESET</button>
+        </div>
+      </div>
 
-    <div class="paragraph-block">
-      <span class="paragraph-eyebrow">// READOUT · PARAGRAPH</span>
-      <p class="paragraph" id="paragraph" aria-live="polite"></p>
-    </div>
-
-    <div class="actions">
-      <button type="button" class="btn btn-primary" id="btn-save">SAVE · PDF</button>
-      <button type="button" class="btn" id="btn-reset">RESET</button>
+      <div class="sliders" id="sliders"></div>
     </div>
 
     <div class="diag-foot">
-      <span><strong>HAS-D</strong> &middot; ILI-763</span>
-      <span>REV 02.00 &middot; HASH B763-04AF</span>
+      <span><strong>HAS-D</strong> &middot; ILI-764</span>
+      <span>REV 02.01 &middot; HASH B764-01AF</span>
       <span>HUMANAGENTSYSTEM.BLOG</span>
     </div>
   </section>
@@ -378,7 +428,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     <p class="print-paragraph" id="print-paragraph"></p>
     <div class="print-foot">
       <span>HUMANAGENTSYSTEM.BLOG</span>
-      <span>ILI-763</span>
+      <span>ILI-764</span>
     </div>
   </div>
 </section>
@@ -386,7 +436,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 <script>
 const SLIDERS = [
   {
-    label: "Chat Disease",
+    label: "CHAT STRATEGY",
+    prompt: "how thought-out is chat as a surface",
     sentences: [
       "You shipped a chat box, named it Quentin, and the board now calls Quentin “the AI strategy.”",
       "The product is mostly chat with three buttons floating in the corner that nobody can explain.",
@@ -396,7 +447,8 @@ const SLIDERS = [
     ]
   },
   {
-    label: "Agent Casting",
+    label: "AGENT DEFINITION",
+    prompt: "how clearly agents are cast",
     sentences: [
       "You have one agent named Steve and Steve writes code, designs UI, runs payroll, and is currently in therapy.",
       "You have several “helpful” agents and they take turns being wrong about different things.",
@@ -406,7 +458,8 @@ const SLIDERS = [
     ]
   },
   {
-    label: "System Self-Awareness",
+    label: "SYSTEM LEGIBILITY",
+    prompt: "can the team name the system",
     sentences: [
       "Nobody can name the system because the system is variously the IDE, the laptop, and the CTO’s confidence.",
       "The team gestures at Cursor when asked, and the skills were installed by an intern who left in March.",
@@ -416,7 +469,8 @@ const SLIDERS = [
     ]
   },
   {
-    label: "Intentionality",
+    label: "DELIBERATE DESIGN",
+    prompt: "discipline of how parts are added",
     sentences: [
       "Skills installed themselves overnight, three MCPs are doing things, two are doing nothing, and one is writing poetry to the database.",
       "Things get added, other things break, the breaks get patched without removing what caused them, and this has been going on for months.",
@@ -426,7 +480,8 @@ const SLIDERS = [
     ]
   },
   {
-    label: "Object Permanence",
+    label: "STATE & MEMORY",
+    prompt: "what the system persists and recalls",
     sentences: [
       "The agent did good work yesterday and it is gone, and the work it is doing right now is already starting to dim.",
       "Some things persist, most don’t, and the audit log is a roadmap item that lives in a chat thread.",
@@ -443,74 +498,76 @@ function isoDate() {
   return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
 }
 
-/* Build a hex bar polygon (12.5% taper, matches the wordmark) for a
-   segment occupying x..x+w in the SVG's local coordinate space. */
-function hexPoints(x, w, h) {
-  const tx = w * 0.125;
-  return [
-    [x + tx,     0],
-    [x + w - tx, 0],
-    [x + w,      h / 2],
-    [x + w - tx, h],
-    [x + tx,     h],
-    [x,          h / 2]
-  ].map(p => p.join(",")).join(" ");
-}
-
 const SEG_COUNT = 5;
-const VB_W = 500;
-const VB_H = 60;
-const SEG_GAP = 12;
-const SEG_W = (VB_W - SEG_GAP * (SEG_COUNT - 1)) / SEG_COUNT;
+const NEUTRAL = 3;
+const ZERO_STATE = "Use the sliders to diagnose your agent product. Your reading takes shape as you slide.";
 
-const state = SLIDERS.map(() => 3);
+const state = SLIDERS.map(() => NEUTRAL);
+
+function valueToPercent(v) {
+  return ((v - 1) / (SEG_COUNT - 1)) * 100;
+}
 
 function buildSlider(i) {
   const data = SLIDERS[i];
   const inputId = "s-" + i;
 
-  const segs = [];
+  const ticks = [];
   for (let n = 1; n <= SEG_COUNT; n++) {
-    const x = (n - 1) * (SEG_W + SEG_GAP);
-    segs.push(
-      '<polygon class="seg" data-n="' + n + '" data-active="' + (n === 3 ? "true" : "false") + '" points="' + hexPoints(x, SEG_W, VB_H) + '"></polygon>'
+    ticks.push(
+      '<span class="slider-tick" data-n="' + n + '" style="left: ' + valueToPercent(n) + '%"></span>'
     );
   }
 
   const nums = [];
   for (let n = 1; n <= SEG_COUNT; n++) {
-    nums.push('<span data-n="' + n + '" data-active="' + (n === 3 ? "true" : "false") + '">' + pad(n) + '</span>');
+    nums.push(
+      '<span data-n="' + n + '" data-active="' + (n === 3 ? "true" : "false") + '" style="left: ' + valueToPercent(n) + '%">' + pad(n) + '</span>'
+    );
   }
+
+  const aria = data.label + ": " + data.prompt;
 
   return (
     '<div class="slider" data-i="' + i + '">' +
       '<div class="slider-head">' +
-        '<span class="slider-id">// ' + pad(i + 1) + '</span>' +
         '<h2 class="slider-label">' + data.label + '</h2>' +
+        '<p class="slider-prompt">' + data.prompt + '</p>' +
       '</div>' +
       '<div class="slider-track">' +
-        '<input type="range" class="slider-input" id="' + inputId + '" min="1" max="5" step="1" value="3" aria-label="' + data.label + '" />' +
-        '<svg class="segments" viewBox="0 0 ' + VB_W + ' ' + VB_H + '" preserveAspectRatio="none" aria-hidden="true">' +
-          segs.join("") +
-        '</svg>' +
-        '<div class="segment-numbers" aria-hidden="true">' + nums.join("") + '</div>' +
+        '<input type="range" class="slider-input" id="' + inputId + '" min="1" max="5" step="1" value="3" aria-label="' + aria + '" />' +
+        '<div class="slider-vis" aria-hidden="true">' +
+          '<div class="slider-rail"></div>' +
+          ticks.join("") +
+          '<div class="slider-thumb" style="left: 50%"></div>' +
+        '</div>' +
       '</div>' +
+      '<div class="segment-numbers" aria-hidden="true">' + nums.join("") + '</div>' +
     '</div>'
   );
 }
 
 function renderParagraph() {
-  const text = state.map((v, i) => SLIDERS[i].sentences[v - 1]).join(" ");
-  document.getElementById("paragraph").textContent = text;
-  document.getElementById("print-paragraph").textContent = text;
+  const contributions = state
+    .map((v, i) => ({ v, i }))
+    .filter(({ v }) => v !== NEUTRAL)
+    .map(({ v, i }) => SLIDERS[i].sentences[v - 1]);
+  const isZero = contributions.length === 0;
+  const text = isZero ? ZERO_STATE : contributions.join(" ");
+  const para = document.getElementById("paragraph");
+  const printPara = document.getElementById("print-paragraph");
+  para.textContent = text;
+  printPara.textContent = text;
+  para.classList.toggle("paragraph--zero", isZero);
+  document.getElementById("btn-save").disabled = isZero;
+  document.getElementById("btn-reset").disabled = isZero;
 }
 
 function applyValue(i, v) {
   state[i] = v;
   const block = document.querySelector('.slider[data-i="' + i + '"]');
-  block.querySelectorAll(".seg").forEach(s => {
-    s.dataset.active = (parseInt(s.dataset.n, 10) === v) ? "true" : "false";
-  });
+  const thumb = block.querySelector(".slider-thumb");
+  if (thumb) thumb.style.left = valueToPercent(v) + "%";
   block.querySelectorAll(".segment-numbers span").forEach(s => {
     s.dataset.active = (parseInt(s.dataset.n, 10) === v) ? "true" : "false";
   });
@@ -531,7 +588,7 @@ function init() {
     input.addEventListener("input", e => applyValue(i, parseInt(e.target.value, 10)));
     input.addEventListener("change", e => applyValue(i, parseInt(e.target.value, 10)));
 
-    block.querySelectorAll(".seg").forEach(s => {
+    block.querySelectorAll(".segment-numbers span").forEach(s => {
       s.addEventListener("click", () => applyValue(i, parseInt(s.dataset.n, 10)));
     });
   }
@@ -539,7 +596,7 @@ function init() {
   renderParagraph();
 
   document.getElementById("btn-reset").addEventListener("click", () => {
-    for (let i = 0; i < SLIDERS.length; i++) applyValue(i, 3);
+    for (let i = 0; i < SLIDERS.length; i++) applyValue(i, NEUTRAL);
   });
 
   const ORIGINAL_TITLE = document.title;
