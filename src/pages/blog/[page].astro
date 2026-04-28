@@ -5,7 +5,7 @@ import ArticleListView from '../../components/ArticleListView.astro';
 export async function getStaticPaths() {
   // Astro evaluates getStaticPaths in an isolated scope at build time — it
   // does not see frontmatter top-level constants, so PAGE_SIZE lives here.
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 5;
   const articles = (await getCollection('articles'))
     .filter((a) => !a.data.draft)
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
