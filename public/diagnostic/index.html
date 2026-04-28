@@ -87,7 +87,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .sliders { display: flex; flex-direction: column; gap: 0; }
 
 .slider {
-  padding: 10px 0 12px;
+  padding: 18px 0 16px;
   border-top: 1px solid var(--rule);
 }
 .slider:last-child { border-bottom: 1px solid var(--rule); }
@@ -95,8 +95,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .slider-head {
   display: flex;
   align-items: baseline;
-  gap: 12px;
-  margin-bottom: 6px;
+  gap: 16px;
+  margin-bottom: 14px;
 }
 .slider-id {
   font-family: var(--font-mono);
@@ -106,13 +106,29 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   color: var(--dim);
   text-transform: uppercase;
 }
+.slider-label-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
 .slider-label {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: clamp(13px, 1.2vw, 15px);
-  line-height: 1.1;
-  letter-spacing: -0.01em;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: clamp(22px, 2.2vw, 28px);
+  line-height: 1.0;
+  letter-spacing: 0.01em;
   color: var(--white);
+  text-transform: uppercase;
+}
+.slider-prompt {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: clamp(13px, 1.05vw, 14px);
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  color: var(--light);
 }
 
 .slider-track {
@@ -283,7 +299,9 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   }
   .diag-title { font-size: 32px; }
   .diag-help  { font-size: 16px; margin-bottom: 36px; }
-  .slider-head { flex-direction: row; gap: 10px; align-items: baseline; margin-bottom: 4px; }
+  .slider-head { flex-direction: row; gap: 12px; align-items: baseline; margin-bottom: 10px; }
+  .slider-label { font-size: 20px; }
+  .slider-prompt { font-size: 13px; }
   .slider-track { height: 18px; }
   .slider-thumb { width: 12px; height: 18px; }
   .paragraph-block { margin-top: 0; margin-bottom: 32px; padding: 20px 0 24px; }
@@ -373,7 +391,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     </div>
 
     <h1 class="diag-title">HAS-D Diagnostic</h1>
-    <p class="diag-help">Move each slider below to where your product is today. The paragraph above updates as you go. Save your result when you're done.</p>
+    <p class="diag-help">Rate your agentic system on five dimensions. 1 means nothing in place. 5 means mature and intentional. The paragraph above updates as you slide. Save when you're done.</p>
 
     <div class="paragraph-block">
       <span class="paragraph-eyebrow">// READOUT · PARAGRAPH</span>
@@ -413,7 +431,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 <script>
 const SLIDERS = [
   {
-    label: "Chat Disease",
+    label: "CHAT STRATEGY",
+    prompt: "how thought-out is chat as a surface",
     sentences: [
       "You shipped a chat box, named it Quentin, and the board now calls Quentin “the AI strategy.”",
       "The product is mostly chat with three buttons floating in the corner that nobody can explain.",
@@ -423,7 +442,8 @@ const SLIDERS = [
     ]
   },
   {
-    label: "Agent Casting",
+    label: "AGENT DEFINITION",
+    prompt: "how clearly agents are cast",
     sentences: [
       "You have one agent named Steve and Steve writes code, designs UI, runs payroll, and is currently in therapy.",
       "You have several “helpful” agents and they take turns being wrong about different things.",
@@ -433,7 +453,8 @@ const SLIDERS = [
     ]
   },
   {
-    label: "System Self-Awareness",
+    label: "SYSTEM LEGIBILITY",
+    prompt: "can the team name the system",
     sentences: [
       "Nobody can name the system because the system is variously the IDE, the laptop, and the CTO’s confidence.",
       "The team gestures at Cursor when asked, and the skills were installed by an intern who left in March.",
@@ -443,7 +464,8 @@ const SLIDERS = [
     ]
   },
   {
-    label: "Intentionality",
+    label: "DELIBERATE DESIGN",
+    prompt: "discipline of how parts are added",
     sentences: [
       "Skills installed themselves overnight, three MCPs are doing things, two are doing nothing, and one is writing poetry to the database.",
       "Things get added, other things break, the breaks get patched without removing what caused them, and this has been going on for months.",
@@ -453,7 +475,8 @@ const SLIDERS = [
     ]
   },
   {
-    label: "Object Permanence",
+    label: "STATE & MEMORY",
+    prompt: "what the system persists and recalls",
     sentences: [
       "The agent did good work yesterday and it is gone, and the work it is doing right now is already starting to dim.",
       "Some things persist, most don’t, and the audit log is a roadmap item that lives in a chat thread.",
@@ -496,14 +519,19 @@ function buildSlider(i) {
     );
   }
 
+  const aria = data.label + ": " + data.prompt;
+
   return (
     '<div class="slider" data-i="' + i + '">' +
       '<div class="slider-head">' +
         '<span class="slider-id">// ' + pad(i + 1) + '</span>' +
-        '<h2 class="slider-label">' + data.label + '</h2>' +
+        '<div class="slider-label-group">' +
+          '<h2 class="slider-label">' + data.label + '</h2>' +
+          '<p class="slider-prompt">' + data.prompt + '</p>' +
+        '</div>' +
       '</div>' +
       '<div class="slider-track">' +
-        '<input type="range" class="slider-input" id="' + inputId + '" min="1" max="5" step="1" value="3" aria-label="' + data.label + '" />' +
+        '<input type="range" class="slider-input" id="' + inputId + '" min="1" max="5" step="1" value="3" aria-label="' + aria + '" />' +
         '<div class="slider-vis" aria-hidden="true">' +
           '<div class="slider-rail"></div>' +
           ticks.join("") +
