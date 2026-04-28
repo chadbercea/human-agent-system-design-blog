@@ -850,86 +850,82 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 /* Footer lives in src/components/SiteFooter.astro. */
 
-/* ───────────── HERO HOVER (DESKTOP) — ILI-756 ─────────────
-   Cursor-driven parallax tilt on the logo + viewport grid,
-   hero text fade, and corner brackets pull-in. JS sets
-   `--hero-cx` / `--hero-cy` (-1..1) on body and toggles
-   `body.hero-hover`. JS gates by `(min-width: 901px) and
-   (hover: hover) and (pointer: fine)` and skips while the
-   article reader is open, so this CSS only animates on
-   desktop with a real pointer in the resting hero state.
-   `prefers-reduced-motion` is handled globally by motion.css
-   (transition-duration → 0.001ms), which collapses every
-   transition below to a static resting frame. */
+/* ───────────── HERO HOVER (DESKTOP) — ILI-776 ─────────────
+   Subtle "lock on" beat: on hero hover the four corner
+   units (bracket + label) translate ~12px diagonally
+   inward as a single transform. No parallax; logo, grid,
+   and corner content sit static at rest. Tooltip follows
+   the cursor inside the hero with a small offset.
 
-/* Use the `perspective()` transform function (not the
-   `perspective` property) so 3D depth is local to each
-   transformed element. The property on `body` would create
-   a containing block for fixed-position descendants and
-   break `body::before` / SiteRails. */
+   JS toggles `body.hero-hover` and gates by
+   `(min-width: 901px) and (hover: hover) and (pointer: fine)`
+   plus skips while the article reader is open. Reduced
+   motion collapses transition-duration globally via
+   motion.css, so the corners stay at rest and the tooltip
+   appears without animation. */
 
-/* Logo tilt — applied to .logo-stage so the parent
-   `.hero-logo` can keep its rise entrance animation
-   (which uses `forwards` fill on `transform: none`). */
-.hero-logo .logo-stage {
-  transform-origin: center center;
-  transform:
-    perspective(1200px)
-    rotateY(calc(var(--hero-cx, 0) * 12deg))
-    rotateX(calc(var(--hero-cy, 0) * -12deg));
-  transition: transform var(--dur-base) var(--ease-out);
-  will-change: transform;
+.hud-corner {
+  transition: transform 150ms var(--ease-out);
 }
-body.hero-hover .hero-logo .logo-stage {
-  transition: transform 120ms linear;
-}
+/* 12px diagonal inward shift = 12 / √2 ≈ 8.49 per axis. */
+body.hero-hover .hud-corner.tl { transform: translate( 8.49px,  8.49px); }
+body.hero-hover .hud-corner.tr { transform: translate(-8.49px,  8.49px); }
+body.hero-hover .hud-corner.bl { transform: translate( 8.49px, -8.49px); }
+body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
 
-/* Grid tilt — body::before is the global grid overlay.
-   Same cursor input as the logo, ~33% magnitude (4deg vs
-   12deg) so it reads as a subtler depth layer. Slight
-   uniform scale prevents the rotated grid from showing
-   viewport edge gaps. */
-body::before {
-  transform-origin: center center;
-  transform:
-    perspective(2400px)
-    scale(1.06)
-    rotateY(calc(var(--hero-cx, 0) * 4deg))
-    rotateX(calc(var(--hero-cy, 0) * -4deg));
-  transition: transform var(--dur-base) var(--ease-out);
-  will-change: transform;
-}
-body.hero-hover::before {
-  transition: transform 160ms linear;
-}
-
-/* Text fade — protocol-chip + tagline + per-corner text.
-   `.hud-corner-text` is the inner span wrapping each
-   corner's textual content; ::before brackets stay
-   unaffected so they translate independently. */
-.protocol-chip,
-.hero-sub,
-.hud-corner-text {
-  transition: opacity var(--dur-base) var(--ease-out);
-}
-body.hero-hover .protocol-chip,
-body.hero-hover .hero-sub,
-body.hero-hover .hud-corner-text {
+/* ───────────── HERO TOOLTIP — ILI-776 ─────────────
+   Mission-control welcome readout that trails the cursor
+   inside the hero. JS positions via translate3d on
+   mousemove; CSS owns the resting frame, fade, and
+   reduced-motion / touch fallbacks. */
+.hero-tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  max-width: 280px;
+  background: var(--black);
+  border: 1px solid var(--rule-strong);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--light);
+  white-space: nowrap;
+  pointer-events: none;
   opacity: 0;
+  transition: opacity 120ms var(--ease-out);
+  will-change: transform, opacity;
+}
+.hero-tooltip.is-visible { opacity: 1; }
+.hero-tooltip-line { display: block; line-height: 1.4; }
+
+/* Reduced-motion: pin to the hero's top-right inset
+   (matches the `.hud-corner.tr` resting position) and
+   hold while the cursor is inside the hero. */
+.hero-tooltip--pinned {
+  top: 40px;
+  right: 72px;
+  left: auto;
+  transform: none !important;
 }
 
-/* Corner bracket pull-in — each ::before translates 80px
-   along the diagonal toward hero center. 80 / √2 ≈ 56.57
-   per axis. Container itself does not move, so the hero
-   bounding box is unchanged. */
-.hud-corner::before {
-  transition: transform var(--dur-base) var(--ease-out);
-  will-change: transform;
+/* Touch fallback: pin statically to the hero's bottom-right
+   on devices without hover. The cursor logic short-circuits
+   on (hover: none) | (pointer: coarse). */
+.hero-tooltip--static {
+  top: auto;
+  bottom: 40px;
+  right: 72px;
+  left: auto;
+  transform: none !important;
+  transition: none;
 }
-body.hero-hover .hud-corner.tl::before { transform: translate( 56.57px,  56.57px); }
-body.hero-hover .hud-corner.tr::before { transform: translate(-56.57px,  56.57px); }
-body.hero-hover .hud-corner.bl::before { transform: translate( 56.57px, -56.57px); }
-body.hero-hover .hud-corner.br::before { transform: translate(-56.57px, -56.57px); }
 
 /* ═══════════════════════════════════════════════
    MOBILE. Below 900px the grid collapses to a
@@ -1014,6 +1010,7 @@ body.hero-hover .hud-corner.br::before { transform: translate(-56.57px, -56.57px
      as the hero. */
   .protocol-chip { display: none; }
   .hud-corner { display: none; }
+  .hero-tooltip { display: none; }
   .hero-stack { margin: 0.5rem 0 2rem; }
   .hero-meta { margin-top: 2rem; }
 
