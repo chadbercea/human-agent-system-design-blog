@@ -52,16 +52,15 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .panel-head {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 24px;
   padding-bottom: 16px;
   margin-bottom: 40px;
   border-bottom: 1px solid var(--rule);
 }
-.panel-head .id    { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.3em; color: var(--white); text-transform: uppercase; }
-.panel-head .title { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.4em; color: var(--mid);   text-transform: uppercase; }
-.panel-head .meta  { font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.3em; color: var(--dim);   text-transform: uppercase; }
+.panel-head .title { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.4em; color: var(--mid); text-transform: uppercase; }
+.panel-head .meta  { font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.3em; color: var(--dim); text-transform: uppercase; }
 
 /* ── Title + help ────────────────────────────────────── */
 .diag-title {
@@ -77,8 +76,9 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .diag-help {
   font-family: var(--font-sans);
   font-weight: 300;
-  font-size: clamp(16px, 1.4vw, 19px);
-  line-height: 1.5;
+  font-size: clamp(32px, 2.8vw, 38px);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
   color: var(--light);
   margin-bottom: 56px;
 }
@@ -94,24 +94,9 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .slider-head {
   display: flex;
-  align-items: baseline;
-  gap: 16px;
-  margin-bottom: 14px;
-}
-.slider-id {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  color: var(--dim);
-  text-transform: uppercase;
-}
-.slider-label-group {
-  display: flex;
   flex-direction: column;
   gap: 4px;
-  flex: 1;
-  min-width: 0;
+  margin-bottom: 14px;
 }
 .slider-label {
   font-family: var(--font-mono);
@@ -298,8 +283,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     margin-bottom: 28px;
   }
   .diag-title { font-size: 32px; }
-  .diag-help  { font-size: 16px; margin-bottom: 36px; }
-  .slider-head { flex-direction: row; gap: 12px; align-items: baseline; margin-bottom: 10px; }
+  .diag-help  { font-size: 26px; line-height: 1.35; margin-bottom: 36px; }
+  .slider-head { gap: 4px; margin-bottom: 10px; }
   .slider-label { font-size: 20px; }
   .slider-prompt { font-size: 13px; }
   .slider-track { height: 18px; }
@@ -385,7 +370,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 <main>
   <section class="diag-panel">
     <div class="panel-head">
-      <span class="id">// 06</span>
       <span class="title">DIAGNOSTIC · HAS-D · LIVE READOUT</span>
       <span class="meta">5 SLIDERS · 5 SENTENCES</span>
     </div>
@@ -524,11 +508,8 @@ function buildSlider(i) {
   return (
     '<div class="slider" data-i="' + i + '">' +
       '<div class="slider-head">' +
-        '<span class="slider-id">// ' + pad(i + 1) + '</span>' +
-        '<div class="slider-label-group">' +
-          '<h2 class="slider-label">' + data.label + '</h2>' +
-          '<p class="slider-prompt">' + data.prompt + '</p>' +
-        '</div>' +
+        '<h2 class="slider-label">' + data.label + '</h2>' +
+        '<p class="slider-prompt">' + data.prompt + '</p>' +
       '</div>' +
       '<div class="slider-track">' +
         '<input type="range" class="slider-input" id="' + inputId + '" min="1" max="5" step="1" value="3" aria-label="' + aria + '" />' +
