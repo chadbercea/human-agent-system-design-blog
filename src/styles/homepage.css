@@ -569,7 +569,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   height: 80vh;
   min-height: 720px;
   border: 1px solid var(--mid);
-  background: var(--white);
+  background: var(--bg-canvas);
 }
 .art-body .diag-embed-foot {
   margin-top: 0.75rem;
