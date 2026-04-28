@@ -17,7 +17,6 @@ interface Props {
   title: string;
   description?: string;
   activeNav?: 'articles' | 'glossary' | 'design-system' | 'about' | 'contact';
-  siteName?: string;
   railTag?: string;
   chrome?: 'full' | 'minimal' | 'none';
 }
@@ -26,7 +25,6 @@ const {
   title,
   description = 'A blog about Human-Agent-System Design. Humans, agents, and systems shipping products together.',
   activeNav = 'articles',
-  siteName = 'DESIGN',
   railTag,
   chrome = 'full',
 } = Astro.props;
@@ -45,7 +43,7 @@ const railTagText = railTag ?? channel.tag;
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Lato:wght@100;300;400;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Lato:wght@100;300;400;700;900&display=swap" rel="stylesheet" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="HAS Design" />
   <meta property="og:title" content={title} />
@@ -59,7 +57,7 @@ const railTagText = railTag ?? channel.tag;
 <body data-chrome={chrome} data-channel-id={channel.id} data-channel-label={channel.label} data-flourish={channel.flourish ?? 'none'}>
   <SiteRails tag={railTagText} />
   <div class="shell">
-    <SiteHeader activeNav={activeNav} siteName={siteName} channelId={channel.id} />
+    <SiteHeader activeNav={activeNav} />
 
     <slot />
 
