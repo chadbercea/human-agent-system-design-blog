@@ -430,18 +430,15 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   border-top: 1px solid var(--rule);
   margin: 0 0 2.25rem;
   width: 100%;
-  max-width: 70ch;
 }
 
-/* Body: readable long-form. Cap measure for sustained reading,
-   scoped override of the "text fills column" rule. */
+/* Body matches the deck measure — fills the reader column. */
 .art-body {
   font-family: var(--font-sans);
   font-weight: 300;
-  font-size: clamp(17px, 1.15vw, 19px);
-  line-height: 1.7;
+  font-size: clamp(19px, 1.4vw, 22px);
+  line-height: 1.65;
   color: var(--light);
-  max-width: 70ch;
 }
 .art-body p { margin-bottom: 1.2em; }
 .art-body p:last-child { margin-bottom: 0; }
@@ -586,7 +583,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   color: var(--dim);
   letter-spacing: 0.5em;
   font-size: 0.85vw;
-  max-width: 70ch;
 }
 
 /* Prev / next footer: mono caps with permalink hash between. */
@@ -598,7 +594,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   margin-top: 3rem;
   padding-top: 1.75rem;
   border-top: 1px solid var(--rule);
-  max-width: 70ch;
 }
 .art-foot-btn {
   display: flex;
@@ -1029,8 +1024,8 @@ body.hero-hover .hud-corner.br::before { transform: translate(-56.57px, -56.57px
   .art-rule { margin-bottom: 1.75rem; max-width: none; }
 
   .art-body {
-    font-size: 17px;
-    line-height: 1.7;
+    font-size: 19px;
+    line-height: 1.65;
     max-width: none;
   }
   .art-body p { margin-bottom: 1.15em; }
