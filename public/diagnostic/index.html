@@ -118,29 +118,43 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .slider-track {
   position: relative;
   width: 100%;
-}
-
-.segments {
-  display: block;
-  width: 100%;
   height: 56px;
 }
 
-.segments .seg {
-  fill: transparent;
-  stroke: var(--white);
-  stroke-width: 1.5;
-  cursor: pointer;
-  transition: fill 120ms linear;
+.slider-vis {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
-.segments .seg[data-active="true"] {
-  fill: var(--white);
+
+.slider-rail {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--white);
+  transform: translateY(-50%);
 }
-.segments .seg:hover {
-  fill: var(--rule-strong);
+
+.slider-tick {
+  position: absolute;
+  top: 50%;
+  width: 1px;
+  height: 12px;
+  background: var(--white);
+  transform: translate(-50%, -50%);
 }
-.segments .seg[data-active="true"]:hover {
-  fill: var(--white);
+
+.slider-thumb {
+  position: absolute;
+  top: 50%;
+  width: 28px;
+  height: 40px;
+  background: var(--white);
+  clip-path: polygon(12.5% 0, 87.5% 0, 100% 50%, 87.5% 100%, 12.5% 100%, 0 50%);
+  transform: translate(-50%, -50%);
+  transition: left 120ms ease-out, box-shadow 120ms linear;
 }
 
 .slider-input {
@@ -153,16 +167,22 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   opacity: 0;
   cursor: pointer;
   z-index: 2;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
 }
-.slider-input:focus-visible + .segments .seg[data-active="true"] {
-  stroke: var(--white);
-  stroke-width: 2.5;
+.slider-input:focus-visible {
+  outline: none;
+}
+.slider-input:focus-visible ~ .slider-vis .slider-thumb {
+  box-shadow: 0 0 0 2px var(--bg-canvas), 0 0 0 4px var(--white);
 }
 
 .segment-numbers {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  position: relative;
+  display: block;
   margin-top: 8px;
+  height: 16px;
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 500;
@@ -171,7 +191,10 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   text-transform: uppercase;
 }
 .segment-numbers span {
-  text-align: center;
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  cursor: pointer;
 }
 .segment-numbers span[data-active="true"] {
   color: var(--white);
@@ -259,7 +282,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .diag-title { font-size: 32px; }
   .diag-help  { font-size: 16px; margin-bottom: 36px; }
   .slider-head { flex-direction: column; gap: 4px; align-items: flex-start; }
-  .segments { height: 44px; }
+  .slider-track { height: 44px; }
+  .slider-thumb { width: 24px; height: 32px; }
   .paragraph-block { margin-top: 36px; }
   .paragraph { font-size: 17px; line-height: 1.55; }
   .actions { flex-wrap: wrap; }
@@ -361,8 +385,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     </div>
 
     <div class="diag-foot">
-      <span><strong>HAS-D</strong> &middot; ILI-763</span>
-      <span>REV 02.00 &middot; HASH B763-04AF</span>
+      <span><strong>HAS-D</strong> &middot; ILI-764</span>
+      <span>REV 02.01 &middot; HASH B764-01AF</span>
       <span>HUMANAGENTSYSTEM.BLOG</span>
     </div>
   </section>
@@ -378,7 +402,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     <p class="print-paragraph" id="print-paragraph"></p>
     <div class="print-foot">
       <span>HUMANAGENTSYSTEM.BLOG</span>
-      <span>ILI-763</span>
+      <span>ILI-764</span>
     </div>
   </div>
 </section>
@@ -443,43 +467,30 @@ function isoDate() {
   return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
 }
 
-/* Build a hex bar polygon (12.5% taper, matches the wordmark) for a
-   segment occupying x..x+w in the SVG's local coordinate space. */
-function hexPoints(x, w, h) {
-  const tx = w * 0.125;
-  return [
-    [x + tx,     0],
-    [x + w - tx, 0],
-    [x + w,      h / 2],
-    [x + w - tx, h],
-    [x + tx,     h],
-    [x,          h / 2]
-  ].map(p => p.join(",")).join(" ");
-}
-
 const SEG_COUNT = 5;
-const VB_W = 500;
-const VB_H = 60;
-const SEG_GAP = 12;
-const SEG_W = (VB_W - SEG_GAP * (SEG_COUNT - 1)) / SEG_COUNT;
 
 const state = SLIDERS.map(() => 3);
+
+function valueToPercent(v) {
+  return ((v - 1) / (SEG_COUNT - 1)) * 100;
+}
 
 function buildSlider(i) {
   const data = SLIDERS[i];
   const inputId = "s-" + i;
 
-  const segs = [];
+  const ticks = [];
   for (let n = 1; n <= SEG_COUNT; n++) {
-    const x = (n - 1) * (SEG_W + SEG_GAP);
-    segs.push(
-      '<polygon class="seg" data-n="' + n + '" data-active="' + (n === 3 ? "true" : "false") + '" points="' + hexPoints(x, SEG_W, VB_H) + '"></polygon>'
+    ticks.push(
+      '<span class="slider-tick" data-n="' + n + '" style="left: ' + valueToPercent(n) + '%"></span>'
     );
   }
 
   const nums = [];
   for (let n = 1; n <= SEG_COUNT; n++) {
-    nums.push('<span data-n="' + n + '" data-active="' + (n === 3 ? "true" : "false") + '">' + pad(n) + '</span>');
+    nums.push(
+      '<span data-n="' + n + '" data-active="' + (n === 3 ? "true" : "false") + '" style="left: ' + valueToPercent(n) + '%">' + pad(n) + '</span>'
+    );
   }
 
   return (
@@ -490,11 +501,13 @@ function buildSlider(i) {
       '</div>' +
       '<div class="slider-track">' +
         '<input type="range" class="slider-input" id="' + inputId + '" min="1" max="5" step="1" value="3" aria-label="' + data.label + '" />' +
-        '<svg class="segments" viewBox="0 0 ' + VB_W + ' ' + VB_H + '" preserveAspectRatio="none" aria-hidden="true">' +
-          segs.join("") +
-        '</svg>' +
-        '<div class="segment-numbers" aria-hidden="true">' + nums.join("") + '</div>' +
+        '<div class="slider-vis" aria-hidden="true">' +
+          '<div class="slider-rail"></div>' +
+          ticks.join("") +
+          '<div class="slider-thumb" style="left: 50%"></div>' +
+        '</div>' +
       '</div>' +
+      '<div class="segment-numbers" aria-hidden="true">' + nums.join("") + '</div>' +
     '</div>'
   );
 }
@@ -508,9 +521,8 @@ function renderParagraph() {
 function applyValue(i, v) {
   state[i] = v;
   const block = document.querySelector('.slider[data-i="' + i + '"]');
-  block.querySelectorAll(".seg").forEach(s => {
-    s.dataset.active = (parseInt(s.dataset.n, 10) === v) ? "true" : "false";
-  });
+  const thumb = block.querySelector(".slider-thumb");
+  if (thumb) thumb.style.left = valueToPercent(v) + "%";
   block.querySelectorAll(".segment-numbers span").forEach(s => {
     s.dataset.active = (parseInt(s.dataset.n, 10) === v) ? "true" : "false";
   });
@@ -531,7 +543,7 @@ function init() {
     input.addEventListener("input", e => applyValue(i, parseInt(e.target.value, 10)));
     input.addEventListener("change", e => applyValue(i, parseInt(e.target.value, 10)));
 
-    block.querySelectorAll(".seg").forEach(s => {
+    block.querySelectorAll(".segment-numbers span").forEach(s => {
       s.addEventListener("click", () => applyValue(i, parseInt(s.dataset.n, 10)));
     });
   }
