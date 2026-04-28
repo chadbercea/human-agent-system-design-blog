@@ -270,12 +270,12 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 /* ── Footer chrome ───────────────────────────────────── */
 .diag-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 32px;
   margin-top: 40px;
-  padding-top: 16px;
+  padding-top: 24px;
   border-top: 1px solid var(--rule);
   font-family: var(--font-mono);
   font-size: 10px;
@@ -285,6 +285,51 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   text-transform: uppercase;
 }
 .diag-foot strong { color: var(--white); font-weight: 600; }
+
+.diag-foot-logo {
+  position: relative;
+  width: 126px;
+  height: 54px;
+  overflow: hidden;
+  display: block;
+  flex-shrink: 0;
+}
+.diag-foot-logo .logo-stage {
+  position: relative;
+  width: 420px;
+  height: 180px;
+  transform: scale(0.3);
+  transform-origin: top left;
+}
+.diag-foot-logo .bar { position: absolute; background: var(--white); }
+.diag-foot-logo .full {
+  width: 30px; height: 120px;
+  clip-path: polygon(50% 0%, 100% 12.5%, 100% 87.5%, 50% 100%, 0% 87.5%, 0% 12.5%);
+}
+.diag-foot-logo .half {
+  width: 30px; height: 60px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.diag-foot-meta {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-self: center;
+}
+
+.diag-foot-actions {
+  display: flex;
+  gap: 12px;
+  justify-self: end;
+}
+.diag-foot-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 10px 18px;
+}
 
 /* ── Mobile ──────────────────────────────────────────── */
 @media (max-width: 700px) {
@@ -312,7 +357,16 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .paragraph { font-size: 19px; line-height: 1.45; }
   .actions { flex-wrap: wrap; }
   .btn { flex: 1; min-width: 140px; }
-  .diag-foot { font-size: 9px; gap: 12px; }
+  .diag-foot {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    font-size: 9px;
+    padding-top: 28px;
+  }
+  .diag-foot-logo { justify-self: start; }
+  .diag-foot-meta { justify-self: start; gap: 12px; }
+  .diag-foot-actions { justify-self: stretch; }
+  .diag-foot-actions .btn { flex: 1; }
 }
 
 /* ── Share modal ─────────────────────────────────────── */
@@ -713,11 +767,29 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
       <div class="sliders" id="sliders"></div>
     </div>
 
-    <div class="diag-foot">
-      <span><strong>HAS-D</strong> &middot; ILI-766</span>
-      <span>REV 02.02 &middot; HASH B766-01AF</span>
-      <span>HUMANAGENTSYSTEM.BLOG</span>
-    </div>
+    <footer class="diag-foot">
+      <a href="/" class="diag-foot-logo" aria-label="Human Agent System Design home">
+        <div class="logo-stage" aria-hidden="true">
+          <div class="bar full" style="top:30px;left:42px;transform:rotate(45deg)"></div>
+          <div class="bar full" style="top:30px;left:115px;transform:rotate(45deg)"></div>
+          <div class="bar half" style="top:81px;left:165px;transform:rotate(-45deg)"></div>
+          <div class="bar half" style="top:32.6px;left:220.2px;transform:rotate(90deg)"></div>
+          <div class="bar half" style="top:53.8px;left:211.4px;transform:rotate(-45deg)"></div>
+          <div class="bar half" style="top:66.2px;left:253.8px;transform:rotate(-45deg)"></div>
+          <div class="bar half" style="top:87.4px;left:245px;transform:rotate(90deg)"></div>
+        </div>
+      </a>
+
+      <div class="diag-foot-meta">
+        <span><strong>HAS-D</strong> &middot; HAS-D-001</span>
+        <span>HUMANAGENTSYSTEM.BLOG</span>
+      </div>
+
+      <div class="diag-foot-actions">
+        <a href="/" class="btn">MAIN BLOG</a>
+        <a href="/#were-assuming-the-system" class="btn">BACK TO ARTICLE</a>
+      </div>
+    </footer>
   </section>
 </main>
 
