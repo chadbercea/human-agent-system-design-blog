@@ -42,8 +42,6 @@ main { position: relative; z-index: 1; }
 
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 
-.print-only { display: none; }
-
 /* ── Panel ───────────────────────────────────────────── */
 .diag-panel {
   padding: 56px 64px 80px;
@@ -317,71 +315,376 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .diag-foot { font-size: 9px; gap: 12px; }
 }
 
-/* ── Print — 8" × 10.5" page artifact ────────────────── */
-@page {
-  size: 8in 10.5in;
-  margin: 0.75in 0.75in 0.75in;
+/* ── Share modal ─────────────────────────────────────── */
+.share-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 5vh 5vw;
+}
+.share-modal[data-open="true"] { display: flex; }
+
+.share-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  cursor: pointer;
 }
 
-@media print {
-  :root { color-scheme: light; }
-  html, body {
-    background: #ffffff;
-    color: #000000;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-  main, .diag-panel { display: none !important; }
-  .print-only { display: block; }
+.share-modal-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: min(90vw, calc((90vh - 100px) * 9 / 16));
+  max-height: 90vh;
+}
 
-  .print-page {
-    font-family: var(--font-sans);
-    color: #000000;
-  }
-  .print-eyebrow {
-    display: flex;
-    justify-content: space-between;
-    font-family: var(--font-mono);
-    font-size: 9pt;
-    font-weight: 500;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: #000000;
-    border-bottom: 0.75pt solid #000000;
-    padding-bottom: 8pt;
-    margin-bottom: 24pt;
-  }
-  .print-title {
-    font-family: var(--font-sans);
-    font-weight: 900;
-    font-size: 36pt;
-    line-height: 1.0;
-    letter-spacing: -0.04em;
-    color: #000000;
-    margin-bottom: 32pt;
-  }
-  .print-paragraph {
-    font-family: var(--font-sans);
-    font-weight: 300;
-    font-size: 14pt;
-    line-height: 1.55;
-    letter-spacing: -0.01em;
-    color: #000000;
-  }
-  .print-foot {
-    position: fixed;
-    bottom: 0.5in;
-    left: 0.75in;
-    right: 0.75in;
-    display: flex;
-    justify-content: space-between;
-    font-family: var(--font-mono);
-    font-size: 8pt;
-    font-weight: 500;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: #000000;
-  }
+.share-preview-frame {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+}
+
+.share-preview-img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+  width: auto;
+  aspect-ratio: 9 / 16;
+  background: #000;
+  object-fit: contain;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.share-preview-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: var(--mid);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.share-modal[data-loading="true"] .share-preview-loading { display: flex; }
+.share-modal:not([data-loading="true"]) .share-preview-loading { display: none; }
+.share-modal[data-loading="true"] .share-preview-img { opacity: 0.25; }
+
+.share-modal-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.share-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--white);
+  border: 1px solid var(--rule-strong);
+  background: transparent;
+  transition: background 120ms linear, color 120ms linear;
+}
+.share-close:hover { background: var(--white); color: var(--black); }
+.share-close:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
+
+@media (max-width: 700px) {
+  .share-modal { padding: 4vh 4vw; }
+  .share-modal-panel { width: 100%; }
+  .share-close { top: -36px; width: 28px; height: 28px; font-size: 16px; }
+}
+
+/* ── Off-screen 1080×1920 share card render node ─────── */
+/* All selectors scoped under .share-card so v10 markup
+   can't collide with the live diagnostic UI above. */
+.share-card-stage {
+  position: fixed;
+  left: -99999px;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  pointer-events: none;
+}
+
+.share-card {
+  width: 1080px;
+  height: 1920px;
+  background: #000;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Lato', sans-serif;
+}
+.share-card * { box-sizing: border-box; margin: 0; padding: 0; }
+
+.share-card .grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.share-card .hex-watermark {
+  position: absolute;
+  top: 850px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 480px;
+  height: 480px;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.share-card .corner {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-color: #fff;
+}
+.share-card .corner.tl { top: 56px; left: 56px; border-top: 2px solid; border-left: 2px solid; }
+.share-card .corner.tr { top: 56px; right: 56px; border-top: 2px solid; border-right: 2px solid; }
+.share-card .corner.bl { bottom: 56px; left: 56px; border-bottom: 2px solid; border-left: 2px solid; }
+.share-card .corner.br { bottom: 56px; right: 56px; border-bottom: 2px solid; border-right: 2px solid; }
+
+.share-card .ticks-edge {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.share-card .ticks-edge.top    { top: 24px;    left: 160px; right: 160px; height: 8px; }
+.share-card .ticks-edge.bottom { bottom: 24px; left: 160px; right: 160px; height: 8px; }
+.share-card .ticks-edge .t { width: 1px; height: 8px; background: rgba(255,255,255,0.4); }
+.share-card .ticks-edge .t.major { height: 14px; background: #fff; }
+
+.share-card .content {
+  position: absolute;
+  top: 80px;
+  left: 80px;
+  right: 80px;
+  bottom: 80px;
+}
+
+.share-card .meta-strip {
+  text-align: center;
+  font: 500 14px/1 'JetBrains Mono', monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 24px 32px 0;
+}
+
+.share-card .ref-line {
+  text-align: center;
+  font: 400 11px/1 'JetBrains Mono', monospace;
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.35);
+  margin-top: 16px;
+}
+
+.share-card .wordmark-zone {
+  text-align: center;
+  margin: 96px 0 0;
+}
+.share-card .wordmark-bbox {
+  width: 745px;
+  height: 265px;
+  margin: 0 auto;
+  position: relative;
+  overflow: visible;
+}
+.share-card .wordmark {
+  position: absolute;
+  top: -92.5px;
+  left: -10px;
+  width: 1050px;
+  height: 450px;
+}
+.share-card .wordmark .bar {
+  position: absolute;
+  background: #fff;
+}
+.share-card .wordmark .full {
+  width: 75px;
+  height: 300px;
+  clip-path: polygon(50% 0%, 100% 12.5%, 100% 87.5%, 50% 100%, 0% 87.5%, 0% 12.5%);
+}
+.share-card .wordmark .half {
+  width: 75px;
+  height: 150px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.share-card .byline {
+  width: 745px;
+  margin: 8px auto 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 44px;
+  line-height: 1;
+  text-transform: uppercase;
+  text-align: justify;
+  text-align-last: justify;
+  color: #fff;
+}
+
+.share-card .mid {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 32px;
+  padding: 0 32px;
+  margin-top: 96px;
+}
+
+.share-card .signal-stack {
+  display: flex;
+  flex-direction: column;
+  padding-top: 24px;
+}
+.share-card .sc-slider {
+  position: relative;
+  width: 100%;
+  height: 16px;
+}
+.share-card .sc-slider-track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #c0c0c0;
+  transform: translateY(-50%);
+}
+.share-card .sc-slider-thumb {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.share-card .diagnosis {
+  font: 400 32px/1.5 'JetBrains Mono', monospace;
+  color: #fff;
+  letter-spacing: 0.005em;
+}
+.share-card .end-tx {
+  margin-top: 28px;
+  font: 500 12px/1 'JetBrains Mono', monospace;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+
+.share-card .bottom { margin-top: 96px; }
+
+.share-card .status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  margin-bottom: 24px;
+}
+.share-card .status-pill {
+  border: 1px solid #fff;
+  padding: 8px 14px;
+  font: 700 11px/1 'JetBrains Mono', monospace;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.share-card .status-pill::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  margin-right: 8px;
+  vertical-align: 1px;
+}
+
+.share-card .barcode { display: flex; gap: 2px; height: 28px; }
+.share-card .barcode span { display: block; width: 2px; height: 100%; background: rgba(255,255,255,0.4); }
+.share-card .barcode span.t { background: #fff; width: 3px; }
+.share-card .barcode span.s { width: 1px; }
+
+.share-card .hairline {
+  height: 1px;
+  background: rgba(255,255,255,0.4);
+  margin: 0 32px;
+}
+
+.share-card .bottom-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 0 32px;
+  margin-top: 28px;
+  margin-bottom: 32px;
+}
+.share-card .bottom-meta .col { display: flex; flex-direction: column; gap: 6px; }
+.share-card .bottom-meta .key {
+  font: 500 11px/1 'JetBrains Mono', monospace;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+.share-card .bottom-meta .val {
+  font: 700 18px/1 'JetBrains Mono', monospace;
+  letter-spacing: 0.06em;
+  color: #fff;
+  text-transform: uppercase;
+}
+.share-card .url-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 0 32px;
+}
+.share-card .url-row .url {
+  text-align: center;
+  font: 700 36px/1 'JetBrains Mono', monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.share-card .url-row .side { height: 1px; background: rgba(255,255,255,0.4); }
+.share-card .post-meta {
+  text-align: center;
+  margin-top: 24px;
+  font: 400 12px/1 'JetBrains Mono', monospace;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
 }
 </style>
 </head>
@@ -402,7 +705,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
         <h2 class="diagnosis-title">Diagnosis</h2>
         <p class="paragraph" id="paragraph" aria-live="polite"></p>
         <div class="actions">
-          <button type="button" class="btn btn-primary" id="btn-save" disabled>SAVE · PDF</button>
+          <button type="button" class="btn btn-primary" id="btn-share" disabled>SHARE · PNG</button>
           <button type="button" class="btn" id="btn-reset" disabled>RESET</button>
         </div>
       </div>
@@ -411,29 +714,157 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     </div>
 
     <div class="diag-foot">
-      <span><strong>HAS-D</strong> &middot; ILI-764</span>
-      <span>REV 02.01 &middot; HASH B764-01AF</span>
+      <span><strong>HAS-D</strong> &middot; ILI-766</span>
+      <span>REV 02.02 &middot; HASH B766-01AF</span>
       <span>HUMANAGENTSYSTEM.BLOG</span>
     </div>
   </section>
 </main>
 
-<section class="print-only" aria-hidden="true">
-  <div class="print-page">
-    <div class="print-eyebrow">
-      <span>HAS-D Diagnostic</span>
-      <span id="print-date">—</span>
+<!-- Share modal -->
+<div
+  class="share-modal"
+  id="share-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="share-modal-title"
+  aria-hidden="true"
+>
+  <div class="share-modal-backdrop" id="share-backdrop" aria-hidden="true"></div>
+  <div class="share-modal-panel" role="document">
+    <button type="button" class="share-close" id="share-close" aria-label="Close share preview">×</button>
+    <h2 id="share-modal-title" class="visually-hidden" style="position:absolute;left:-99999px;">HAS-D Diagnostic share preview</h2>
+    <div class="share-preview-frame">
+      <img class="share-preview-img" id="share-preview-img" alt="HAS-D Diagnostic 9:16 share card preview" />
+      <div class="share-preview-loading" aria-live="polite">RENDERING…</div>
     </div>
-    <h1 class="print-title">HAS-D Diagnostic</h1>
-    <p class="print-paragraph" id="print-paragraph"></p>
-    <div class="print-foot">
-      <span>HUMANAGENTSYSTEM.BLOG</span>
-      <span>ILI-764</span>
+    <div class="share-modal-actions">
+      <button type="button" class="btn btn-primary" id="btn-download" disabled>DOWNLOAD · PNG</button>
     </div>
   </div>
-</section>
+</div>
 
-<script>
+<!-- Off-screen 1080×1920 v10 share card render node -->
+<div class="share-card-stage" aria-hidden="true">
+  <div class="share-card" id="share-card">
+    <div class="grid"></div>
+
+    <svg class="hex-watermark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,2 95,26 95,74 50,98 5,74 5,26" fill="none" stroke="#fff" stroke-width="0.5"/>
+      <polygon points="50,15 83,33 83,67 50,85 17,67 17,33" fill="none" stroke="#fff" stroke-width="0.5"/>
+      <polygon points="50,28 71,40 71,60 50,72 29,60 29,40" fill="none" stroke="#fff" stroke-width="0.5"/>
+    </svg>
+
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+
+    <div class="ticks-edge top">
+      <div class="t major"></div>
+      <div class="t"></div><div class="t"></div><div class="t"></div><div class="t"></div>
+      <div class="t major"></div>
+      <div class="t"></div><div class="t"></div><div class="t"></div><div class="t"></div>
+      <div class="t major"></div>
+      <div class="t"></div><div class="t"></div><div class="t"></div><div class="t"></div>
+      <div class="t major"></div>
+      <div class="t"></div><div class="t"></div><div class="t"></div><div class="t"></div>
+      <div class="t major"></div>
+    </div>
+    <div class="ticks-edge bottom">
+      <div class="t major"></div>
+      <div class="t"></div><div class="t"></div><div class="t"></div><div class="t"></div>
+      <div class="t major"></div>
+      <div class="t"></div><div class="t"></div><div class="t"></div><div class="t"></div>
+      <div class="t major"></div>
+      <div class="t"></div><div class="t"></div><div class="t"></div><div class="t"></div>
+      <div class="t major"></div>
+      <div class="t"></div><div class="t"></div><div class="t"></div><div class="t"></div>
+      <div class="t major"></div>
+    </div>
+
+    <div class="content">
+      <div class="meta-strip" id="sc-transmission">TRANSMISSION · 04 · 27 · 2026 · 14:32 UTC</div>
+      <div class="ref-line">REF · 0000-DIAG-04272026 · A1B2C3D · ENVELOPE: NOMINAL · CHANNEL: PUBLIC</div>
+
+      <div class="wordmark-zone">
+        <div class="wordmark-bbox">
+          <div class="wordmark">
+            <div class="bar full" style="top:75px;left:105px;transform:rotate(45deg)"></div>
+            <div class="bar full" style="top:75px;left:287.5px;transform:rotate(45deg)"></div>
+            <div class="bar half" style="top:202.5px;left:412.5px;transform:rotate(-45deg)"></div>
+            <div class="bar half" style="top:81.5px;left:550.5px;transform:rotate(90deg)"></div>
+            <div class="bar half" style="top:134.5px;left:528.5px;transform:rotate(-45deg)"></div>
+            <div class="bar half" style="top:165.5px;left:634.5px;transform:rotate(-45deg)"></div>
+            <div class="bar half" style="top:218.5px;left:612.5px;transform:rotate(90deg)"></div>
+          </div>
+        </div>
+        <div class="byline">HUMAN AGENT SYSTEM DESIGN</div>
+      </div>
+
+      <div class="mid">
+        <div class="signal-stack" id="sc-signal-stack">
+          <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
+          <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
+          <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
+          <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
+          <div class="sc-slider"><div class="sc-slider-track"></div><div class="sc-slider-thumb" style="left: 50%"></div></div>
+        </div>
+
+        <div>
+          <div class="diagnosis" id="sc-diagnosis"></div>
+          <div class="end-tx">// END · TRANSMISSION CLOSED · CHECKSUM 7F3A·B12C·9DE4</div>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <div class="status-row">
+          <div class="status-pill">SIGNAL LOCK · NOMINAL</div>
+          <div class="barcode">
+            <span class="t"></span><span></span><span class="s"></span><span></span><span class="t"></span>
+            <span class="s"></span><span></span><span class="t"></span><span></span><span class="s"></span>
+            <span class="t"></span><span class="s"></span><span></span><span class="t"></span><span></span>
+            <span class="s"></span><span class="t"></span><span></span><span class="s"></span><span></span>
+            <span class="t"></span><span></span><span class="s"></span><span></span><span class="t"></span>
+          </div>
+        </div>
+
+        <div class="hairline"></div>
+
+        <div class="bottom-meta">
+          <div class="col">
+            <div class="key">// DATE</div>
+            <div class="val" id="sc-date">2026.04.27</div>
+          </div>
+          <div class="col">
+            <div class="key">// BUILD</div>
+            <div class="val">A1B2C3D</div>
+          </div>
+          <div class="col">
+            <div class="key">// STATUS</div>
+            <div class="val">TRANSMITTED</div>
+          </div>
+          <div class="col">
+            <div class="key">// REF</div>
+            <div class="val">HAS-D-001</div>
+          </div>
+        </div>
+
+        <div class="url-row">
+          <div class="side"></div>
+          <div class="url">humanagentsystem.blog</div>
+          <div class="side"></div>
+        </div>
+
+        <div class="post-meta">// POST 02 · WE'RE ASSUMING THE SYSTEM · CHILD OF HCI</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { domToPng } from 'https://cdn.jsdelivr.net/npm/modern-screenshot@4.7.0/+esm';
+
 const SLIDERS = [
   {
     label: "CHAT STRATEGY",
@@ -547,19 +978,21 @@ function buildSlider(i) {
   );
 }
 
-function renderParagraph() {
+function composeParagraph() {
   const contributions = state
     .map((v, i) => ({ v, i }))
     .filter(({ v }) => v !== NEUTRAL)
     .map(({ v, i }) => SLIDERS[i].sentences[v - 1]);
   const isZero = contributions.length === 0;
-  const text = isZero ? ZERO_STATE : contributions.join(" ");
+  return { isZero, text: isZero ? ZERO_STATE : contributions.join(" ") };
+}
+
+function renderParagraph() {
+  const { isZero, text } = composeParagraph();
   const para = document.getElementById("paragraph");
-  const printPara = document.getElementById("print-paragraph");
   para.textContent = text;
-  printPara.textContent = text;
   para.classList.toggle("paragraph--zero", isZero);
-  document.getElementById("btn-save").disabled = isZero;
+  document.getElementById("btn-share").disabled = isZero;
   document.getElementById("btn-reset").disabled = isZero;
 }
 
@@ -576,6 +1009,143 @@ function applyValue(i, v) {
   input.setAttribute("aria-valuetext", "Position " + v + " of 5: " + SLIDERS[i].sentences[v - 1]);
   renderParagraph();
 }
+
+/* ── Share card render node sync ──────────────────────── */
+
+function utcTransmissionStamp(d) {
+  // TRANSMISSION · MM · DD · YYYY · HH:MM UTC
+  return "TRANSMISSION · "
+    + pad(d.getUTCMonth() + 1) + " · "
+    + pad(d.getUTCDate()) + " · "
+    + d.getUTCFullYear() + " · "
+    + pad(d.getUTCHours()) + ":" + pad(d.getUTCMinutes()) + " UTC";
+}
+function utcDottedDate(d) {
+  // YYYY.MM.DD
+  return d.getUTCFullYear() + "." + pad(d.getUTCMonth() + 1) + "." + pad(d.getUTCDate());
+}
+function localFilenameDate(d) {
+  return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+}
+
+function syncShareCard() {
+  const now = new Date();
+  document.getElementById("sc-transmission").textContent = utcTransmissionStamp(now);
+  document.getElementById("sc-date").textContent = utcDottedDate(now);
+
+  const thumbs = document.querySelectorAll("#sc-signal-stack .sc-slider-thumb");
+  thumbs.forEach((thumb, i) => {
+    const v = state[i];
+    thumb.style.left = ((v - 1) * 25) + "%";
+  });
+
+  document.getElementById("sc-diagnosis").textContent = composeParagraph().text;
+}
+
+/* ── Share modal ──────────────────────────────────────── */
+
+const modal = document.getElementById("share-modal");
+const backdrop = document.getElementById("share-backdrop");
+const closeBtn = document.getElementById("share-close");
+const downloadBtn = document.getElementById("btn-download");
+const previewImg = document.getElementById("share-preview-img");
+const shareBtn = document.getElementById("btn-share");
+
+let lastCaptureDataUrl = null;
+let lastCaptureDate = null;
+let previousActive = null;
+
+const FOCUSABLE_SEL = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+function focusableInModal() {
+  return Array.from(modal.querySelectorAll(FOCUSABLE_SEL)).filter(el => !el.disabled && el.offsetParent !== null);
+}
+
+function trapFocus(e) {
+  if (e.key !== "Tab") return;
+  const items = focusableInModal();
+  if (items.length === 0) return;
+  const first = items[0];
+  const last = items[items.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
+function onKeyDown(e) {
+  if (e.key === "Escape") {
+    e.preventDefault();
+    closeShareModal();
+    return;
+  }
+  trapFocus(e);
+}
+
+async function openShareModal() {
+  if (shareBtn.disabled) return;
+  previousActive = document.activeElement;
+
+  syncShareCard();
+
+  modal.dataset.open = "true";
+  modal.dataset.loading = "true";
+  modal.setAttribute("aria-hidden", "false");
+  downloadBtn.disabled = true;
+  document.addEventListener("keydown", onKeyDown);
+  closeBtn.focus();
+
+  const node = document.getElementById("share-card");
+  const captureDate = new Date();
+
+  try {
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+    const dataUrl = await domToPng(node, {
+      width: 1080,
+      height: 1920,
+      scale: 2,
+      backgroundColor: "#000000"
+    });
+    previewImg.src = dataUrl;
+    lastCaptureDataUrl = dataUrl;
+    lastCaptureDate = captureDate;
+    modal.dataset.loading = "false";
+    downloadBtn.disabled = false;
+  } catch (err) {
+    console.error("Share PNG render failed:", err);
+    modal.dataset.loading = "false";
+    previewImg.removeAttribute("src");
+    previewImg.alt = "Render failed. Please close and try again.";
+  }
+}
+
+function closeShareModal() {
+  if (modal.dataset.open !== "true") return;
+  modal.dataset.open = "false";
+  modal.setAttribute("aria-hidden", "true");
+  document.removeEventListener("keydown", onKeyDown);
+  if (previousActive && typeof previousActive.focus === "function") {
+    previousActive.focus();
+  }
+}
+
+async function handleDownload() {
+  if (!lastCaptureDataUrl || !lastCaptureDate) return;
+  const filename = "HAS-D-Diagnostic-" + localFilenameDate(lastCaptureDate) + ".png";
+  const a = document.createElement("a");
+  a.href = lastCaptureDataUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+/* ── Init ─────────────────────────────────────────────── */
 
 function init() {
   const root = document.getElementById("sliders");
@@ -597,25 +1167,13 @@ function init() {
 
   document.getElementById("btn-reset").addEventListener("click", () => {
     for (let i = 0; i < SLIDERS.length; i++) applyValue(i, NEUTRAL);
+    closeShareModal();
   });
 
-  const ORIGINAL_TITLE = document.title;
-  function preparePrint() {
-    const stamp = isoDate();
-    document.getElementById("print-date").textContent = stamp;
-    document.title = "HAS-D Diagnostic — " + stamp;
-  }
-  function restorePrint() {
-    document.title = ORIGINAL_TITLE;
-  }
-  window.addEventListener("beforeprint", preparePrint);
-  window.addEventListener("afterprint", restorePrint);
-  document.getElementById("print-date").textContent = isoDate();
-
-  document.getElementById("btn-save").addEventListener("click", () => {
-    preparePrint();
-    window.print();
-  });
+  shareBtn.addEventListener("click", openShareModal);
+  closeBtn.addEventListener("click", closeShareModal);
+  backdrop.addEventListener("click", closeShareModal);
+  downloadBtn.addEventListener("click", handleDownload);
 }
 
 init();
