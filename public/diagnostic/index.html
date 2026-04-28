@@ -38,14 +38,29 @@ html, body {
   overflow-x: clip;
 }
 
-main { position: relative; z-index: 1; }
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 
 /* ── Panel ───────────────────────────────────────────── */
 .diag-panel {
-  padding: 56px 64px 80px;
+  padding: 56px 64px 0; /* footer carries its own bottom edge so it can pin */
   border-bottom: 1px solid var(--rule);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .panel-head {
@@ -274,8 +289,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 32px;
-  margin-top: 40px;
-  padding-top: 24px;
+  margin-top: auto; /* sticky footer — pin to bottom of panel/viewport */
+  padding: 24px 0;
   border-top: 1px solid var(--rule);
   font-family: var(--font-mono);
   font-size: 10px;
@@ -283,6 +298,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   letter-spacing: 0.3em;
   color: var(--dim);
   text-transform: uppercase;
+  min-height: 80px; /* footer is its own row, flush to bottom edge */
+  box-sizing: border-box;
 }
 .diag-foot strong { color: var(--white); font-weight: 600; }
 
@@ -333,7 +350,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 /* ── Mobile ──────────────────────────────────────────── */
 @media (max-width: 700px) {
-  .diag-panel { padding: 32px 20px 56px; }
+  .diag-panel { padding: 32px 20px 0; }
   .panel-head {
     grid-template-columns: 1fr;
     gap: 6px;
@@ -361,7 +378,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     grid-template-columns: 1fr;
     gap: 20px;
     font-size: 9px;
-    padding-top: 28px;
+    padding-top: 48px; /* sticky-footer gap on mobile */
   }
   .diag-foot-logo { justify-self: start; }
   .diag-foot-meta { justify-self: start; gap: 12px; }
@@ -1285,6 +1302,25 @@ function init() {
 }
 
 init();
+
+/* ── Embedded mode: post own height to parent for iframe sizing ── */
+(function () {
+  if (window.parent === window) return;
+  document.body.dataset.embedded = "true";
+
+  function reportHeight() {
+    var h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+    window.parent.postMessage({ type: "hasd-diag:height", height: h }, "*");
+  }
+
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(reportHeight).observe(document.body);
+  } else {
+    window.addEventListener("resize", reportHeight);
+  }
+  window.addEventListener("load", reportHeight);
+  reportHeight();
+})();
 </script>
 </body>
 </html>

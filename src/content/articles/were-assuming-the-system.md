@@ -154,7 +154,7 @@ If that sounds like you, the worksheet is where you start.
     loading="lazy"
     referrerpolicy="no-referrer-when-downgrade"
   ></iframe>
-  <p class="diag-embed-foot">
-    <a href="/diagnostic" target="_blank" rel="noopener">Open the diagnostic in a new tab →</a>
-  </p>
+  <a class="diag-embed-cta" href="/diagnostic" target="_blank" rel="noopener" role="button">
+    <span class="diag-embed-cta-label">Open the diagnostic in a new tab →</span>
+  </a>
 </div>
