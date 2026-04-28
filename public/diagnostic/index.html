@@ -494,10 +494,10 @@ function isoDate() {
 }
 
 const SEG_COUNT = 5;
+const NEUTRAL = 3;
 const ZERO_STATE = "Use the sliders to diagnose your agent product. Your reading takes shape as you slide.";
 
-const state = SLIDERS.map(() => 3);
-let touched = false;
+const state = SLIDERS.map(() => NEUTRAL);
 
 function valueToPercent(v) {
   return ((v - 1) / (SEG_COUNT - 1)) * 100;
@@ -543,14 +543,17 @@ function buildSlider(i) {
 }
 
 function renderParagraph() {
-  const text = touched
-    ? state.map((v, i) => SLIDERS[i].sentences[v - 1]).join(" ")
-    : ZERO_STATE;
+  const contributions = state
+    .map((v, i) => ({ v, i }))
+    .filter(({ v }) => v !== NEUTRAL)
+    .map(({ v, i }) => SLIDERS[i].sentences[v - 1]);
+  const isZero = contributions.length === 0;
+  const text = isZero ? ZERO_STATE : contributions.join(" ");
   const para = document.getElementById("paragraph");
   const printPara = document.getElementById("print-paragraph");
   para.textContent = text;
   printPara.textContent = text;
-  para.classList.toggle("paragraph--zero", !touched);
+  para.classList.toggle("paragraph--zero", isZero);
 }
 
 function applyValue(i, v) {
@@ -575,20 +578,18 @@ function init() {
     const block = document.querySelector('.slider[data-i="' + i + '"]');
     const input = document.getElementById("s-" + i);
 
-    input.addEventListener("input", e => { touched = true; applyValue(i, parseInt(e.target.value, 10)); });
-    input.addEventListener("change", e => { touched = true; applyValue(i, parseInt(e.target.value, 10)); });
+    input.addEventListener("input", e => applyValue(i, parseInt(e.target.value, 10)));
+    input.addEventListener("change", e => applyValue(i, parseInt(e.target.value, 10)));
 
     block.querySelectorAll(".segment-numbers span").forEach(s => {
-      s.addEventListener("click", () => { touched = true; applyValue(i, parseInt(s.dataset.n, 10)); });
+      s.addEventListener("click", () => applyValue(i, parseInt(s.dataset.n, 10)));
     });
   }
 
   renderParagraph();
 
   document.getElementById("btn-reset").addEventListener("click", () => {
-    for (let i = 0; i < SLIDERS.length; i++) applyValue(i, 3);
-    touched = false;
-    renderParagraph();
+    for (let i = 0; i < SLIDERS.length; i++) applyValue(i, NEUTRAL);
   });
 
   const ORIGINAL_TITLE = document.title;
