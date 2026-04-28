@@ -1,0 +1,98 @@
+---
+/* Pagination footer — chrome pinned to the bottom of the article list
+   panel. Always rendered. Page size 10. With ≤10 articles it reads
+   `01 / 01` and shows no nav controls; the footer's job is also to fill
+   the visual gap below the last card so the page grid doesn't bleed
+   through. ILI-773. */
+
+export interface Props {
+  currentPage: number;
+  totalPages: number;
+  articleCount: number;
+}
+
+const { currentPage, totalPages, articleCount } = Astro.props;
+
+const pad = (n: number) => String(n).padStart(2, '0');
+
+function pageHref(p: number): string {
+  return p === 1 ? '/blog' : `/blog/${p}`;
+}
+
+// Above 6 pages, collapse the middle so the strip stays one mono line:
+//   ← 01 · 02 · … · 11 · 12 →
+// Otherwise render every page number as a dot-separated list.
+type Token = { kind: 'page'; n: number } | { kind: 'gap' };
+function buildTokens(current: number, total: number): Token[] {
+  if (total <= 6) {
+    return Array.from({ length: total }, (_, i) => ({ kind: 'page' as const, n: i + 1 }));
+  }
+  const tokens: Token[] = [];
+  const push = (n: number) => tokens.push({ kind: 'page', n });
+  push(1);
+  push(2);
+  if (current > 3) tokens.push({ kind: 'gap' });
+  if (current > 2 && current < total - 1) push(current);
+  if (current < total - 2) tokens.push({ kind: 'gap' });
+  push(total - 1);
+  push(total);
+  // Dedupe consecutive duplicates (e.g. when current is near an edge).
+  const out: Token[] = [];
+  for (const t of tokens) {
+    const last = out[out.length - 1];
+    if (t.kind === 'page' && last && last.kind === 'page' && last.n === t.n) continue;
+    if (t.kind === 'gap' && last && last.kind === 'gap') continue;
+    out.push(t);
+  }
+  return out;
+}
+
+const tokens = buildTokens(currentPage, totalPages);
+const hasNav = totalPages > 1;
+const prevDisabled = currentPage <= 1;
+const nextDisabled = currentPage >= totalPages;
+
+const empty = articleCount === 0;
+const singleLabel = empty ? `${pad(0)} / ${pad(0)}` : `${pad(currentPage)} / ${pad(totalPages || 1)}`;
+---
+<nav class="pagination-footer" aria-label="Article list pagination">
+  {!hasNav && (
+    <span class="pagination-single">{singleLabel}</span>
+  )}
+  {hasNav && (
+    <div class="pagination-strip">
+      <a
+        class:list={['pagination-arrow', { 'is-disabled': prevDisabled }]}
+        href={prevDisabled ? undefined : pageHref(currentPage - 1)}
+        aria-label="Previous page"
+        aria-disabled={prevDisabled ? 'true' : undefined}
+        tabindex={prevDisabled ? -1 : undefined}
+      >&larr;</a>
+
+      <span class="pagination-pages">
+        {tokens.map((t, i) => (
+          <Fragment>
+            {i > 0 && <span class="pagination-sep" aria-hidden="true">·</span>}
+            {t.kind === 'gap' ? (
+              <span class="pagination-gap" aria-hidden="true">&hellip;</span>
+            ) : (
+              <a
+                class:list={['pagination-page', { 'is-active': t.n === currentPage }]}
+                href={pageHref(t.n)}
+                aria-current={t.n === currentPage ? 'page' : undefined}
+              >{pad(t.n)}</a>
+            )}
+          </Fragment>
+        ))}
+      </span>
+
+      <a
+        class:list={['pagination-arrow', { 'is-disabled': nextDisabled }]}
+        href={nextDisabled ? undefined : pageHref(currentPage + 1)}
+        aria-label="Next page"
+        aria-disabled={nextDisabled ? 'true' : undefined}
+        tabindex={nextDisabled ? -1 : undefined}
+      >&rarr;</a>
+    </div>
+  )}
+</nav>

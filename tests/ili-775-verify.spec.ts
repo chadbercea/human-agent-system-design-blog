@@ -103,8 +103,10 @@ test.describe('ILI-775 — nav Resources dropdown + mobile accordion', () => {
       await page.waitForLoadState('networkidle');
       const trigger = page.locator('[data-resources-trigger]');
       await expect(trigger).toHaveAttribute('aria-current', 'page');
-      // Articles link is NOT active on these routes.
-      await expect(page.locator('header.site-header nav.nav > a[href="/"]')).not.toHaveAttribute('aria-current', 'page');
+      // Articles link is NOT active on these routes. ILI-773 moved the
+      // canonical articles route from `/` to `/blog`, so the nav link
+      // points to `/blog` now.
+      await expect(page.locator('header.site-header nav.nav > a[href="/blog"]')).not.toHaveAttribute('aria-current', 'page');
     }
   });
 

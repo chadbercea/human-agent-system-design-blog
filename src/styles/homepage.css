@@ -340,6 +340,82 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .post-card:hover .post-card-read .arrow,
 .post-card.active .post-card-read .arrow { transform: translateX(3px); }
 
+/* ───────────── COL 2: PAGINATION FOOTER ─────────────
+   Pinned to the bottom of `.col-list` (which is a flex
+   column; the card list takes remaining space, this stays
+   at the foot). Always rendered — fills the visual gap below
+   the last card so the page grid can't bleed through, and
+   reads as part of the panel's frame even at `01 / 01`.
+   Mono caps + design-system tokens only. ILI-773. */
+.pagination-footer {
+  flex-shrink: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.25rem;
+  border-top: 1px solid var(--rule);
+  background: var(--black);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.72vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.pagination-single { color: var(--mid); }
+
+.pagination-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.pagination-pages {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.pagination-sep,
+.pagination-gap { color: var(--dim); }
+
+.pagination-page {
+  color: var(--mid);
+  padding: 0.25rem 0.35rem;
+  border: 1px solid transparent;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
+}
+.pagination-page:hover,
+.pagination-page:focus-visible {
+  color: var(--white);
+  outline: none;
+}
+.pagination-page.is-active {
+  color: var(--black);
+  background: var(--white);
+  border-color: var(--white);
+}
+
+.pagination-arrow {
+  color: var(--mid);
+  padding: 0.25rem 0.35rem;
+  letter-spacing: 0;
+  font-size: 0.85vw;
+  line-height: 1;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.pagination-arrow:hover,
+.pagination-arrow:focus-visible {
+  color: var(--white);
+  outline: none;
+}
+.pagination-arrow.is-disabled {
+  color: var(--dim);
+  pointer-events: none;
+  cursor: default;
+}
+
 /* ───────────── COL 3: ARTICLE READER ───────────── */
 .col-article {
   overflow-y: auto;
@@ -967,6 +1043,16 @@ body.hero-hover .hud-corner.br::before { transform: translate(-56.57px, -56.57px
     margin-top: 0.35rem;
   }
   .post-card-foot { font-size: 10px; }
+
+  /* Pagination footer mobile sizing — px-based per CLAUDE.md
+     non-negotiables. Sits at the foot of the panel above the
+     article reader / SiteFooter. */
+  .pagination-footer {
+    height: 56px;
+    font-size: 11px;
+    padding: 0 1.25rem;
+  }
+  .pagination-arrow { font-size: 14px; }
 
   /* Article reader on mobile: render inline as a full-flow section,
      not a fixed overlay. When .stage.open we hide the hero + list and

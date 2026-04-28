@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import ArticleListView from '../../components/ArticleListView.astro';
+
+export async function getStaticPaths() {
+  // Astro evaluates getStaticPaths in an isolated scope at build time — it
+  // does not see frontmatter top-level constants, so PAGE_SIZE lives here.
+  const PAGE_SIZE = 10;
+  const articles = (await getCollection('articles'))
+    .filter((a) => !a.data.draft)
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+  const totalPages = Math.max(1, Math.ceil(articles.length / PAGE_SIZE));
+  const paths = [];
+  for (let p = 2; p <= totalPages; p++) {
+    paths.push({
+      params: { page: String(p) },
+      props: {
+        pageArticles: articles.slice((p - 1) * PAGE_SIZE, p * PAGE_SIZE),
+        allArticles: articles,
+        currentPage: p,
+        totalPages,
+      },
+    });
+  }
+  return paths;
+}
+
+const { pageArticles, allArticles, currentPage, totalPages } = Astro.props;
+---
+<ArticleListView
+  pageArticles={pageArticles}
+  allArticles={allArticles}
+  currentPage={currentPage}
+  totalPages={totalPages}
+/>
