@@ -43,7 +43,10 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .stage.open .col-hero,
 .stage.open .col-list {
   overflow: hidden;
-  height: calc(100vh - 160px);
+  /* SiteFooter is pushed below the article in open mode, so these columns
+     fill from header to viewport bottom (80px header only). Subtracting
+     the footer here leaves a visible gap below the back-button column. */
+  height: calc(100vh - 80px);
   position: sticky;
   top: 80px;
 }
