@@ -1,9 +1,13 @@
 ---
 interface Props {
-  activeNav?: 'articles' | 'glossary' | 'design-system' | 'about' | 'contact';
+  activeNav?: 'articles' | 'glossary' | 'design-system' | 'diagnostic' | 'about' | 'contact';
 }
 
 const { activeNav = 'articles' } = Astro.props;
+const isResourcesActive =
+  activeNav === 'glossary' ||
+  activeNav === 'design-system' ||
+  activeNav === 'diagnostic';
 ---
 <header class="site-header">
   <div class="sh-mark">
@@ -24,8 +28,32 @@ const { activeNav = 'articles' } = Astro.props;
 
   <nav class="nav">
     <a href="/" aria-current={activeNav === 'articles' ? 'page' : undefined}>Articles</a>
-    <a href="/glossary" aria-current={activeNav === 'glossary' ? 'page' : undefined}>Glossary</a>
-    <a href="/design-system" aria-current={activeNav === 'design-system' ? 'page' : undefined}>Design System</a>
+
+    <div class="nav-resources" data-resources>
+      <button
+        class="nav-resources-trigger"
+        type="button"
+        aria-expanded="false"
+        aria-haspopup="menu"
+        aria-controls="nav-resources-panel"
+        aria-current={isResourcesActive ? 'page' : undefined}
+        data-resources-trigger
+      >
+        <span>Resources</span>
+        <span class="nav-resources-chevron" aria-hidden="true">▾</span>
+      </button>
+      <div
+        class="nav-resources-panel"
+        id="nav-resources-panel"
+        role="menu"
+        data-resources-panel
+      >
+        <a href="/glossary" role="menuitem" aria-current={activeNav === 'glossary' ? 'page' : undefined}>Glossary</a>
+        <a href="/design-system" role="menuitem" aria-current={activeNav === 'design-system' ? 'page' : undefined}>Design System</a>
+        <a href="/diagnostic" role="menuitem" aria-current={activeNav === 'diagnostic' ? 'page' : undefined}>Diagnostic</a>
+      </div>
+    </div>
+
     <a href="/about" aria-current={activeNav === 'about' ? 'page' : undefined}>About</a>
     <a href="/contact" aria-current={activeNav === 'contact' ? 'page' : undefined}>Contact</a>
   </nav>
@@ -58,10 +86,37 @@ const { activeNav = 'articles' } = Astro.props;
         </svg>
       </div>
     </div>
-    <nav class="sh-drawer-nav" aria-label="Primary">
+    <nav
+      class="sh-drawer-nav"
+      aria-label="Primary"
+      data-resources-active={isResourcesActive ? 'true' : 'false'}
+    >
       <a href="/" data-text="Articles" aria-current={activeNav === 'articles' ? 'page' : undefined}>Articles</a>
-      <a href="/glossary" data-text="Glossary" aria-current={activeNav === 'glossary' ? 'page' : undefined}>Glossary</a>
-      <a href="/design-system" data-text="Design System" aria-current={activeNav === 'design-system' ? 'page' : undefined}>Design System</a>
+
+      <div class="sh-drawer-resources" data-mobile-resources>
+        <button
+          class="sh-drawer-resources-trigger"
+          type="button"
+          aria-expanded={isResourcesActive ? 'true' : 'false'}
+          aria-controls="sh-drawer-resources-children"
+          aria-current={isResourcesActive ? 'page' : undefined}
+          data-text="Resources"
+          data-mobile-resources-trigger
+        >
+          <span class="link-typed">Resources</span>
+          <span class="sh-drawer-resources-chevron" aria-hidden="true">▾</span>
+        </button>
+        <div
+          class="sh-drawer-resources-children"
+          id="sh-drawer-resources-children"
+          data-mobile-resources-children
+        >
+          <a href="/glossary" data-text="Glossary" data-resources-child aria-current={activeNav === 'glossary' ? 'page' : undefined}>Glossary</a>
+          <a href="/design-system" data-text="Design System" data-resources-child aria-current={activeNav === 'design-system' ? 'page' : undefined}>Design System</a>
+          <a href="/diagnostic" data-text="Diagnostic" data-resources-child aria-current={activeNav === 'diagnostic' ? 'page' : undefined}>Diagnostic</a>
+        </div>
+      </div>
+
       <a href="/about" data-text="About" aria-current={activeNav === 'about' ? 'page' : undefined}>About</a>
       <a href="/contact" data-text="Contact" aria-current={activeNav === 'contact' ? 'page' : undefined}>Contact</a>
     </nav>
@@ -142,6 +197,73 @@ const { activeNav = 'articles' } = Astro.props;
     window.addEventListener('scroll', onScroll, { passive: true });
   })();
 
+  // Desktop Resources dropdown — click to open, outside click / Escape to
+  // close, keyboard Enter/Space to open, ↓ to move into panel, Tab to cycle.
+  (function () {
+    var wrap = document.querySelector('[data-resources]');
+    if (!wrap) return;
+    var trigger = wrap.querySelector('[data-resources-trigger]');
+    var panel = wrap.querySelector('[data-resources-panel]');
+    if (!trigger || !panel) return;
+    var items = panel.querySelectorAll('a');
+
+    function isOpen() { return wrap.classList.contains('is-open'); }
+    function open() {
+      wrap.classList.add('is-open');
+      trigger.setAttribute('aria-expanded', 'true');
+    }
+    function close(returnFocus) {
+      wrap.classList.remove('is-open');
+      trigger.setAttribute('aria-expanded', 'false');
+      if (returnFocus) trigger.focus();
+    }
+
+    trigger.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (isOpen()) close(false); else open();
+    });
+
+    trigger.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!isOpen()) open();
+        if (items[0]) items[0].focus();
+      } else if (e.key === 'Escape' && isOpen()) {
+        e.preventDefault();
+        close(true);
+      }
+    });
+
+    panel.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && isOpen()) {
+        e.preventDefault();
+        close(true);
+      } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        var idx = -1;
+        for (var i = 0; i < items.length; i++) {
+          if (items[i] === document.activeElement) { idx = i; break; }
+        }
+        var next = e.key === 'ArrowDown' ? idx + 1 : idx - 1;
+        if (next < 0) next = items.length - 1;
+        if (next >= items.length) next = 0;
+        items[next].focus();
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!isOpen()) return;
+      if (wrap.contains(e.target)) return;
+      close(false);
+    });
+
+    document.addEventListener('focusin', function (e) {
+      if (!isOpen()) return;
+      if (wrap.contains(e.target)) return;
+      close(false);
+    });
+  })();
+
   (function () {
     var burger = document.querySelector('[data-sh-burger]');
     var drawer = document.querySelector('[data-sh-drawer]');
@@ -152,34 +274,89 @@ const { activeNav = 'articles' } = Astro.props;
     // Re-running after a view transition can leave html overflow stuck
     // hidden if the previous page was unloaded with the drawer open.
     document.documentElement.style.overflow = '';
+    var drawerNav = drawer.querySelector('.sh-drawer-nav');
+    var resourcesActive = drawerNav && drawerNav.getAttribute('data-resources-active') === 'true';
+    var mobileResources = drawer.querySelector('[data-mobile-resources]');
+    var mobileResourcesTrigger = drawer.querySelector('[data-mobile-resources-trigger]');
+    var mobileResourcesChildren = drawer.querySelector('[data-mobile-resources-children]');
+    var resourceChildLinks = drawer.querySelectorAll('[data-resources-child]');
     var closers = drawer.querySelectorAll('[data-sh-close], a');
-    var links = drawer.querySelectorAll('.sh-drawer-nav a');
     var STEP_MS = 22;       // per-char interval
     var GAP_MS = 60;        // pause between items
     var typeTimers = [];
+
+    function setMobileResourcesOpen(isOpen) {
+      if (!mobileResources || !mobileResourcesTrigger) return;
+      mobileResources.classList.toggle('is-open', isOpen);
+      mobileResourcesTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
 
     function clearTypeTimers() {
       typeTimers.forEach(function (id) { window.clearTimeout(id); });
       typeTimers = [];
     }
 
+    // Build the typewriter sequence. Top-level rows always type. Resource
+    // children only type when the accordion is initially expanded — i.e.
+    // when the current route is a Resources child.
+    function getTypeSequence() {
+      var rows = drawer.querySelectorAll('.sh-drawer-nav > a, [data-mobile-resources-trigger]');
+      var seq = [];
+      rows.forEach(function (row) {
+        seq.push(row);
+        if (row.hasAttribute('data-mobile-resources-trigger') && resourcesActive) {
+          resourceChildLinks.forEach(function (child) { seq.push(child); });
+        }
+      });
+      return seq;
+    }
+
+    // Restore an element to its full data-text label without animation.
+    // Anchors use a span.link-typed structure; the resources trigger
+    // already wraps its label in .link-typed via the template.
+    function restoreLink(el) {
+      var text = el.dataset.text || '';
+      var typed = el.querySelector('.link-typed');
+      if (typed) {
+        typed.textContent = text;
+      } else {
+        el.textContent = text;
+      }
+      el.classList.remove('is-typing');
+      el.classList.remove('is-typed');
+    }
+
     function typeLinks() {
-      // Empty every link's text + add the cursor scaffolding once. Only
-      // the link currently typing carries `.is-typing` (which makes its
-      // cursor visible), so unstarted items render as blank space and
-      // typed items lose their cursor immediately on completion.
-      links.forEach(function (a) {
-        a.classList.remove('is-typing');
-        a.classList.remove('is-typed');
-        a.innerHTML = '<span class="link-typed"></span><span class="link-cursor" aria-hidden="true"></span>';
+      var seq = getTypeSequence();
+      // Empty every sequenced row + scaffold cursor. Rows outside the
+      // sequence (e.g. collapsed accordion children) are restored to
+      // their static text so they're ready when the user expands.
+      seq.forEach(function (el) {
+        el.classList.remove('is-typing');
+        el.classList.remove('is-typed');
+        var typed = el.querySelector('.link-typed');
+        if (!typed) {
+          el.innerHTML = '<span class="link-typed"></span><span class="link-cursor" aria-hidden="true"></span>';
+        } else {
+          typed.textContent = '';
+          if (!el.querySelector('.link-cursor')) {
+            var cursor = document.createElement('span');
+            cursor.className = 'link-cursor';
+            cursor.setAttribute('aria-hidden', 'true');
+            el.appendChild(cursor);
+          }
+        }
+      });
+      resourceChildLinks.forEach(function (child) {
+        if (seq.indexOf(child) === -1) restoreLink(child);
       });
 
       function typeOne(idx) {
-        if (idx >= links.length) return;
-        var a = links[idx];
-        var text = a.dataset.text || '';
-        var typed = a.querySelector('.link-typed');
-        a.classList.add('is-typing');
+        if (idx >= seq.length) return;
+        var el = seq[idx];
+        var text = el.dataset.text || '';
+        var typed = el.querySelector('.link-typed');
+        el.classList.add('is-typing');
         var i = 0;
         function tick() {
           i += 1;
@@ -187,8 +364,8 @@ const { activeNav = 'articles' } = Astro.props;
           if (i < text.length) {
             typeTimers.push(window.setTimeout(tick, STEP_MS));
           } else {
-            a.classList.remove('is-typing');
-            a.classList.add('is-typed');
+            el.classList.remove('is-typing');
+            el.classList.add('is-typed');
             typeTimers.push(window.setTimeout(function () { typeOne(idx + 1); }, GAP_MS));
           }
         }
@@ -199,11 +376,8 @@ const { activeNav = 'articles' } = Astro.props;
 
     function resetLinks() {
       clearTypeTimers();
-      links.forEach(function (a) {
-        a.classList.remove('is-typing');
-        a.classList.remove('is-typed');
-        a.textContent = a.dataset.text || a.textContent;
-      });
+      var allRows = drawer.querySelectorAll('.sh-drawer-nav a, [data-mobile-resources-trigger]');
+      allRows.forEach(function (el) { restoreLink(el); });
     }
 
     function open() {
@@ -211,6 +385,9 @@ const { activeNav = 'articles' } = Astro.props;
       burger.classList.add('is-open');
       burger.setAttribute('aria-expanded', 'true');
       document.documentElement.style.overflow = 'hidden';
+      // Each menu open: accordion starts collapsed unless the route is
+      // inside Resources, in which case it auto-expands.
+      setMobileResourcesOpen(!!resourcesActive);
       typeTimers.push(window.setTimeout(typeLinks, 80));
     }
     function close() {
@@ -229,6 +406,19 @@ const { activeNav = 'articles' } = Astro.props;
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && drawer.classList.contains('is-open')) close();
     });
+
+    if (mobileResourcesTrigger) {
+      mobileResourcesTrigger.addEventListener('click', function () {
+        var willOpen = !mobileResources.classList.contains('is-open');
+        // When the user expands mid-session, restore child labels so they
+        // render immediately (no typewriter — that's reserved for the
+        // initial open animation).
+        if (willOpen) {
+          resourceChildLinks.forEach(function (child) { restoreLink(child); });
+        }
+        setMobileResourcesOpen(willOpen);
+      });
+    }
   })();
 </script>
 
@@ -308,8 +498,10 @@ const { activeNav = 'articles' } = Astro.props;
     display: flex;
     gap: 2rem;
     justify-self: end;
+    align-items: center;
   }
-  .site-header .nav a {
+  .site-header .nav a,
+  .site-header .nav-resources-trigger {
     font-family: var(--font-mono);
     font-weight: 500;
     font-size: 11px;
@@ -323,15 +515,81 @@ const { activeNav = 'articles' } = Astro.props;
       color var(--dur-fast) var(--ease-out),
       border-color var(--dur-fast) var(--ease-out);
   }
-  .site-header .nav a:where(:hover, :focus-visible) {
+  .site-header .nav-resources-trigger {
+    background: transparent;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+  }
+  .site-header .nav a:where(:hover, :focus-visible),
+  .site-header .nav-resources-trigger:where(:hover, :focus-visible) {
     color: var(--white);
     border-bottom-color: var(--white);
   }
-  .site-header .nav a[aria-current="page"] {
+  .site-header .nav a[aria-current="page"],
+  .site-header .nav-resources-trigger[aria-current="page"] {
     color: var(--white);
     border-bottom-color: var(--white);
   }
-  .site-header .nav a:focus-visible {
+  .site-header .nav a:focus-visible,
+  .site-header .nav-resources-trigger:focus-visible {
+    outline: none;
+  }
+
+  /* Resources dropdown */
+  .site-header .nav-resources {
+    position: relative;
+    display: inline-flex;
+  }
+  .site-header .nav-resources-chevron {
+    display: inline-block;
+    line-height: 1;
+    transform: translateY(-1px) rotate(0deg);
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .site-header .nav-resources.is-open .nav-resources-chevron {
+    transform: translateY(-1px) rotate(180deg);
+  }
+  .site-header .nav-resources-panel {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    min-width: 200px;
+    background: var(--black);
+    border: 1px solid var(--rule-strong);
+    display: none;
+    flex-direction: column;
+    z-index: 110;
+  }
+  .site-header .nav-resources.is-open .nav-resources-panel {
+    display: flex;
+  }
+  .site-header .nav-resources-panel a {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--mid);
+    white-space: nowrap;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--rule);
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out);
+  }
+  .site-header .nav-resources-panel a:last-child { border-bottom: none; }
+  .site-header .nav-resources-panel a[aria-current="page"] {
+    color: var(--white);
+  }
+  .site-header .nav-resources-panel a:where(:hover, :focus-visible) {
+    background: var(--white);
+    color: var(--black);
     outline: none;
   }
 
@@ -504,9 +762,15 @@ const { activeNav = 'articles' } = Astro.props;
     flex-direction: column;
     gap: 4px;
   }
-  .sh-drawer-nav a {
+  .sh-drawer-nav > a,
+  .sh-drawer-resources-trigger {
     position: relative;
     display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--rule);
     font-family: var(--font-sans);
     font-weight: 700;
     font-size: 28px;
@@ -514,15 +778,20 @@ const { activeNav = 'articles' } = Astro.props;
     line-height: 1.15;
     color: var(--light);
     padding: 12px 0;
-    border-bottom: 1px solid var(--rule);
     text-decoration: none;
+    cursor: pointer;
     transition: color var(--dur-fast) var(--ease-out);
   }
-  .sh-drawer-nav a:hover,
-  .sh-drawer-nav a:focus-visible,
-  .sh-drawer-nav a[aria-current="page"] { color: var(--white); }
-  .sh-drawer-nav a .link-typed { white-space: pre; }
-  .sh-drawer-nav a .link-cursor {
+  .sh-drawer-nav > a:hover,
+  .sh-drawer-nav > a:focus-visible,
+  .sh-drawer-nav > a[aria-current="page"],
+  .sh-drawer-resources-trigger:hover,
+  .sh-drawer-resources-trigger:focus-visible,
+  .sh-drawer-resources-trigger[aria-current="page"] { color: var(--white); }
+  .sh-drawer-nav a .link-typed,
+  .sh-drawer-resources-trigger .link-typed { white-space: pre; }
+  .sh-drawer-nav a .link-cursor,
+  .sh-drawer-resources-trigger .link-cursor {
     display: none;
     width: 0.45ch;
     height: 0.78em;
@@ -532,12 +801,60 @@ const { activeNav = 'articles' } = Astro.props;
     transform: translateY(0.04em);
     animation: cursor-blink 0.6s step-end infinite;
   }
-  .sh-drawer-nav a.is-typing .link-cursor { display: inline-block; }
+  .sh-drawer-nav a.is-typing .link-cursor,
+  .sh-drawer-resources-trigger.is-typing .link-cursor { display: inline-block; }
+
+  /* Mobile Resources accordion */
+  .sh-drawer-resources-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .sh-drawer-resources-trigger:focus-visible { outline: none; }
+  .sh-drawer-resources-chevron {
+    font-size: 16px;
+    line-height: 1;
+    color: var(--mid);
+    transition:
+      transform var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+  .sh-drawer-resources.is-open .sh-drawer-resources-chevron {
+    transform: rotate(180deg);
+    color: var(--white);
+  }
+  .sh-drawer-resources-children {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height var(--dur-base) var(--ease-out);
+  }
+  .sh-drawer-resources.is-open .sh-drawer-resources-children {
+    max-height: 320px;
+  }
+  .sh-drawer-resources-children a {
+    display: block;
+    padding: 10px 0 10px 24px;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    color: var(--light);
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .sh-drawer-resources-children a:last-child { border-bottom: none; }
+  .sh-drawer-resources-children a:hover,
+  .sh-drawer-resources-children a:focus-visible,
+  .sh-drawer-resources-children a[aria-current="page"] { color: var(--white); }
   @keyframes cursor-blink {
     50% { background-color: transparent; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .sh-drawer-nav a .link-cursor { animation: none; }
+    .sh-drawer-nav a .link-cursor,
+    .sh-drawer-resources-trigger .link-cursor { animation: none; }
   }
 
   @media (max-width: 900px) {
