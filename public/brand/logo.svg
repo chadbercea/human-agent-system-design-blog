@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 30 305 120" role="img" aria-label="HAS Design">
+  <title>HAS Design</title>
+  <g fill="#111111">
+    <polygon points="15,0 30,15 30,105 15,120 0,105 0,15" transform="translate(42 30) rotate(45 15 60)"/>
+    <polygon points="15,0 30,15 30,105 15,120 0,105 0,15" transform="translate(115 30) rotate(45 15 60)"/>
+    <polygon points="15,0 30,15 30,45 15,60 0,45 0,15" transform="translate(165 81) rotate(-45 15 30)"/>
+    <polygon points="15,0 30,15 30,45 15,60 0,45 0,15" transform="translate(220.2 32.6) rotate(90 15 30)"/>
+    <polygon points="15,0 30,15 30,45 15,60 0,45 0,15" transform="translate(211.4 53.8) rotate(-45 15 30)"/>
+    <polygon points="15,0 30,15 30,45 15,60 0,45 0,15" transform="translate(253.8 66.2) rotate(-45 15 30)"/>
+    <polygon points="15,0 30,15 30,45 15,60 0,45 0,15" transform="translate(245 87.4) rotate(90 15 30)"/>
+  </g>
+</svg>
