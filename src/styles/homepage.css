@@ -567,14 +567,37 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   border: 1px solid var(--mid);
   background: var(--bg-canvas);
 }
-.art-body .diag-embed-foot {
+.art-body .diag-embed-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 80px;
   margin-top: 0.75rem;
+  padding: 0 24px;
+  border: 1px solid var(--mid);
+  background: var(--bg-canvas);
+  color: var(--white);
   font-family: var(--font-mono);
-  font-size: 0.72vw;
+  font-weight: 600;
+  font-size: 0.85vw;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: background 120ms linear, color 120ms linear, border-color 120ms linear;
 }
-.art-body .diag-embed-foot a { color: var(--white); }
+.art-body .diag-embed-cta:hover,
+.art-body .diag-embed-cta:focus-visible {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
+  outline: none;
+}
+.art-body .diag-embed-cta-label {
+  display: inline-block;
+}
 
 .art-end {
   margin-top: 4rem;
@@ -1038,7 +1061,12 @@ body.hero-hover .hud-corner.br::before { transform: translate(-56.57px, -56.57px
   .art-body figcaption { font-size: 11px; letter-spacing: 0.14em; }
   .art-body .diag-embed { margin: 2em 0; }
   .art-body .diag-embed iframe { height: 560px; }
-  .art-body .diag-embed-foot { font-size: 11px; letter-spacing: 0.14em; }
+  .art-body .diag-embed-cta {
+    height: 80px;
+    padding: 0 16px;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+  }
   .art-end { margin-top: 3rem; font-size: 12px; max-width: none; }
 
   .art-foot {
