@@ -241,8 +241,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .actions {
   display: flex;
   gap: 12px;
-  margin-top: 48px;
-  padding-top: 24px;
+  margin-top: 32px;
+  padding-top: 20px;
   border-top: 1px solid var(--rule);
 }
 
@@ -256,13 +256,19 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   border: 1px solid var(--white);
   background: transparent;
   color: var(--white);
-  transition: background 120ms linear, color 120ms linear;
+  transition: background 120ms linear, color 120ms linear, opacity 120ms linear;
 }
 .btn:hover  { background: var(--white); color: var(--black); }
 .btn:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
 
 .btn-primary { background: var(--white); color: var(--black); }
 .btn-primary:hover { background: transparent; color: var(--white); }
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 
 /* ── Footer chrome ───────────────────────────────────── */
 .diag-foot {
@@ -395,14 +401,13 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
       <div class="paragraph-block">
         <h2 class="diagnosis-title">Diagnosis</h2>
         <p class="paragraph" id="paragraph" aria-live="polite"></p>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btn-save" disabled>SAVE · PDF</button>
+          <button type="button" class="btn" id="btn-reset" disabled>RESET</button>
+        </div>
       </div>
 
       <div class="sliders" id="sliders"></div>
-    </div>
-
-    <div class="actions">
-      <button type="button" class="btn btn-primary" id="btn-save">SAVE · PDF</button>
-      <button type="button" class="btn" id="btn-reset">RESET</button>
     </div>
 
     <div class="diag-foot">
@@ -554,6 +559,8 @@ function renderParagraph() {
   para.textContent = text;
   printPara.textContent = text;
   para.classList.toggle("paragraph--zero", isZero);
+  document.getElementById("btn-save").disabled = isZero;
+  document.getElementById("btn-reset").disabled = isZero;
 }
 
 function applyValue(i, v) {
