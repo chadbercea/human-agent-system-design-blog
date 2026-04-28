@@ -1285,6 +1285,25 @@ function init() {
 }
 
 init();
+
+/* ── Embedded mode: post own height to parent for iframe sizing ── */
+(function () {
+  if (window.parent === window) return;
+  document.body.dataset.embedded = "true";
+
+  function reportHeight() {
+    var h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+    window.parent.postMessage({ type: "hasd-diag:height", height: h }, "*");
+  }
+
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(reportHeight).observe(document.body);
+  } else {
+    window.addEventListener("resize", reportHeight);
+  }
+  window.addEventListener("load", reportHeight);
+  reportHeight();
+})();
 </script>
 </body>
 </html>
