@@ -262,8 +262,6 @@ const siteDescription = featured?.data.description
           if (window.HASRails) {
             window.HASRails.set({
               tag: '// DISPATCH · ' + (data.postId || '').replace(/^\/\/\s*/, ''),
-              channel: data.date,
-              transmission: data.read,
             });
           }
           if (!opts || opts.updateHash !== false) {
