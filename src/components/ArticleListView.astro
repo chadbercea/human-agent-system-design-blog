@@ -1,0 +1,488 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import HomepageLayout from '../layouts/HomepageLayout.astro';
+import PostCard from './PostCard.astro';
+import PaginationFooter from './PaginationFooter.astro';
+
+export interface Props {
+  pageArticles: CollectionEntry<'articles'>[];
+  allArticles: CollectionEntry<'articles'>[];
+  currentPage: number;
+  totalPages: number;
+}
+
+const { pageArticles, allArticles, currentPage, totalPages } = Astro.props;
+
+function formatDate(d: Date): string {
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}.${m}.${day}`;
+}
+
+const totalEntries = allArticles.length;
+const entryCount = String(totalEntries).padStart(3, '0');
+const lastUpdated = totalEntries > 0 ? formatDate(allArticles[0].data.date) : '—';
+
+const rendered = await Promise.all(
+  pageArticles.map(async (a) => {
+    const { Content } = await a.render();
+    return { article: a, Content };
+  })
+);
+
+function readMinutes(body: string): number {
+  const words = body.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 220));
+}
+
+const cards = pageArticles.map((a) => ({
+  slug: a.slug,
+  title: a.data.title,
+  date: a.data.date,
+  dek: a.data.description ?? '',
+  tags: a.data.tags ?? [],
+  minutes: readMinutes(a.body),
+  postNumber: a.data.postNumber,
+}));
+
+const articleMeta = cards.map((c) => ({
+  slug: c.slug,
+  title: c.title,
+  lede: c.dek,
+  postId: `// POST ${String(c.postNumber).padStart(2, '0')}`,
+  date: formatDate(c.date),
+  read: `${c.minutes} MIN READ`,
+  tags: c.tags.map((t) => t.toUpperCase()),
+}));
+
+const featured = pageArticles[0] ?? allArticles[0];
+const siteDescription = featured?.data.description
+  ?? 'A blog about Human-Agent-System Design. Humans, agents, and systems shipping products together.';
+
+const pageSuffix = currentPage > 1 ? ` // Page ${String(currentPage).padStart(2, '0')}` : '';
+const title = `HAS Design${pageSuffix}`;
+---
+<HomepageLayout title={title} description={siteDescription} activeNav="articles">
+  <div class="stage" id="stage">
+    <div class="col col-hero">
+      <div class="hero-inner">
+        <div class="protocol-chip">PROTOCOL 001 &middot; PHASE ALPHA</div>
+
+        <div class="hero-stack">
+          <div class="hero-logo">
+            <div class="logo-stage">
+              <div class="bar full" style="top:30px;left:42px;transform:rotate(45deg)"></div>
+              <div class="bar full" style="top:30px;left:115px;transform:rotate(45deg)"></div>
+              <div class="bar half" style="top:81px;left:165px;transform:rotate(-45deg)"></div>
+              <div class="bar half" style="top:32.6px;left:220.2px;transform:rotate(90deg)"></div>
+              <div class="bar half" style="top:53.8px;left:211.4px;transform:rotate(-45deg)"></div>
+              <div class="bar half" style="top:66.2px;left:253.8px;transform:rotate(-45deg)"></div>
+              <div class="bar half" style="top:87.4px;left:245px;transform:rotate(90deg)"></div>
+            </div>
+          </div>
+
+          <div class="hero-sub">
+            <svg viewBox="0 0 275.44 15" xmlns="http://www.w3.org/2000/svg" aria-label="HUMAN AGENT SYSTEM DESIGN">
+              <text x="0" y="12" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="500" fill="currentColor" textLength="275.44" lengthAdjust="spacing">HUMAN AGENT SYSTEM DESIGN</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="hud-corner tl">
+          <span class="hud-corner-text">
+            <strong>OBS // SITE</strong>
+            42.56&deg;N &middot; 114.46&deg;W<br />
+            <span class="dim">TWIN FALLS / IDAHO</span><br />
+            <span id="hud-t">T+00:00:00</span>
+          </span>
+        </div>
+        <div class="hud-corner tr">
+          <span class="hud-corner-text">
+            <strong>INDEX // LIVE</strong>
+            ENTRIES <span id="hud-entries" data-target={totalEntries}>{entryCount}</span><br />
+            UPD {lastUpdated}<br />
+            <span class="dim">CH 01 / DISPATCH</span>
+          </span>
+        </div>
+        <div class="hud-corner bl">
+          <span class="hud-corner-text">
+            <strong>STATUS // LINK</strong>
+            AGENT-01 &nbsp; ONLINE<br />
+            OPERATOR &nbsp; LINKED<br />
+            <span class="dim">HANDSHAKE &middot; OK</span>
+          </span>
+        </div>
+        <div class="hud-corner br">
+          <span class="hud-corner-text">
+            <strong>BUILD // META</strong>
+            REV 01.00<br />
+            HASH <span id="hud-hash" data-target="9F2A-8C1D">9F2A-8C1D</span><br />
+            <span class="dim">GAMMA &middot; sRGB</span>
+          </span>
+        </div>
+      </div>
+      <button class="back-btn" id="back-btn" aria-label="Back to articles">
+        <span class="back-content">
+          <span class="back-arrow">&larr;</span>
+          <span>Back</span>
+        </span>
+      </button>
+    </div>
+    <div class="col col-list">
+      <span class="list-label">Published Articles</span>
+      <ul class="post-card-list" id="article-list">
+        {cards.map((c, i) => (
+          <PostCard
+            index={i}
+            postNumber={c.postNumber}
+            slug={c.slug}
+            title={c.title}
+            date={c.date}
+            dek={c.dek}
+            tags={c.tags}
+            minutes={c.minutes}
+          />
+        ))}
+      </ul>
+      <PaginationFooter
+        currentPage={currentPage}
+        totalPages={totalPages}
+        articleCount={totalEntries}
+      />
+    </div>
+    <div class="col col-article">
+      <button class="mobile-back" id="mobile-back" aria-label="Back to articles">
+        <span>&larr;</span>
+        <span>All Articles</span>
+      </button>
+      <article class="article-inner">
+        <div class="art-head" id="art-head">
+          <span class="art-head-id" id="art-head-id"></span>
+          <span class="art-head-sep" aria-hidden="true">&middot;</span>
+          <span class="art-head-date" id="art-head-date"></span>
+          <span class="art-head-sep" aria-hidden="true">&middot;</span>
+          <span class="art-head-read" id="art-head-read"></span>
+        </div>
+        <h1 class="art-h1" id="art-h1"></h1>
+        <p class="art-lede" id="art-lede"></p>
+        <div class="art-tags" id="art-tags"></div>
+        <hr class="art-rule" aria-hidden="true" />
+        <div class="art-body" id="art-body"></div>
+        <div class="art-end" aria-hidden="true">&middot;&nbsp;&middot;&nbsp;&middot;</div>
+        <nav class="art-foot" aria-label="Article navigation">
+          <button class="art-foot-btn art-foot-prev" id="art-foot-prev" type="button">
+            <span class="art-foot-dir">&larr; PREV</span>
+            <span class="art-foot-title" id="art-foot-prev-title"></span>
+          </button>
+          <span class="art-foot-hash" id="art-foot-hash"></span>
+          <button class="art-foot-btn art-foot-next" id="art-foot-next" type="button">
+            <span class="art-foot-dir">NEXT &rarr;</span>
+            <span class="art-foot-title" id="art-foot-next-title"></span>
+          </button>
+        </nav>
+      </article>
+    </div>
+  </div>
+
+  <Fragment slot="after-shell">
+    <div hidden aria-hidden="true">
+      {rendered.map(({ article, Content }) => (
+        <div id={`body-${article.slug}`}><Content /></div>
+      ))}
+    </div>
+
+    <script type="application/json" id="article-meta" is:inline set:html={JSON.stringify(articleMeta)} />
+
+    <script is:inline data-astro-rerun>
+      (function () {
+        var meta = [];
+        try {
+          meta = JSON.parse(document.getElementById('article-meta').textContent || '[]');
+        } catch (e) { meta = []; }
+
+        var stage = document.getElementById('stage');
+        var items = document.querySelectorAll('.post-card');
+        var backBtn = document.getElementById('back-btn');
+        var mobileBack = document.getElementById('mobile-back');
+        var colArticle = document.querySelector('.col-article');
+        var headIdEl = document.getElementById('art-head-id');
+        var headDateEl = document.getElementById('art-head-date');
+        var headReadEl = document.getElementById('art-head-read');
+        var h1El = document.getElementById('art-h1');
+        var ledeEl = document.getElementById('art-lede');
+        var tagsEl = document.getElementById('art-tags');
+        var bodyEl = document.getElementById('art-body');
+        var prevBtn = document.getElementById('art-foot-prev');
+        var nextBtn = document.getElementById('art-foot-next');
+        var prevTitleEl = document.getElementById('art-foot-prev-title');
+        var nextTitleEl = document.getElementById('art-foot-next-title');
+        var hashEl = document.getElementById('art-foot-hash');
+        var savedScrollY = 0;
+        var currentIdx = -1;
+
+        function renderTags(tags) {
+          if (!tags || !tags.length) { tagsEl.textContent = ''; return; }
+          tagsEl.textContent = 'TAGS · ' + tags.join(' · ');
+        }
+
+        function renderFooter(idx) {
+          var prev = meta[idx + 1];
+          var next = meta[idx - 1];
+          if (prev) {
+            prevBtn.hidden = false;
+            prevTitleEl.textContent = prev.title;
+          } else {
+            prevBtn.hidden = true;
+            prevTitleEl.textContent = '';
+          }
+          if (next) {
+            nextBtn.hidden = false;
+            nextTitleEl.textContent = next.title;
+          } else {
+            nextBtn.hidden = true;
+            nextTitleEl.textContent = '';
+          }
+          var cur = meta[idx];
+          hashEl.textContent = cur ? '#' + cur.slug : '';
+        }
+
+        function openArticle(idx, opts) {
+          var data = meta[idx];
+          if (!data) return;
+          var wasOpen = stage.classList.contains('open');
+          if (!wasOpen) {
+            savedScrollY = window.scrollY || window.pageYOffset || 0;
+          }
+          currentIdx = idx;
+          headIdEl.textContent = data.postId;
+          headDateEl.textContent = data.date;
+          headReadEl.textContent = data.read;
+          h1El.textContent = data.title;
+          ledeEl.textContent = data.lede || '';
+          renderTags(data.tags);
+          var src = document.getElementById('body-' + data.slug);
+          bodyEl.innerHTML = src ? src.innerHTML : '';
+          if (window.HASReveal) {
+            window.HASReveal.apply(bodyEl, {
+              selectors: 'h2, h3, figure, pre, blockquote',
+            });
+          }
+          renderFooter(idx);
+          items.forEach(function (el) { el.classList.remove('active'); });
+          var activeEl = items[idx];
+          if (activeEl) activeEl.classList.add('active');
+          stage.classList.add('open');
+          document.body.classList.add('article-open');
+          if (window.HASRails) {
+            window.HASRails.set({
+              tag: '// DISPATCH · ' + (data.postId || '').replace(/^\/\/\s*/, ''),
+            });
+          }
+          if (!opts || opts.updateHash !== false) {
+            if (history && history.replaceState) {
+              history.replaceState(null, '', '#' + data.slug);
+            } else {
+              window.location.hash = data.slug;
+            }
+          }
+          window.scrollTo(0, 0);
+          if (colArticle) colArticle.scrollTop = 0;
+        }
+
+        function closeArticle() {
+          stage.classList.remove('open');
+          document.body.classList.remove('article-open');
+          items.forEach(function (el) { el.classList.remove('active'); });
+          currentIdx = -1;
+          if (window.HASRails) window.HASRails.reset();
+          if (history && history.replaceState) {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+          window.scrollTo(0, savedScrollY);
+        }
+
+        items.forEach(function (el) {
+          el.addEventListener('click', function () {
+            var idx = parseInt(el.getAttribute('data-index'), 10);
+            openArticle(idx);
+          });
+        });
+
+        if (backBtn) backBtn.addEventListener('click', closeArticle);
+        if (mobileBack) mobileBack.addEventListener('click', closeArticle);
+        if (prevBtn) prevBtn.addEventListener('click', function () {
+          if (currentIdx >= 0 && meta[currentIdx + 1]) openArticle(currentIdx + 1);
+        });
+        if (nextBtn) nextBtn.addEventListener('click', function () {
+          if (currentIdx >= 0 && meta[currentIdx - 1]) openArticle(currentIdx - 1);
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') closeArticle();
+        });
+
+        var initialHash = (window.location.hash || '').replace(/^#/, '');
+        if (initialHash) {
+          for (var i = 0; i < meta.length; i++) {
+            if (meta[i].slug === initialHash) {
+              openArticle(i, { updateHash: false });
+              break;
+            }
+          }
+        }
+
+        // ILI-771 — diagnostic iframe self-reports its content height so the
+        // embed scales with both the article column width and inner stacking
+        // (mobile single-column / desktop two-column / paragraph length).
+        window.addEventListener('message', function (e) {
+          var d = e.data;
+          if (!d || d.type !== 'hasd-diag:height' || typeof d.height !== 'number') return;
+          var frames = bodyEl.querySelectorAll('iframe');
+          for (var i = 0; i < frames.length; i++) {
+            if (frames[i].contentWindow === e.source) {
+              frames[i].style.height = d.height + 'px';
+              return;
+            }
+          }
+        });
+      })();
+    </script>
+
+    <script is:inline data-astro-rerun>
+      // ILI-756 — desktop hero hover: cursor-driven parallax tilt on the
+      // logo + viewport grid, hero text fade, corner-bracket pull-in.
+      // Sets `--hero-cx` / `--hero-cy` (-1..1) on body and toggles
+      // `body.hero-hover`. CSS rules in homepage.css consume both.
+      (function () {
+        var heroCol = document.querySelector('.col-hero');
+        var stage = document.getElementById('stage');
+        if (!heroCol || !stage) return;
+
+        var desktop = window.matchMedia('(min-width: 901px) and (hover: hover) and (pointer: fine)');
+        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+        var rafId = 0;
+        var nx = 0, ny = 0;
+
+        function flush() {
+          rafId = 0;
+          document.body.style.setProperty('--hero-cx', nx.toFixed(3));
+          document.body.style.setProperty('--hero-cy', ny.toFixed(3));
+        }
+
+        function schedule() {
+          if (!rafId) rafId = requestAnimationFrame(flush);
+        }
+
+        function eligible() {
+          return desktop.matches && !reduced.matches && !stage.classList.contains('open');
+        }
+
+        function onMove(e) {
+          if (!eligible()) return;
+          var rect = heroCol.getBoundingClientRect();
+          if (rect.width <= 0 || rect.height <= 0) return;
+          var x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          var y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+          nx = x < -1 ? -1 : x > 1 ? 1 : x;
+          ny = y < -1 ? -1 : y > 1 ? 1 : y;
+          schedule();
+        }
+
+        function onEnter() {
+          if (!eligible()) return;
+          document.body.classList.add('hero-hover');
+        }
+
+        function reset() {
+          document.body.classList.remove('hero-hover');
+          nx = 0; ny = 0;
+          schedule();
+        }
+
+        heroCol.addEventListener('mouseenter', onEnter);
+        heroCol.addEventListener('mousemove', onMove);
+        heroCol.addEventListener('mouseleave', reset);
+
+        // Tear down if the viewport drops below the desktop breakpoint or
+        // reduced-motion turns on mid-session, and when the article reader
+        // opens (the hero collapses to an 80px back column).
+        function onGuardChange() { if (!eligible()) reset(); }
+        desktop.addEventListener('change', onGuardChange);
+        reduced.addEventListener('change', onGuardChange);
+
+        var stageObserver = new MutationObserver(function () {
+          if (stage.classList.contains('open')) reset();
+        });
+        stageObserver.observe(stage, { attributes: true, attributeFilter: ['class'] });
+      })();
+    </script>
+
+    <script>
+      import { countUp } from '../lib/countUp';
+
+      const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const pad = (n: number) => (n < 10 ? '0' + n : '' + n);
+      const fmtT = (seconds: number) => {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = Math.floor(seconds % 60);
+        return 'T+' + pad(h) + ':' + pad(m) + ':' + pad(s);
+      };
+
+      const tEl = document.getElementById('hud-t');
+      const entriesEl = document.getElementById('hud-entries');
+      const hashEl = document.getElementById('hud-hash');
+
+      // t=80 — telemetry count-ups begin. Corner values resolve first,
+      // then the T+ counter takes over as a live session timer.
+      window.setTimeout(() => {
+        if (entriesEl) {
+          const target = Number(entriesEl.getAttribute('data-target') || '0');
+          countUp(entriesEl, {
+            from: 0,
+            to: target,
+            duration: 520,
+            ease: 'out',
+            format: (v) => String(Math.round(v)).padStart(3, '0'),
+          });
+        }
+
+        if (tEl && !prefersReducedMotion) {
+          const start = performance.now();
+          const tick = () => {
+            const elapsed = (performance.now() - start) / 1000;
+            tEl.textContent = fmtT(elapsed);
+          };
+          tick();
+          window.setInterval(tick, 1000);
+        }
+
+        if (hashEl && !prefersReducedMotion) {
+          const target = hashEl.getAttribute('data-target') || '';
+          const chars = 'ABCDEF0123456789';
+          const duration = 600;
+          const start = performance.now();
+          const scramble = () => {
+            const elapsed = performance.now() - start;
+            if (elapsed >= duration) { hashEl.textContent = target; return; }
+            const locked = Math.floor((elapsed / duration) * target.length);
+            let out = '';
+            for (let i = 0; i < target.length; i++) {
+              if (target[i] === '-') out += '-';
+              else if (i < locked) out += target[i];
+              else out += chars[Math.floor(Math.random() * chars.length)];
+            }
+            hashEl.textContent = out;
+            requestAnimationFrame(scramble);
+          };
+          requestAnimationFrame(scramble);
+        }
+      }, 80);
+    </script>
+  </Fragment>
+</HomepageLayout>
