@@ -6,7 +6,6 @@ interface Props {
   title: string;
   description?: string;
   railLeft?: string;
-  railRight?: string;
   chrome?: 'full' | 'minimal' | 'none';
 }
 
@@ -14,7 +13,6 @@ const {
   title,
   description = 'Human-Agent-System Design.',
   railLeft = 'HUMAN · AGENT · SYSTEM  /  PROTOCOL 001  /  PHASE ALPHA',
-  railRight = 'CH 01 · SIGNAL STRONG  /  LIVE TRANSMISSION  /  T+00:32:18',
   chrome = 'full',
 } = Astro.props;
 
@@ -42,7 +40,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 </head>
 <body data-chrome={chrome}>
   <div class="rail rail--left"><span>{railLeft}</span></div>
-  <div class="rail rail--right"><span>{railRight}</span></div>
   <main>
     <slot />
   </main>
@@ -112,12 +109,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
     font-weight: 500;
     letter-spacing: 0.45em;
     text-transform: uppercase;
-    color: var(--dim);
-    border-left: 1px solid var(--rule);
-    border-right: 1px solid var(--rule);
+    color: var(--white);
+    background: var(--black);
   }
-  .rail--left { left: 0; }
-  .rail--right { right: 0; }
+  .rail--left { left: 0; border-right: 1px solid var(--rule); }
   .rail span { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; }
   .rail em { color: var(--white); font-style: normal; font-weight: 600; }
 
