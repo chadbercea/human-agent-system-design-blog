@@ -87,7 +87,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .sliders { display: flex; flex-direction: column; gap: 0; }
 
 .slider {
-  padding: 28px 0 32px;
+  padding: 10px 0 12px;
   border-top: 1px solid var(--rule);
 }
 .slider:last-child { border-bottom: 1px solid var(--rule); }
@@ -95,12 +95,12 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .slider-head {
   display: flex;
   align-items: baseline;
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 6px;
 }
 .slider-id {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.3em;
   color: var(--dim);
@@ -109,16 +109,16 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .slider-label {
   font-family: var(--font-sans);
   font-weight: 700;
-  font-size: clamp(20px, 2vw, 24px);
+  font-size: clamp(13px, 1.2vw, 15px);
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   color: var(--white);
 }
 
 .slider-track {
   position: relative;
   width: 100%;
-  height: 56px;
+  height: 20px;
 }
 
 .slider-vis {
@@ -141,7 +141,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   position: absolute;
   top: 50%;
   width: 1px;
-  height: 12px;
+  height: 6px;
   background: var(--white);
   transform: translate(-50%, -50%);
 }
@@ -149,8 +149,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .slider-thumb {
   position: absolute;
   top: 50%;
-  width: 28px;
-  height: 40px;
+  width: 14px;
+  height: 20px;
   background: var(--white);
   clip-path: polygon(12.5% 0, 87.5% 0, 100% 50%, 87.5% 100%, 12.5% 100%, 0 50%);
   transform: translate(-50%, -50%);
@@ -181,10 +181,10 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .segment-numbers {
   position: relative;
   display: block;
-  margin-top: 8px;
-  height: 16px;
+  margin-top: 4px;
+  height: 12px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 500;
   letter-spacing: 0.25em;
   color: var(--dim);
@@ -201,11 +201,13 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   font-weight: 600;
 }
 
-/* ── Paragraph readout ───────────────────────────────── */
+/* ── Paragraph readout (hero) ────────────────────────── */
 .paragraph-block {
-  margin-top: 56px;
-  padding: 24px 0 0;
+  margin-top: 0;
+  margin-bottom: 48px;
+  padding: 28px 0 36px;
   border-top: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
 }
 .paragraph-eyebrow {
   display: block;
@@ -215,14 +217,14 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   letter-spacing: 0.4em;
   color: var(--mid);
   text-transform: uppercase;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 .paragraph {
   font-family: var(--font-sans);
   font-weight: 300;
-  font-size: clamp(18px, 1.7vw, 22px);
-  line-height: 1.55;
-  letter-spacing: -0.01em;
+  font-size: clamp(22px, 2.6vw, 36px);
+  line-height: 1.4;
+  letter-spacing: -0.015em;
   color: var(--white);
 }
 
@@ -281,11 +283,12 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   }
   .diag-title { font-size: 32px; }
   .diag-help  { font-size: 16px; margin-bottom: 36px; }
-  .slider-head { flex-direction: column; gap: 4px; align-items: flex-start; }
-  .slider-track { height: 44px; }
-  .slider-thumb { width: 24px; height: 32px; }
-  .paragraph-block { margin-top: 36px; }
-  .paragraph { font-size: 17px; line-height: 1.55; }
+  .slider-head { flex-direction: row; gap: 10px; align-items: baseline; margin-bottom: 4px; }
+  .slider-track { height: 18px; }
+  .slider-thumb { width: 12px; height: 18px; }
+  .paragraph-block { margin-top: 0; margin-bottom: 32px; padding: 20px 0 24px; }
+  .paragraph-eyebrow { margin-bottom: 16px; }
+  .paragraph { font-size: 19px; line-height: 1.45; }
   .actions { flex-wrap: wrap; }
   .btn { flex: 1; min-width: 140px; }
   .diag-foot { font-size: 9px; gap: 12px; }
@@ -370,14 +373,14 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     </div>
 
     <h1 class="diag-title">HAS-D Diagnostic</h1>
-    <p class="diag-help">Move each slider to where your product is today. The paragraph below updates as you go. Save your result when you're done.</p>
-
-    <div class="sliders" id="sliders"></div>
+    <p class="diag-help">Move each slider below to where your product is today. The paragraph above updates as you go. Save your result when you're done.</p>
 
     <div class="paragraph-block">
       <span class="paragraph-eyebrow">// READOUT · PARAGRAPH</span>
       <p class="paragraph" id="paragraph" aria-live="polite"></p>
     </div>
+
+    <div class="sliders" id="sliders"></div>
 
     <div class="actions">
       <button type="button" class="btn btn-primary" id="btn-save">SAVE · PDF</button>
