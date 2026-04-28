@@ -20,7 +20,7 @@ async function shootHomepage(name, viewport) {
 async function shootArticleOpen(name, viewport) {
   const ctx = await browser.newContext({ viewport });
   const page = await ctx.newPage();
-  await page.goto(URL + '#the-system-is-the-third-thing', { waitUntil: 'networkidle' });
+  await page.goto(URL + '#were-assuming-the-system', { waitUntil: 'networkidle' });
   await page.waitForTimeout(600);
   await page.screenshot({ path: `${OUT}/${name}.png`, fullPage: false });
   await ctx.close();
