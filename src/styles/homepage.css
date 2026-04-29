@@ -196,14 +196,22 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   justify-content: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease 0.25s, color 0.2s;
+  background: transparent;
   color: #7a7a7a;
+  transition:
+    opacity 0.3s ease 0.25s,
+    background-color 120ms linear,
+    color 120ms linear;
 }
 .stage.open .back-btn {
   opacity: 1;
   pointer-events: all;
 }
-.back-btn:hover { color: #c8c8c8; }
+.back-btn:where(:hover, :focus-visible) {
+  background: var(--white);
+  color: var(--black);
+  outline: none;
+}
 .back-content {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
