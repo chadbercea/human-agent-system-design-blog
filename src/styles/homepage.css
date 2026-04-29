@@ -462,6 +462,11 @@ body.hero-sequence-play .protocol-chip.is-typed {
   line-height: 1.5;
   color: var(--light);
   margin-top: 0.4rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .post-card-foot {
