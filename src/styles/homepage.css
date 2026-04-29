@@ -371,6 +371,305 @@ body.hero-sequence-play .protocol-chip.is-typed {
   letter-spacing: 0;
 }
 
+/* ───────────── HERO — FRAME VARIANT (ILI-787) ─────────────
+   Index hero only. NASA-terminal boot sequence: 13 scan
+   lines print up from the bottom of a fixed-height white
+   viewport, then a #FFF frame block fades over the stack
+   and cascades in (rule → eyebrow → h1 → dek → audience →
+   cta). End-state is the same regardless of motion path —
+   a top-aligned frame block reading as the resting brand
+   statement. Signal strip hugs the bottom of the column
+   as persistent chrome. /blog pages keep the original HUD
+   logo hero — the variant is gated by `.col-hero.has-hero-frame`.
+
+   Color is pure two-tone (#000 on #FFF) per the design
+   system tokens; this hero is the only place on the site
+   where the canvas inverts to white.
+   ────────────────────────────────────────────────────────── */
+.col-hero.has-hero-frame {
+  background: #ffffff;
+  color: #000000;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #000;
+}
+
+.frame-viewport {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.scan-stack {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px 40px 32px;
+  pointer-events: none;
+  /* End-state default: hidden. The play-state CSS below
+     reveals it while the boot sequence is running. */
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.scan-line {
+  display: grid;
+  grid-template-columns: 96px 64px 1fr;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 32px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #000;
+  white-space: nowrap;
+  /* Each line prints up: max-height 0 → 32px on .is-visible. */
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-height 200ms var(--ease-out),
+    opacity 200ms var(--ease-out);
+}
+.scan-line.is-visible {
+  max-height: 32px;
+  opacity: 1;
+}
+.scan-line .scan-t { color: #000; opacity: 0.55; }
+.scan-line .scan-c { color: #000; font-weight: 700; }
+.scan-line .scan-d { color: #000; }
+
+.frame-block {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ffffff;
+  padding: 88px 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  /* End-state default: visible. The play-state CSS below
+     hides it (opacity 0) until JS adds .is-visible. */
+}
+
+.frame-rule {
+  width: 100%;
+  height: 1px;
+  background: #000;
+  margin-bottom: 32px;
+  transform-origin: left center;
+}
+
+.frame-eyebrow {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #000;
+  margin-bottom: 28px;
+}
+
+.frame-h1 {
+  font-family: var(--font-sans);
+  font-weight: 100;
+  font-size: 40px;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: #000;
+  margin-bottom: 24px;
+  hyphens: none;
+  white-space: nowrap;
+}
+
+.frame-dek {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: 17px;
+  line-height: 1.45;
+  color: #000;
+  max-width: 60ch;
+  margin-bottom: 32px;
+}
+
+.frame-audience {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #000;
+  margin-bottom: 32px;
+}
+
+.frame-cta {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #000;
+  background: #fff;
+  border: 1px solid #000;
+  padding: 12px 18px;
+  text-decoration: none;
+  transition:
+    background 120ms linear,
+    color 120ms linear;
+}
+.frame-cta:where(:hover, :focus-visible) {
+  background: #000;
+  color: #fff;
+  outline: none;
+}
+
+.signal-strip {
+  flex: 0 0 auto;
+  border-top: 1px solid #000;
+  padding: 14px 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: #ffffff;
+  color: #000;
+}
+.signal-strip .signal-sep { opacity: 0.4; }
+.signal-strip .signal-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  animation: signal-cursor-blink 1s steps(1, end) infinite;
+}
+@keyframes signal-cursor-blink {
+  0%, 50%      { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+/* Article-open state — when an article reader is open the
+   hero column collapses to an 80px back-button strip. The
+   white frame visuals don't belong in that compressed
+   state, so we hide them and let the existing back-btn
+   styles take over (column inverts to black). */
+.stage.open .col-hero.has-hero-frame {
+  background: var(--black);
+  border-right: 1px solid #1c1c1c;
+}
+.stage.open .col-hero.has-hero-frame .frame-viewport,
+.stage.open .col-hero.has-hero-frame .signal-strip {
+  display: none;
+}
+
+/* ── Play-state overrides — only active while the boot
+      sequence is running. Without `body.has-hero-frame-play`,
+      CSS shows end-state (frame visible, scan-stack hidden)
+      so reduced-motion users and within-session repeat
+      visits land on the resting hero at first paint. ── */
+body.has-hero-frame-play .has-hero-frame .scan-stack {
+  opacity: 1;
+}
+body.has-hero-frame-play .has-hero-frame .scan-stack.is-fading {
+  opacity: 0;
+}
+body.has-hero-frame-play .has-hero-frame .frame-block {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+body.has-hero-frame-play .has-hero-frame .frame-block.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.has-hero-frame-play .has-hero-frame .frame-rule {
+  transform: scaleX(0);
+  transition: transform 0.5s ease 0.05s;
+}
+body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-rule {
+  transform: scaleX(1);
+}
+
+body.has-hero-frame-play .has-hero-frame .frame-eyebrow,
+body.has-hero-frame-play .has-hero-frame .frame-h1,
+body.has-hero-frame-play .has-hero-frame .frame-dek,
+body.has-hero-frame-play .has-hero-frame .frame-audience,
+body.has-hero-frame-play .has-hero-frame .frame-cta {
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-eyebrow {
+  transition-delay: 0.20s;
+  opacity: 1;
+  transform: translateY(0);
+}
+body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-h1 {
+  transition-delay: 0.32s;
+  opacity: 1;
+  transform: translateY(0);
+}
+body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-dek {
+  transition-delay: 0.48s;
+  opacity: 1;
+  transform: translateY(0);
+}
+body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-audience {
+  transition-delay: 0.64s;
+  opacity: 1;
+  transform: translateY(0);
+}
+body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-cta {
+  transition-delay: 0.80s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Reduced motion safety net — even if the JS gate failed and
+   the play class was added in error, drop every transition
+   so the user lands on end-state instantly. */
+@media (prefers-reduced-motion: reduce) {
+  .scan-line,
+  .scan-stack,
+  .frame-block,
+  .frame-rule,
+  .frame-eyebrow,
+  .frame-h1,
+  .frame-dek,
+  .frame-audience,
+  .frame-cta {
+    transition: none !important;
+    animation: none !important;
+  }
+  body.has-hero-frame-play .has-hero-frame .scan-stack { display: none; }
+  body.has-hero-frame-play .has-hero-frame .frame-block,
+  body.has-hero-frame-play .has-hero-frame .frame-rule,
+  body.has-hero-frame-play .has-hero-frame .frame-eyebrow,
+  body.has-hero-frame-play .has-hero-frame .frame-h1,
+  body.has-hero-frame-play .has-hero-frame .frame-dek,
+  body.has-hero-frame-play .has-hero-frame .frame-audience,
+  body.has-hero-frame-play .has-hero-frame .frame-cta {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ───────────── COL 2: POST CARD LIST (HUD) ─────────────
    Spec-sheet cards — mono // POST NN + date header, Lato
    700 title, dek, mono tag + read-time footer. Hairline
@@ -1249,6 +1548,44 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
   .hero-tooltip { display: none; }
   .hero-stack { margin: 0.5rem 0 2rem; }
   .hero-meta { margin-top: 2rem; }
+
+  /* Frame hero (ILI-787) on mobile — viewport gets a fixed min-height
+     so the absolutely-positioned frame-block has room to land, scan
+     lines stay readable at 12px, and content paddings drop to phone
+     scale. Border-right collapses with the column. */
+  .col-hero.has-hero-frame {
+    border-right: none;
+    border-bottom: 1px solid #000;
+  }
+  .col-hero.has-hero-frame .frame-viewport {
+    min-height: 540px;
+  }
+  .col-hero.has-hero-frame .scan-stack {
+    padding: 16px 20px 20px;
+  }
+  .col-hero.has-hero-frame .scan-line {
+    grid-template-columns: 76px 56px 1fr;
+    gap: 12px;
+  }
+  .col-hero.has-hero-frame .frame-block {
+    padding: 56px 24px 40px;
+  }
+  .col-hero.has-hero-frame .frame-h1 {
+    font-size: 32px;
+    line-height: 1.08;
+    white-space: normal;
+    word-break: normal;
+  }
+  .col-hero.has-hero-frame .frame-dek {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .col-hero.has-hero-frame .signal-strip {
+    padding: 12px 20px;
+    font-size: 10px;
+    letter-spacing: 0.10em;
+    gap: 8px;
+  }
 
   /* Desktop back column / button: hide entirely on mobile */
   .back-btn { display: none; }
