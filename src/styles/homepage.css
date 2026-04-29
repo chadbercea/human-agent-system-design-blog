@@ -371,24 +371,25 @@ body.hero-sequence-play .protocol-chip.is-typed {
   letter-spacing: 0;
 }
 
-/* ───────────── HERO — FRAME VARIANT (ILI-787) ─────────────
+/* ───────────── HERO — FRAME VARIANT (ILI-787 / ILI-788) ─────────────
    Index hero only. NASA-terminal boot sequence: 13 scan
-   lines print up from the bottom of a fixed-height white
-   viewport, then a #FFF frame block fades over the stack
-   and cascades in (rule → eyebrow → h1 → dek → audience →
-   cta). End-state is the same regardless of motion path —
-   a top-aligned frame block reading as the resting brand
-   statement. Signal strip hugs the bottom of the column
-   as persistent chrome. /blog pages keep the original HUD
-   logo hero — the variant is gated by `.col-hero.has-hero-frame`.
+   lines print up from the bottom of a black viewport, then
+   the frame block resolves on top — rule, eyebrow, h1, dek,
+   audience, cta print in at the same 145ms cadence using
+   the same max-height + opacity reveal mechanism, so the
+   whole pass reads as one continuous terminal print pass.
+   End-state is a top-aligned frame block reading as the
+   resting brand statement. Signal strip hugs the bottom
+   of the column as persistent chrome. /blog pages keep the
+   original HUD hero — variant gated by `.col-hero.has-hero-frame`.
 
-   Color is pure two-tone (#000 on #FFF) per the design
-   system tokens; this hero is the only place on the site
-   where the canvas inverts to white.
-   ────────────────────────────────────────────────────────── */
+   Hero is the only block on the index page that flips to
+   black: pure two-tone (#FFF on #000). The rest of the
+   page returns to white bg / black text.
+   ─────────────────────────────────────────────────────────────────── */
 .col-hero.has-hero-frame {
-  background: #ffffff;
-  color: #000000;
+  background: #000000;
+  color: #ffffff;
   display: flex;
   flex-direction: column;
   border-right: 1px solid #000;
@@ -417,6 +418,9 @@ body.hero-sequence-play .protocol-chip.is-typed {
   transition: opacity 0.45s ease;
 }
 
+/* Shared reveal mechanism — scan lines and frame lines use
+   the same max-height + opacity transition so the cadence
+   reads as a single continuous print pass. */
 .scan-line {
   display: grid;
   grid-template-columns: 96px 64px 1fr;
@@ -428,23 +432,22 @@ body.hero-sequence-play .protocol-chip.is-typed {
   line-height: 32px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #000;
+  color: #fff;
   white-space: nowrap;
-  /* Each line prints up: max-height 0 → 32px on .is-visible. */
   max-height: 0;
   opacity: 0;
   overflow: hidden;
   transition:
-    max-height 200ms var(--ease-out),
-    opacity 200ms var(--ease-out);
+    max-height 0.32s cubic-bezier(.4, .1, .2, 1),
+    opacity 0.18s linear 0.08s;
 }
 .scan-line.is-visible {
   max-height: 32px;
   opacity: 1;
 }
-.scan-line .scan-t { color: #000; opacity: 0.55; }
-.scan-line .scan-c { color: #000; font-weight: 700; }
-.scan-line .scan-d { color: #000; }
+.scan-line .scan-t { color: #fff; opacity: 0.55; }
+.scan-line .scan-c { color: #fff; font-weight: 700; }
+.scan-line .scan-d { color: #fff; }
 
 .frame-block {
   position: absolute;
@@ -452,7 +455,7 @@ body.hero-sequence-play .protocol-chip.is-typed {
   left: 0;
   right: 0;
   bottom: 0;
-  background: #ffffff;
+  background: #000000;
   padding: 88px 64px;
   display: flex;
   flex-direction: column;
@@ -462,12 +465,19 @@ body.hero-sequence-play .protocol-chip.is-typed {
      hides it (opacity 0) until JS adds .is-visible. */
 }
 
+/* Frame-line wrapper — same reveal as .scan-line, taller
+   max-height target so multi-line content (h1, dek) clears.
+   At rest (no play class), the wrapper is unstyled so the
+   end-state composition is identical to a static frame. */
+.frame-line {
+  width: 100%;
+}
+
 .frame-rule {
   width: 100%;
   height: 1px;
-  background: #000;
+  background: #fff;
   margin-bottom: 32px;
-  transform-origin: left center;
 }
 
 .frame-eyebrow {
@@ -476,7 +486,7 @@ body.hero-sequence-play .protocol-chip.is-typed {
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #000;
+  color: #fff;
   margin-bottom: 28px;
 }
 
@@ -486,7 +496,7 @@ body.hero-sequence-play .protocol-chip.is-typed {
   font-size: 40px;
   line-height: 1.05;
   letter-spacing: -0.01em;
-  color: #000;
+  color: #fff;
   margin-bottom: 24px;
   hyphens: none;
   white-space: nowrap;
@@ -497,7 +507,7 @@ body.hero-sequence-play .protocol-chip.is-typed {
   font-weight: 300;
   font-size: 17px;
   line-height: 1.45;
-  color: #000;
+  color: #fff;
   max-width: 60ch;
   margin-bottom: 32px;
 }
@@ -508,7 +518,7 @@ body.hero-sequence-play .protocol-chip.is-typed {
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #000;
+  color: #fff;
   margin-bottom: 32px;
 }
 
@@ -519,9 +529,9 @@ body.hero-sequence-play .protocol-chip.is-typed {
   font-size: 12px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #000;
-  background: #fff;
-  border: 1px solid #000;
+  color: #fff;
+  background: transparent;
+  border: 1px solid #fff;
   padding: 12px 18px;
   text-decoration: none;
   transition:
@@ -529,14 +539,14 @@ body.hero-sequence-play .protocol-chip.is-typed {
     color 120ms linear;
 }
 .frame-cta:where(:hover, :focus-visible) {
-  background: #000;
-  color: #fff;
+  background: #fff;
+  color: #000;
   outline: none;
 }
 
 .signal-strip {
   flex: 0 0 auto;
-  border-top: 1px solid #000;
+  border-top: 1px solid #fff;
   padding: 14px 40px;
   display: flex;
   align-items: center;
@@ -547,13 +557,14 @@ body.hero-sequence-play .protocol-chip.is-typed {
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  background: #ffffff;
-  color: #000;
+  background: #000000;
+  color: #fff;
 }
 .signal-strip .signal-sep { opacity: 0.4; }
 .signal-strip .signal-cursor {
   display: inline-block;
   margin-left: 2px;
+  color: #fff;
   animation: signal-cursor-blink 1s steps(1, end) infinite;
 }
 @keyframes signal-cursor-blink {
@@ -562,10 +573,9 @@ body.hero-sequence-play .protocol-chip.is-typed {
 }
 
 /* Article-open state — when an article reader is open the
-   hero column collapses to an 80px back-button strip. The
-   white frame visuals don't belong in that compressed
-   state, so we hide them and let the existing back-btn
-   styles take over (column inverts to black). */
+   hero column collapses to an 80px back-button strip. Hero
+   is already black, so we just hide the frame visuals and
+   let the back-btn take over. */
 .stage.open .col-hero.has-hero-frame {
   background: var(--black);
   border-right: 1px solid #1c1c1c;
@@ -589,56 +599,28 @@ body.has-hero-frame-play .has-hero-frame .scan-stack.is-fading {
 body.has-hero-frame-play .has-hero-frame .frame-block {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.45s ease;
 }
 body.has-hero-frame-play .has-hero-frame .frame-block.is-visible {
   opacity: 1;
   pointer-events: auto;
 }
 
-body.has-hero-frame-play .has-hero-frame .frame-rule {
-  transform: scaleX(0);
-  transition: transform 0.5s ease 0.05s;
-}
-body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-rule {
-  transform: scaleX(1);
-}
-
-body.has-hero-frame-play .has-hero-frame .frame-eyebrow,
-body.has-hero-frame-play .has-hero-frame .frame-h1,
-body.has-hero-frame-play .has-hero-frame .frame-dek,
-body.has-hero-frame-play .has-hero-frame .frame-audience,
-body.has-hero-frame-play .has-hero-frame .frame-cta {
+/* Frame lines hide until JS adds .is-visible at the cadence —
+   identical reveal mechanism to .scan-line above. No translateY,
+   no per-element delays; the orchestrator schedules each
+   .is-visible flip 145ms apart. */
+body.has-hero-frame-play .has-hero-frame .frame-line {
+  max-height: 0;
   opacity: 0;
-  transform: translateY(4px);
+  overflow: hidden;
   transition:
-    opacity 0.5s ease,
-    transform 0.5s ease;
+    max-height 0.32s cubic-bezier(.4, .1, .2, 1),
+    opacity 0.18s linear 0.08s;
 }
-body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-eyebrow {
-  transition-delay: 0.20s;
+body.has-hero-frame-play .has-hero-frame .frame-line.is-visible {
+  max-height: 220px;
   opacity: 1;
-  transform: translateY(0);
-}
-body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-h1 {
-  transition-delay: 0.32s;
-  opacity: 1;
-  transform: translateY(0);
-}
-body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-dek {
-  transition-delay: 0.48s;
-  opacity: 1;
-  transform: translateY(0);
-}
-body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-audience {
-  transition-delay: 0.64s;
-  opacity: 1;
-  transform: translateY(0);
-}
-body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-cta {
-  transition-delay: 0.80s;
-  opacity: 1;
-  transform: translateY(0);
 }
 
 /* Reduced motion safety net — even if the JS gate failed and
@@ -648,6 +630,7 @@ body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-cta {
   .scan-line,
   .scan-stack,
   .frame-block,
+  .frame-line,
   .frame-rule,
   .frame-eyebrow,
   .frame-h1,
@@ -659,14 +642,10 @@ body.has-hero-frame-play .has-hero-frame .frame-block.is-visible .frame-cta {
   }
   body.has-hero-frame-play .has-hero-frame .scan-stack { display: none; }
   body.has-hero-frame-play .has-hero-frame .frame-block,
-  body.has-hero-frame-play .has-hero-frame .frame-rule,
-  body.has-hero-frame-play .has-hero-frame .frame-eyebrow,
-  body.has-hero-frame-play .has-hero-frame .frame-h1,
-  body.has-hero-frame-play .has-hero-frame .frame-dek,
-  body.has-hero-frame-play .has-hero-frame .frame-audience,
-  body.has-hero-frame-play .has-hero-frame .frame-cta {
+  body.has-hero-frame-play .has-hero-frame .frame-line {
     opacity: 1;
-    transform: none;
+    max-height: none;
+    overflow: visible;
   }
 }
 

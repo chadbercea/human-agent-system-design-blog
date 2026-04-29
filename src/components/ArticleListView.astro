@@ -125,12 +125,12 @@ const title = `HAS Design${pageSuffix}`;
         <div class="frame-viewport" id="frame-viewport">
           <div class="scan-stack" id="scan-stack" aria-hidden="true"></div>
           <div class="frame-block" id="frame-block">
-            <div class="frame-rule" aria-hidden="true"></div>
-            <div class="frame-eyebrow">// FRAME &middot; V1.0 &middot; TRIAD VERIFIED</div>
-            <h1 class="frame-h1">Human Agent System Design</h1>
-            <p class="frame-dek">Humans, agents, and the system they share. Three actors. Three design objects. One framework.</p>
-            <div class="frame-audience">&gt; FOR THE PEOPLE SHIPPING THEM</div>
-            <a class="frame-cta" href="/blog/were-assuming-the-system">Begin transmission &rarr;</a>
+            <div class="frame-line"><div class="frame-rule" aria-hidden="true"></div></div>
+            <div class="frame-line"><div class="frame-eyebrow">// FRAME &middot; V1.0 &middot; TRIAD VERIFIED</div></div>
+            <div class="frame-line"><h1 class="frame-h1">Human Agent System Design</h1></div>
+            <div class="frame-line"><p class="frame-dek">Humans, agents, and the system they share. Three actors. Three design objects. One framework.</p></div>
+            <div class="frame-line"><div class="frame-audience">&gt; FOR THE PEOPLE SHIPPING THEM</div></div>
+            <div class="frame-line"><a class="frame-cta" href="/blog/were-assuming-the-system">Begin transmission &rarr;</a></div>
           </div>
         </div>
         <div class="signal-strip" aria-hidden="true">
@@ -919,19 +919,16 @@ const title = `HAS Design${pageSuffix}`;
     </script>
 
     <script is:inline data-astro-rerun>
-      /* ILI-787 — frame-hero boot sequence orchestrator.
-         Runs only when the pre-paint gate added
-         `body.has-hero-frame-play` (first session visit, motion
-         allowed). Prints 13 scan lines bottom-up at 145ms
-         cadence after a 280ms initial delay; each line transitions
-         max-height 0 → 32px so newer lines appear to print up
-         from the bottom and push earlier lines through the top
-         clip. After the last line + 280ms pause, scan-stack fades
-         out (0.45s) and frame-block fades in (0.5s) on top — the
-         CSS cascade chains the rule, eyebrow, h1, dek, audience,
-         and CTA at staggered delays. Once everything settles,
-         we set sessionStorage so within-session repeat visits
-         skip straight to end-state via the gate above. */
+      /* ILI-788 — frame-hero boot sequence orchestrator.
+         One continuous terminal print pass at a single rhythm:
+         13 scan lines at 145ms cadence after a 280ms initial
+         delay, then a 280ms hand-off pause, scan-stack fades
+         out as frame-block becomes visible, then a 200ms breath
+         before frame lines (rule, eyebrow, h1, dek, audience,
+         cta) print at the same 145ms cadence using the same
+         max-height + opacity reveal as scan lines. Set
+         sessionStorage so within-session repeat visits skip
+         straight to end-state via the pre-paint gate. */
       (function () {
         if (!document.body.classList.contains('has-hero-frame-play')) return;
         var hero = document.querySelector('.col-hero.has-hero-frame');
@@ -958,7 +955,8 @@ const title = `HAS Design${pageSuffix}`;
 
         var INITIAL_DELAY = 280;
         var CADENCE = 145;
-        var POST_LAST_PAUSE = 280;
+        var HANDOFF_PAUSE = 280;
+        var FRAME_BREATH = 200;
         var FADE_OUT_MS = 450;
 
         function makeLine(parts) {
@@ -971,7 +969,7 @@ const title = `HAS Design${pageSuffix}`;
           return el;
         }
 
-        // Pre-build all the line elements so layout doesn't shift
+        // Pre-build the scan-line elements so layout doesn't shift
         // mid-sequence; reveal each via a class flip.
         var nodes = lines.map(function (parts) {
           var n = makeLine(parts);
@@ -986,17 +984,30 @@ const title = `HAS Design${pageSuffix}`;
         });
 
         var totalLinesTime = INITIAL_DELAY + (nodes.length - 1) * CADENCE;
-        var fadeOutAt = totalLinesTime + POST_LAST_PAUSE;
+        var fadeOutAt = totalLinesTime + HANDOFF_PAUSE;
 
         window.setTimeout(function () {
           scanStack.classList.add('is-fading');
           frameBlock.classList.add('is-visible');
         }, fadeOutAt);
 
+        // Frame phase: 200ms breath after the hand-off, then each
+        // .frame-line prints at the same 145ms cadence. Same reveal
+        // mechanism as scan lines (max-height + opacity, no
+        // translateY) so the whole sequence reads as one rhythm.
+        var frameLines = frameBlock.querySelectorAll('.frame-line');
+        var frameStart = fadeOutAt + FRAME_BREATH;
+        frameLines.forEach(function (el, i) {
+          window.setTimeout(function () {
+            el.classList.add('is-visible');
+          }, frameStart + i * CADENCE);
+        });
+
         // Post-completion: set the session flag and drop the play
         // class so any re-entry from a view transition lands on
         // end-state rules (no transitions re-running).
-        var totalDuration = fadeOutAt + FADE_OUT_MS + 800; /* +cascade tail */
+        var lastFrameAt = frameStart + Math.max(0, frameLines.length - 1) * CADENCE;
+        var totalDuration = Math.max(fadeOutAt + FADE_OUT_MS, lastFrameAt) + 400;
         window.setTimeout(function () {
           try { sessionStorage.setItem('has_hero_played', '1'); } catch (e) {}
           document.body.classList.remove('has-hero-frame-play');
