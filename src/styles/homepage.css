@@ -892,7 +892,8 @@ body.hero-sequence-play .protocol-chip.is-typed {
    readability. Homepage columns remain uncapped.
    ───────────────────────────────────────────────────────── */
 .prose-page {
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   display: flex;
   justify-content: center;
@@ -1023,6 +1024,9 @@ a.contact-send {
   margin-top: 3rem;
   padding-top: 2.5rem;
   border-top: 1px solid #1c1c1c;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 /* Footer lives in src/components/SiteFooter.astro. */

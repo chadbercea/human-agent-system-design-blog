@@ -1,5 +1,7 @@
 ---
 import HomepageLayout from '../layouts/HomepageLayout.astro';
+
+const shareUrl = Astro.site ? new URL('/', Astro.site).toString().replace(/\/$/, '') : 'https://hasdesign.io';
 ---
 <HomepageLayout
   title="Transmission received · HAS Design"
@@ -10,13 +12,53 @@ import HomepageLayout from '../layouts/HomepageLayout.astro';
   <main class="prose-page">
     <article class="prose-inner">
       <p class="eyebrow">Relay · acknowledged</p>
-      <h1 class="prose-h1 h1-pending">Transmission received.</h1>
+      <h1 class="prose-h1 h1-pending">Thanks.</h1>
       <div class="prose-body">
-        <p>Your message is in. If a reply is warranted, it will come from chadbercea@gmail.com — keep an eye on it. In the meantime, the work continues in public.</p>
+        <p>While you're here — go read something. Or pass HAS-D along to someone designing or building with agents. The framework gets sharper the more people prod it.</p>
       </div>
-      <p class="thanks-actions">
-        <a class="contact-send" href="/blog">Back to articles</a>
-      </p>
+      <div class="thanks-actions">
+        <a class="contact-send" href="/blog">Read the articles</a>
+        <button
+          type="button"
+          class="contact-send"
+          id="share-copy"
+          data-share-url={shareUrl}
+          aria-live="polite"
+        >Copy link to share</button>
+      </div>
     </article>
   </main>
+
+  <script is:inline>
+    (function () {
+      var btn = document.getElementById('share-copy');
+      if (!btn) return;
+      var defaultLabel = btn.textContent;
+      var url = btn.getAttribute('data-share-url') || window.location.origin;
+      var resetTimer;
+
+      btn.addEventListener('click', function () {
+        var done = function (ok) {
+          btn.textContent = ok ? 'Copied' : 'Copy failed';
+          clearTimeout(resetTimer);
+          resetTimer = setTimeout(function () { btn.textContent = defaultLabel; }, 1800);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function () { done(true); }, function () { done(false); });
+        } else {
+          var ta = document.createElement('textarea');
+          ta.value = url;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'absolute';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          done(ok);
+        }
+      });
+    })();
+  </script>
 </HomepageLayout>
