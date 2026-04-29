@@ -460,9 +460,14 @@ body.hero-sequence-play .protocol-chip.is-typed {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: flex-start;
-  /* End-state default: visible. The play-state CSS below
-     hides it (opacity 0) until JS adds .is-visible. */
+  /* Bottom-up print — same vocabulary as the scan-stack
+     above: lines anchor to the bottom of the viewport and
+     each new revealed line pushes earlier lines up. The
+     scan log resolves into the frame block in the same
+     reading position, no jump. overflow:hidden clips any
+     content that pushes past the top during the rise. */
+  justify-content: flex-end;
+  overflow: hidden;
 }
 
 /* Frame-line wrapper — same reveal as .scan-line, taller
