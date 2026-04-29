@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import ArticleListView from '../../components/ArticleListView.astro';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 const articles = (await getCollection('articles'))
   .filter((a) => !a.data.draft)
