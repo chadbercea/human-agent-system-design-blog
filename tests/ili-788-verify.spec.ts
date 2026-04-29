@@ -29,10 +29,12 @@ test.describe('ILI-788 — hero v2: black inversion + continuous print cadence',
     );
     expect(heroBg).toBe('rgb(0, 0, 0)');
 
+    // frame-block is transparent — the black surface comes from .col-hero
+    // so the scan log behind it stays visible during the print pass.
     const blockBg = await page.locator('.frame-block').evaluate((el) =>
       getComputedStyle(el).backgroundColor
     );
-    expect(blockBg).toBe('rgb(0, 0, 0)');
+    expect(blockBg).toMatch(/rgba\(0,\s*0,\s*0,\s*0\)|transparent/);
 
     // All hero text is white.
     const textColors = await Promise.all([

@@ -13,18 +13,19 @@ test.describe('ILI-787 — frame hero on index, HUD hero preserved on /blog', ()
     // Pre-paint gate flips the body class.
     expect(await page.evaluate(() => document.body.classList.contains('has-hero-frame-play'))).toBe(true);
 
-    // Frame block hidden initially while scan-stack is visible.
-    const initialFrameOpacity = await page.locator('.frame-block').evaluate((el) => getComputedStyle(el).opacity);
-    expect(Number(initialFrameOpacity)).toBeLessThan(0.5);
+    // Initially no frame lines are revealed (scan phase hasn't reached
+    // the frame yet). The frame-block container itself is always present.
+    const initialVisible = await page.locator('.frame-line.is-visible').count();
+    expect(initialVisible).toBe(0);
 
-    // Sequence total ≈ 280 + 12*145 + 280 + 500 + 800 ≈ 3.6s. Wait it out.
+    // Sequence total ≈ 280 + 12*145 + 280 + 200 + 5*145 + 400 ≈ 3.6s. Wait it out.
     await page.waitForTimeout(3800);
 
-    // End-state: body class cleared, frame block visible, scan-stack faded.
+    // End-state: body class cleared, all frame lines revealed.
     expect(await page.evaluate(() => document.body.classList.contains('has-hero-frame-play'))).toBe(false);
 
-    const finalFrameOpacity = await page.locator('.frame-block').evaluate((el) => getComputedStyle(el).opacity);
-    expect(Number(finalFrameOpacity)).toBe(1);
+    const finalVisible = await page.locator('.frame-line.is-visible').count();
+    expect(finalVisible).toBe(6);
 
     // Final copy lands verbatim per spec — no em dashes, no edits.
     await expect(page.locator('.frame-eyebrow')).toHaveText('// FRAME · V1.0 · TRIAD VERIFIED');
@@ -62,8 +63,11 @@ test.describe('ILI-787 — frame hero on index, HUD hero preserved on /blog', ()
 
     expect(await page.evaluate(() => document.body.classList.contains('has-hero-frame-play'))).toBe(false);
 
-    const opacity = await page.locator('.frame-block').evaluate((el) => getComputedStyle(el).opacity);
-    expect(Number(opacity)).toBe(1);
+    // End state: frame content fully revealed (all .frame-line are non-zero height).
+    const heights = await page.locator('.frame-line').evaluateAll((els) =>
+      els.map((el) => (el as HTMLElement).offsetHeight)
+    );
+    for (const h of heights) expect(h).toBeGreaterThan(0);
   });
 
   test('reduced motion: skip the sequence entirely, render frame at rest', async ({ browser }) => {
@@ -77,8 +81,11 @@ test.describe('ILI-787 — frame hero on index, HUD hero preserved on /blog', ()
 
     expect(await page.evaluate(() => document.body.classList.contains('has-hero-frame-play'))).toBe(false);
 
-    const opacity = await page.locator('.frame-block').evaluate((el) => getComputedStyle(el).opacity);
-    expect(Number(opacity)).toBe(1);
+    // Frame content visible at rest.
+    const heights = await page.locator('.frame-line').evaluateAll((els) =>
+      els.map((el) => (el as HTMLElement).offsetHeight)
+    );
+    for (const h of heights) expect(h).toBeGreaterThan(0);
 
     await context.close();
   });

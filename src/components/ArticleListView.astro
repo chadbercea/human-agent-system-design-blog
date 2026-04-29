@@ -957,7 +957,6 @@ const title = `HAS Design${pageSuffix}`;
         var CADENCE = 145;
         var HANDOFF_PAUSE = 280;
         var FRAME_BREATH = 200;
-        var FADE_OUT_MS = 450;
 
         function makeLine(parts) {
           var el = document.createElement('div');
@@ -983,20 +982,15 @@ const title = `HAS Design${pageSuffix}`;
           }, INITIAL_DELAY + i * CADENCE);
         });
 
+        // Frame phase: 280ms hand-off pause + 200ms breath after
+        // the last scan line, then each .frame-line prints at the
+        // same 145ms cadence. Same reveal mechanism as scan lines
+        // (max-height + opacity, no translateY) so the entire pass
+        // reads as one rhythm. The scan log stays visible — frame
+        // lines print below it and the whole stack lifts together.
         var totalLinesTime = INITIAL_DELAY + (nodes.length - 1) * CADENCE;
-        var fadeOutAt = totalLinesTime + HANDOFF_PAUSE;
-
-        window.setTimeout(function () {
-          scanStack.classList.add('is-fading');
-          frameBlock.classList.add('is-visible');
-        }, fadeOutAt);
-
-        // Frame phase: 200ms breath after the hand-off, then each
-        // .frame-line prints at the same 145ms cadence. Same reveal
-        // mechanism as scan lines (max-height + opacity, no
-        // translateY) so the whole sequence reads as one rhythm.
+        var frameStart = totalLinesTime + HANDOFF_PAUSE + FRAME_BREATH;
         var frameLines = frameBlock.querySelectorAll('.frame-line');
-        var frameStart = fadeOutAt + FRAME_BREATH;
         frameLines.forEach(function (el, i) {
           window.setTimeout(function () {
             el.classList.add('is-visible');
@@ -1007,7 +1001,7 @@ const title = `HAS Design${pageSuffix}`;
         // class so any re-entry from a view transition lands on
         // end-state rules (no transitions re-running).
         var lastFrameAt = frameStart + Math.max(0, frameLines.length - 1) * CADENCE;
-        var totalDuration = Math.max(fadeOutAt + FADE_OUT_MS, lastFrameAt) + 400;
+        var totalDuration = lastFrameAt + 400;
         window.setTimeout(function () {
           try { sessionStorage.setItem('has_hero_played', '1'); } catch (e) {}
           document.body.classList.remove('has-hero-frame-play');

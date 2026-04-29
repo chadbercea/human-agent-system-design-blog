@@ -395,27 +395,29 @@ body.hero-sequence-play .protocol-chip.is-typed {
   border-right: 1px solid #000;
 }
 
+/* Single bottom-anchored print column. scan-stack and frame-block
+   are siblings stacked vertically; both are pushed to the bottom of
+   the viewport via flex-end. Each new revealed line (scan or frame)
+   appears at the bottom and lifts the entire stack up — the scan log
+   stays visible the whole time, and the frame content prints in
+   below it as one continuous pass. overflow:hidden clips any content
+   that pushes past the top of the viewport. */
 .frame-viewport {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-}
-
-.scan-stack {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 24px 40px 32px;
+}
+
+.scan-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 40px;
   pointer-events: none;
-  /* End-state default: hidden. The play-state CSS below
-     reveals it while the boot sequence is running. */
-  opacity: 0;
-  transition: opacity 0.45s ease;
 }
 
 /* Shared reveal mechanism — scan lines and frame lines use
@@ -450,24 +452,12 @@ body.hero-sequence-play .protocol-chip.is-typed {
 .scan-line .scan-d { color: #fff; }
 
 .frame-block {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #000000;
-  padding: 88px 64px;
+  background: transparent;
+  padding: 24px 64px 56px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  /* Bottom-up print — same vocabulary as the scan-stack
-     above: lines anchor to the bottom of the viewport and
-     each new revealed line pushes earlier lines up. The
-     scan log resolves into the frame block in the same
-     reading position, no jump. overflow:hidden clips any
-     content that pushes past the top during the rise. */
   justify-content: flex-end;
-  overflow: hidden;
 }
 
 /* Frame-line wrapper — same reveal as .scan-line, taller
@@ -591,25 +581,9 @@ body.hero-sequence-play .protocol-chip.is-typed {
 }
 
 /* ── Play-state overrides — only active while the boot
-      sequence is running. Without `body.has-hero-frame-play`,
-      CSS shows end-state (frame visible, scan-stack hidden)
-      so reduced-motion users and within-session repeat
-      visits land on the resting hero at first paint. ── */
-body.has-hero-frame-play .has-hero-frame .scan-stack {
-  opacity: 1;
-}
-body.has-hero-frame-play .has-hero-frame .scan-stack.is-fading {
-  opacity: 0;
-}
-body.has-hero-frame-play .has-hero-frame .frame-block {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.45s ease;
-}
-body.has-hero-frame-play .has-hero-frame .frame-block.is-visible {
-  opacity: 1;
-  pointer-events: auto;
-}
+      sequence is running. Containers stay visible the whole
+      time; the individual lines (scan-line and frame-line)
+      handle their own reveal via max-height + opacity. ── */
 
 /* Frame lines hide until JS adds .is-visible at the cadence —
    identical reveal mechanism to .scan-line above. No translateY,
