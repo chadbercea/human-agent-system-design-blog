@@ -1000,6 +1000,30 @@ body.hero-sequence-play .protocol-chip.is-typed {
   color: var(--black);
   border-color: var(--white);
 }
+.contact-send[disabled] {
+  opacity: 0.5;
+  cursor: progress;
+}
+a.contact-send {
+  display: inline-block;
+  text-decoration: none;
+}
+.contact-status {
+  font-family: var(--font-mono);
+  font-size: 0.75vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #858585;
+  min-height: 1.2em;
+  margin: 0;
+}
+.contact-status[data-kind="error"] { color: #c8c8c8; }
+.contact-status[data-kind="pending"] { color: var(--white); }
+.thanks-actions {
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid #1c1c1c;
+}
 
 /* Footer lives in src/components/SiteFooter.astro. */
 
@@ -1398,5 +1422,7 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
   .contact-form input,
   .contact-form textarea { font-size: 16px; }
   .contact-send { font-size: 11px; padding: 0.9rem 1.5rem; }
+  .contact-status { font-size: 11px; }
+  .thanks-actions { margin-top: 2.25rem; padding-top: 2rem; }
 }
 
