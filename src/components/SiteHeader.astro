@@ -1,13 +1,15 @@
 ---
 interface Props {
-  activeNav?: 'articles' | 'glossary' | 'design-system' | 'diagnostic' | 'about' | 'contact';
+  activeNav?: 'articles' | 'glossary' | 'design-system' | 'diagnostic' | 'reading-list' | 'system-recipes' | 'about' | 'contact';
 }
 
 const { activeNav = 'articles' } = Astro.props;
 const isResourcesActive =
   activeNav === 'glossary' ||
   activeNav === 'design-system' ||
-  activeNav === 'diagnostic';
+  activeNav === 'diagnostic' ||
+  activeNav === 'reading-list' ||
+  activeNav === 'system-recipes';
 ---
 <header class="site-header">
   <div class="sh-mark">
@@ -51,6 +53,8 @@ const isResourcesActive =
         <a href="/glossary" role="menuitem" aria-current={activeNav === 'glossary' ? 'page' : undefined}>Glossary</a>
         <a href="/design-system" role="menuitem" aria-current={activeNav === 'design-system' ? 'page' : undefined}>Design System</a>
         <a href="/diagnostic" role="menuitem" aria-current={activeNav === 'diagnostic' ? 'page' : undefined}>Diagnostic</a>
+        <a href="/reading-list" role="menuitem" aria-current={activeNav === 'reading-list' ? 'page' : undefined}>Reading List</a>
+        <a href="/system-recipes" role="menuitem" aria-current={activeNav === 'system-recipes' ? 'page' : undefined}>System Recipes</a>
       </div>
     </div>
 
@@ -114,6 +118,8 @@ const isResourcesActive =
           <a href="/glossary" data-text="Glossary" data-resources-child aria-current={activeNav === 'glossary' ? 'page' : undefined}>Glossary</a>
           <a href="/design-system" data-text="Design System" data-resources-child aria-current={activeNav === 'design-system' ? 'page' : undefined}>Design System</a>
           <a href="/diagnostic" data-text="Diagnostic" data-resources-child aria-current={activeNav === 'diagnostic' ? 'page' : undefined}>Diagnostic</a>
+          <a href="/reading-list" data-text="Reading List" data-resources-child aria-current={activeNav === 'reading-list' ? 'page' : undefined}>Reading List</a>
+          <a href="/system-recipes" data-text="System Recipes" data-resources-child aria-current={activeNav === 'system-recipes' ? 'page' : undefined}>System Recipes</a>
         </div>
       </div>
 

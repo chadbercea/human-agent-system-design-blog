@@ -48,13 +48,17 @@ test.describe('ILI-775 — nav Resources dropdown + mobile accordion', () => {
     await expect(wrap).toHaveClass(/is-open/);
 
     const items = panel.locator('a');
-    await expect(items).toHaveCount(3);
+    await expect(items).toHaveCount(5);
     await expect(items.nth(0)).toHaveText('Glossary');
     await expect(items.nth(1)).toHaveText('Design System');
     await expect(items.nth(2)).toHaveText('Diagnostic');
+    await expect(items.nth(3)).toHaveText('Reading List');
+    await expect(items.nth(4)).toHaveText('System Recipes');
     await expect(items.nth(0)).toHaveAttribute('href', '/glossary');
     await expect(items.nth(1)).toHaveAttribute('href', '/design-system');
     await expect(items.nth(2)).toHaveAttribute('href', '/diagnostic');
+    await expect(items.nth(3)).toHaveAttribute('href', '/reading-list');
+    await expect(items.nth(4)).toHaveAttribute('href', '/system-recipes');
   });
 
   test('desktop: dropdown closes on outside click and on Escape', async ({ page }) => {
@@ -153,10 +157,12 @@ test.describe('ILI-775 — nav Resources dropdown + mobile accordion', () => {
 
     // Children are visible and ordered.
     const children = page.locator('[data-mobile-resources-children] a');
-    await expect(children).toHaveCount(3);
+    await expect(children).toHaveCount(5);
     await expect(children.nth(0)).toHaveAttribute('href', '/glossary');
     await expect(children.nth(1)).toHaveAttribute('href', '/design-system');
     await expect(children.nth(2)).toHaveAttribute('href', '/diagnostic');
+    await expect(children.nth(3)).toHaveAttribute('href', '/reading-list');
+    await expect(children.nth(4)).toHaveAttribute('href', '/system-recipes');
   });
 
   test('mobile: accordion auto-expands when current route is a Resources child', async ({ page }) => {
