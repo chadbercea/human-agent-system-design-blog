@@ -166,3 +166,9 @@ Don't list what you have. List what would have to be there for the smallest agen
 Most readers find the answer to question five is "no one" and "I don't know."
 
 That person is you. The work starts this week.
+
+<div class="diag-embed">
+  <a class="diag-embed-cta" href="/diagnostic" target="_blank" rel="noopener" role="button">
+    <span class="diag-embed-cta-label">Open the diagnostic in a new tab →</span>
+  </a>
+</div>
