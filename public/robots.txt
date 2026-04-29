@@ -1,4 +1,121 @@
+# robots.txt
+# Permissive policy: allow search engines, LLM training crawlers,
+# AI search indexers, and user-triggered AI agents.
+
+# ─── Default: allow everything to all well-behaved crawlers ───
 User-agent: *
 Allow: /
 
-Sitemap: https://your-domain.com/sitemap-index.xml
+# ─── OpenAI ───
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ChatGPT-User/2.0
+Allow: /
+
+# ─── Anthropic ───
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: claude-web
+Allow: /
+
+# ─── Google ───
+User-agent: Googlebot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+User-agent: Google-CloudVertexBot
+Allow: /
+
+User-agent: GoogleOther-Extended
+Allow: /
+
+# ─── Microsoft / Bing ───
+User-agent: bingbot
+Allow: /
+
+User-agent: msnbot
+Allow: /
+
+# ─── Perplexity ───
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# ─── Apple ───
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# ─── Meta ───
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+# ─── Common Crawl (feeds most open-source LLMs) ───
+User-agent: CCBot
+Allow: /
+
+# ─── DuckDuckGo ───
+User-agent: DuckAssistBot
+Allow: /
+
+# ─── Amazon ───
+User-agent: Amazonbot
+Allow: /
+
+# ─── Mistral ───
+User-agent: MistralAI-User
+Allow: /
+
+# ─── xAI / Grok ───
+User-agent: GrokBot
+Allow: /
+
+# ─── You.com ───
+User-agent: YouBot
+Allow: /
+
+# ─── Cohere ───
+User-agent: cohere-ai
+Allow: /
+
+User-agent: cohere-training-data-crawler
+Allow: /
+
+# ─── ByteDance ───
+User-agent: Bytespider
+Allow: /
+
+# ─── Sitemap ───
+Sitemap: https://humanagentsystem.design/sitemap-index.xml
