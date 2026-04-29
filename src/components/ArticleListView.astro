@@ -9,9 +9,13 @@ export interface Props {
   allArticles: CollectionEntry<'articles'>[];
   currentPage: number;
   totalPages: number;
+  /* ILI-787 — index swaps the HUD logo hero for a NASA-terminal
+     boot sequence that resolves into a #FFF frame block. /blog
+     paginated pages keep the original HUD hero. */
+  heroVariant?: 'hud' | 'frame';
 }
 
-const { pageArticles, allArticles, currentPage, totalPages } = Astro.props;
+const { pageArticles, allArticles, currentPage, totalPages, heroVariant = 'hud' } = Astro.props;
 
 function formatDate(d: Date): string {
   const y = d.getUTCFullYear();
@@ -64,124 +68,182 @@ const pageSuffix = currentPage > 1 ? ` // Page ${String(currentPage).padStart(2,
 const title = `HAS Design${pageSuffix}`;
 ---
 <HomepageLayout title={title} description={siteDescription} activeNav="articles">
-  <script is:inline data-astro-rerun>
-    /* ILI-781 — pre-paint sequence gate. Runs synchronously
-       during HTML parsing so the body class is in place before
-       the hero paints. Skip the sequence when sessionStorage
-       has already seen it (subsequent visits this tab) or when
-       the OS reduces motion. The orchestrator below picks the
-       class up to drive the choreography; CSS scopes initial
-       hidden states to it. data-astro-rerun re-evaluates on
-       view transitions so navigating back to the homepage
-       doesn't accidentally inherit a stale play class. */
-    (function () {
-      try {
-        var played = false;
-        try { played = sessionStorage.getItem('hero_sequence_played') === 'true'; } catch (e) {}
-        var reduced = window.matchMedia
-          && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (!played && !reduced) {
-          document.body.classList.add('hero-sequence-play');
-        } else {
-          document.body.classList.remove('hero-sequence-play');
-        }
-      } catch (e) {}
-    })();
-  </script>
+  {heroVariant === 'frame' ? (
+    <script is:inline data-astro-rerun>
+      /* ILI-787 — pre-paint gate for the frame hero on the
+         index page. Adds `body.has-hero-frame-play` only on the
+         first visit in the session and only when the OS isn't
+         reducing motion. CSS uses the class to scope the
+         initial hidden states (frame-block opacity:0, scan-stack
+         visible) so the boot sequence runs from rest. Without
+         the class, CSS shows the end-state at first paint —
+         which covers reduced-motion users and within-session
+         repeat visits in one path. */
+      (function () {
+        try {
+          var played = false;
+          try { played = sessionStorage.getItem('has_hero_played') === '1'; } catch (e) {}
+          var reduced = window.matchMedia
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (!played && !reduced) {
+            document.body.classList.add('has-hero-frame-play');
+          } else {
+            document.body.classList.remove('has-hero-frame-play');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  ) : (
+    <script is:inline data-astro-rerun>
+      /* ILI-781 — pre-paint sequence gate. Runs synchronously
+         during HTML parsing so the body class is in place before
+         the hero paints. Skip the sequence when sessionStorage
+         has already seen it (subsequent visits this tab) or when
+         the OS reduces motion. The orchestrator below picks the
+         class up to drive the choreography; CSS scopes initial
+         hidden states to it. data-astro-rerun re-evaluates on
+         view transitions so navigating back to the homepage
+         doesn't accidentally inherit a stale play class. */
+      (function () {
+        try {
+          var played = false;
+          try { played = sessionStorage.getItem('hero_sequence_played') === 'true'; } catch (e) {}
+          var reduced = window.matchMedia
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (!played && !reduced) {
+            document.body.classList.add('hero-sequence-play');
+          } else {
+            document.body.classList.remove('hero-sequence-play');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  )}
   <div class="stage" id="stage">
-    <div class="col col-hero">
-      <div class="hero-inner">
-        <div class="protocol-chip" data-label="PROTOCOL 001 · PHASE ALPHA">PROTOCOL 001 &middot; PHASE ALPHA</div>
+    {heroVariant === 'frame' ? (
+      <div class="col col-hero has-hero-frame">
+        <div class="frame-viewport" id="frame-viewport">
+          <div class="scan-stack" id="scan-stack" aria-hidden="true"></div>
+          <div class="frame-block" id="frame-block">
+            <div class="frame-rule" aria-hidden="true"></div>
+            <div class="frame-eyebrow">// FRAME &middot; V1.0 &middot; TRIAD VERIFIED</div>
+            <h1 class="frame-h1">Human Agent System Design</h1>
+            <p class="frame-dek">Humans, agents, and the system they share. Three actors. Three design objects. One framework.</p>
+            <div class="frame-audience">&gt; FOR THE PEOPLE SHIPPING THEM</div>
+            <a class="frame-cta" href="/blog/were-assuming-the-system">Begin transmission &rarr;</a>
+          </div>
+        </div>
+        <div class="signal-strip" aria-hidden="true">
+          <span class="signal-item">VISITOR ACQUIRED</span>
+          <span class="signal-sep">&middot;</span>
+          <span class="signal-item">TELEMETRY NOMINAL</span>
+          <span class="signal-sep">&middot;</span>
+          <span class="signal-item">ARCHIVE STANDING BY <span class="signal-cursor">&#9646;</span></span>
+          <span class="signal-sep">&middot;</span>
+          <span class="signal-item">SIGNAL ██████████ 100%</span>
+        </div>
+        <button class="back-btn" id="back-btn" aria-label="Back to articles">
+          <span class="back-content">
+            <span class="back-arrow">&larr;</span>
+            <span>Back</span>
+          </span>
+        </button>
+      </div>
+    ) : (
+      <div class="col col-hero">
+        <div class="hero-inner">
+          <div class="protocol-chip" data-label="PROTOCOL 001 · PHASE ALPHA">PROTOCOL 001 &middot; PHASE ALPHA</div>
 
-        <div class="hero-stack">
-          <div class="hero-logo">
-            <div class="logo-stage">
-              <div class="bar full" style="top:30px;left:42px;transform:rotate(45deg)"></div>
-              <div class="bar full" style="top:30px;left:115px;transform:rotate(45deg)"></div>
-              <div class="bar half" style="top:81px;left:165px;transform:rotate(-45deg)"></div>
-              <div class="bar half" style="top:32.6px;left:220.2px;transform:rotate(90deg)"></div>
-              <div class="bar half" style="top:53.8px;left:211.4px;transform:rotate(-45deg)"></div>
-              <div class="bar half" style="top:66.2px;left:253.8px;transform:rotate(-45deg)"></div>
-              <div class="bar half" style="top:87.4px;left:245px;transform:rotate(90deg)"></div>
+          <div class="hero-stack">
+            <div class="hero-logo">
+              <div class="logo-stage">
+                <div class="bar full" style="top:30px;left:42px;transform:rotate(45deg)"></div>
+                <div class="bar full" style="top:30px;left:115px;transform:rotate(45deg)"></div>
+                <div class="bar half" style="top:81px;left:165px;transform:rotate(-45deg)"></div>
+                <div class="bar half" style="top:32.6px;left:220.2px;transform:rotate(90deg)"></div>
+                <div class="bar half" style="top:53.8px;left:211.4px;transform:rotate(-45deg)"></div>
+                <div class="bar half" style="top:66.2px;left:253.8px;transform:rotate(-45deg)"></div>
+                <div class="bar half" style="top:87.4px;left:245px;transform:rotate(90deg)"></div>
+              </div>
+            </div>
+
+            <div class="hero-sub">
+              <svg viewBox="0 0 275.44 15" xmlns="http://www.w3.org/2000/svg" aria-label="HUMAN AGENT SYSTEM DESIGN">
+                <text x="0" y="12" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="500" fill="currentColor" textLength="275.44" lengthAdjust="spacing">HUMAN AGENT SYSTEM DESIGN</text>
+              </svg>
             </div>
           </div>
 
-          <div class="hero-sub">
-            <svg viewBox="0 0 275.44 15" xmlns="http://www.w3.org/2000/svg" aria-label="HUMAN AGENT SYSTEM DESIGN">
-              <text x="0" y="12" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="500" fill="currentColor" textLength="275.44" lengthAdjust="spacing">HUMAN AGENT SYSTEM DESIGN</text>
-            </svg>
+          <div class="hud-corner tl">
+            <span class="hud-corner-text">
+              <strong class="hud-corner-label" data-label="OBS // SITE">OBS // SITE</strong>
+              <span class="hud-corner-data">
+                42.56&deg;N &middot; 114.46&deg;W<br />
+                <span class="dim">TWIN FALLS / IDAHO</span><br />
+                <span id="hud-t">T+00:00:00</span>
+              </span>
+            </span>
+          </div>
+          <div class="hud-corner tr">
+            <span class="hud-corner-text">
+              <strong class="hud-corner-label" data-label="INDEX // LIVE">INDEX // LIVE</strong>
+              <span class="hud-corner-data">
+                ENTRIES <span id="hud-entries" data-target={totalEntries}>{entryCount}</span><br />
+                UPD {lastUpdated}<br />
+                <span class="dim">CH 01 / DISPATCH</span>
+              </span>
+            </span>
+          </div>
+          <div class="hud-corner bl">
+            <span class="hud-corner-text">
+              <strong class="hud-corner-label" data-label="STATUS // LINK">STATUS // LINK</strong>
+              <span class="hud-corner-data">
+                AGENT-01 &nbsp; ONLINE<br />
+                OPERATOR &nbsp; LINKED<br />
+                <span class="dim">HANDSHAKE &middot; OK</span>
+              </span>
+            </span>
+          </div>
+          <div class="hud-corner br">
+            <span class="hud-corner-text">
+              <strong class="hud-corner-label" data-label="BUILD // META">BUILD // META</strong>
+              <span class="hud-corner-data">
+                REV 01.00<br />
+                HASH <span id="hud-hash" data-target="9F2A-8C1D">9F2A-8C1D</span><br />
+                <span class="dim">GAMMA &middot; sRGB</span>
+              </span>
+            </span>
           </div>
         </div>
-
-        <div class="hud-corner tl">
-          <span class="hud-corner-text">
-            <strong class="hud-corner-label" data-label="OBS // SITE">OBS // SITE</strong>
-            <span class="hud-corner-data">
-              42.56&deg;N &middot; 114.46&deg;W<br />
-              <span class="dim">TWIN FALLS / IDAHO</span><br />
-              <span id="hud-t">T+00:00:00</span>
-            </span>
+        <button class="back-btn" id="back-btn" aria-label="Back to articles">
+          <span class="back-content">
+            <span class="back-arrow">&larr;</span>
+            <span>Back</span>
           </span>
-        </div>
-        <div class="hud-corner tr">
-          <span class="hud-corner-text">
-            <strong class="hud-corner-label" data-label="INDEX // LIVE">INDEX // LIVE</strong>
-            <span class="hud-corner-data">
-              ENTRIES <span id="hud-entries" data-target={totalEntries}>{entryCount}</span><br />
-              UPD {lastUpdated}<br />
-              <span class="dim">CH 01 / DISPATCH</span>
+        </button>
+        <div class="hero-tooltip" id="hero-tooltip" aria-hidden="true">
+          <div class="hero-tooltip-frame">
+            <span class="hero-tooltip-line">
+              <span class="hero-tooltip-text" data-target="> VISITOR ACQUIRED">&gt; VISITOR ACQUIRED</span>
             </span>
-          </span>
-        </div>
-        <div class="hud-corner bl">
-          <span class="hud-corner-text">
-            <strong class="hud-corner-label" data-label="STATUS // LINK">STATUS // LINK</strong>
-            <span class="hud-corner-data">
-              AGENT-01 &nbsp; ONLINE<br />
-              OPERATOR &nbsp; LINKED<br />
-              <span class="dim">HANDSHAKE &middot; OK</span>
+            <span class="hero-tooltip-line">
+              <span class="hero-tooltip-text" data-target="> TELEMETRY NOMINAL">&gt; TELEMETRY NOMINAL</span>
             </span>
-          </span>
-        </div>
-        <div class="hud-corner br">
-          <span class="hud-corner-text">
-            <strong class="hud-corner-label" data-label="BUILD // META">BUILD // META</strong>
-            <span class="hud-corner-data">
-              REV 01.00<br />
-              HASH <span id="hud-hash" data-target="9F2A-8C1D">9F2A-8C1D</span><br />
-              <span class="dim">GAMMA &middot; sRGB</span>
+            <span class="hero-tooltip-line">
+              <span class="hero-tooltip-text" data-target="> ARCHIVE STANDING BY">&gt; ARCHIVE STANDING BY</span>
+              <span class="hero-tooltip-cursor" aria-hidden="true">&#9646;</span>
             </span>
-          </span>
+            <span class="hero-tooltip-rule" aria-hidden="true"></span>
+            <span class="hero-tooltip-line hero-tooltip-line--telem">
+              <span>&gt;&nbsp;COORD&nbsp;&nbsp;</span><span id="hero-tooltip-coord">X+0000.0  Y+0000.0</span>
+            </span>
+            <span class="hero-tooltip-line hero-tooltip-line--telem">
+              <span>&gt;&nbsp;SIGNAL&nbsp;</span><span id="hero-tooltip-signal-bar">██████████</span><span>&nbsp;</span><span id="hero-tooltip-signal-pct">100%</span>
+            </span>
+          </div>
         </div>
       </div>
-      <button class="back-btn" id="back-btn" aria-label="Back to articles">
-        <span class="back-content">
-          <span class="back-arrow">&larr;</span>
-          <span>Back</span>
-        </span>
-      </button>
-      <div class="hero-tooltip" id="hero-tooltip" aria-hidden="true">
-        <div class="hero-tooltip-frame">
-          <span class="hero-tooltip-line">
-            <span class="hero-tooltip-text" data-target="> VISITOR ACQUIRED">&gt; VISITOR ACQUIRED</span>
-          </span>
-          <span class="hero-tooltip-line">
-            <span class="hero-tooltip-text" data-target="> TELEMETRY NOMINAL">&gt; TELEMETRY NOMINAL</span>
-          </span>
-          <span class="hero-tooltip-line">
-            <span class="hero-tooltip-text" data-target="> ARCHIVE STANDING BY">&gt; ARCHIVE STANDING BY</span>
-            <span class="hero-tooltip-cursor" aria-hidden="true">&#9646;</span>
-          </span>
-          <span class="hero-tooltip-rule" aria-hidden="true"></span>
-          <span class="hero-tooltip-line hero-tooltip-line--telem">
-            <span>&gt;&nbsp;COORD&nbsp;&nbsp;</span><span id="hero-tooltip-coord">X+0000.0  Y+0000.0</span>
-          </span>
-          <span class="hero-tooltip-line hero-tooltip-line--telem">
-            <span>&gt;&nbsp;SIGNAL&nbsp;</span><span id="hero-tooltip-signal-bar">██████████</span><span>&nbsp;</span><span id="hero-tooltip-signal-pct">100%</span>
-          </span>
-        </div>
-      </div>
-    </div>
+    )}
     <div class="col col-list">
       <span class="list-label">Published Articles</span>
       <ul class="post-card-list" id="article-list">
@@ -853,6 +915,92 @@ const title = `HAS Design${pageSuffix}`;
         window.setTimeout(function () {
           document.body.classList.remove('hero-sequence-play');
         }, 2500);
+      })();
+    </script>
+
+    <script is:inline data-astro-rerun>
+      /* ILI-787 — frame-hero boot sequence orchestrator.
+         Runs only when the pre-paint gate added
+         `body.has-hero-frame-play` (first session visit, motion
+         allowed). Prints 13 scan lines bottom-up at 145ms
+         cadence after a 280ms initial delay; each line transitions
+         max-height 0 → 32px so newer lines appear to print up
+         from the bottom and push earlier lines through the top
+         clip. After the last line + 280ms pause, scan-stack fades
+         out (0.45s) and frame-block fades in (0.5s) on top — the
+         CSS cascade chains the rule, eyebrow, h1, dek, audience,
+         and CTA at staggered delays. Once everything settles,
+         we set sessionStorage so within-session repeat visits
+         skip straight to end-state via the gate above. */
+      (function () {
+        if (!document.body.classList.contains('has-hero-frame-play')) return;
+        var hero = document.querySelector('.col-hero.has-hero-frame');
+        if (!hero) return;
+        var scanStack = hero.querySelector('.scan-stack');
+        var frameBlock = hero.querySelector('.frame-block');
+        if (!scanStack || !frameBlock) return;
+
+        var lines = [
+          ['+00.001', 'PING', 'sweep envelope · radius ∞'],
+          ['+00.034', 'CAL',  'calibrating actor classifier'],
+          ['+00.124', 'HIT',  'actor.01 · classification HUMAN'],
+          ['+00.298', 'HIT',  'actor.02 · classification AGENT'],
+          ['+00.412', 'PING', 'third-actor sweep · expanded radius'],
+          ['+00.620', 'PING', 'sweep · negative'],
+          ['+00.840', 'NULL', 'no signal · system not located'],
+          ['+01.020', 'WARN', 'triad incomplete · reclassifying'],
+          ['+01.180', 'NOTE', 'environment is not substrate'],
+          ['+01.340', 'RECL', 'classifier · revising'],
+          ['+01.488', 'HIT',  'actor.03 · classification SYSTEM'],
+          ['+01.604', 'LOCK', 'triad established · 3 design objects'],
+          ['+01.660', 'RDY',  'publishing frame · v1.0']
+        ];
+
+        var INITIAL_DELAY = 280;
+        var CADENCE = 145;
+        var POST_LAST_PAUSE = 280;
+        var FADE_OUT_MS = 450;
+
+        function makeLine(parts) {
+          var el = document.createElement('div');
+          el.className = 'scan-line';
+          var t = document.createElement('span'); t.className = 'scan-t'; t.textContent = parts[0];
+          var c = document.createElement('span'); c.className = 'scan-c'; c.textContent = parts[1];
+          var d = document.createElement('span'); d.className = 'scan-d'; d.textContent = parts[2];
+          el.appendChild(t); el.appendChild(c); el.appendChild(d);
+          return el;
+        }
+
+        // Pre-build all the line elements so layout doesn't shift
+        // mid-sequence; reveal each via a class flip.
+        var nodes = lines.map(function (parts) {
+          var n = makeLine(parts);
+          scanStack.appendChild(n);
+          return n;
+        });
+
+        nodes.forEach(function (el, i) {
+          window.setTimeout(function () {
+            el.classList.add('is-visible');
+          }, INITIAL_DELAY + i * CADENCE);
+        });
+
+        var totalLinesTime = INITIAL_DELAY + (nodes.length - 1) * CADENCE;
+        var fadeOutAt = totalLinesTime + POST_LAST_PAUSE;
+
+        window.setTimeout(function () {
+          scanStack.classList.add('is-fading');
+          frameBlock.classList.add('is-visible');
+        }, fadeOutAt);
+
+        // Post-completion: set the session flag and drop the play
+        // class so any re-entry from a view transition lands on
+        // end-state rules (no transitions re-running).
+        var totalDuration = fadeOutAt + FADE_OUT_MS + 800; /* +cascade tail */
+        window.setTimeout(function () {
+          try { sessionStorage.setItem('has_hero_played', '1'); } catch (e) {}
+          document.body.classList.remove('has-hero-frame-play');
+        }, totalDuration);
       })();
     </script>
   </Fragment>
