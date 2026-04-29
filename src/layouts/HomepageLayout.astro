@@ -16,9 +16,12 @@ import { getChannelForPath } from '../lib/channels';
 interface Props {
   title: string;
   description?: string;
-  activeNav?: 'articles' | 'glossary' | 'design-system' | 'diagnostic' | 'about' | 'contact';
+  activeNav?: 'articles' | 'glossary' | 'design-system' | 'diagnostic' | 'reading-list' | 'system-recipes' | 'about' | 'contact';
   railTag?: string;
   chrome?: 'full' | 'minimal' | 'none';
+  noindex?: boolean;
+  ogTitle?: string;
+  ogDescription?: string;
 }
 
 const {
@@ -27,6 +30,9 @@ const {
   activeNav = 'articles',
   railTag,
   chrome = 'full',
+  noindex = false,
+  ogTitle,
+  ogDescription,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
@@ -39,6 +45,7 @@ const railTagText = railTag ?? channel.tag;
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title}</title>
   <meta name="description" content={description} />
+  {noindex && <meta name="robots" content="noindex" />}
   <link rel="canonical" href={canonical} />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -46,12 +53,12 @@ const railTagText = railTag ?? channel.tag;
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Lato:wght@100;300;400;700;900&display=swap" rel="stylesheet" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="HAS Design" />
-  <meta property="og:title" content={title} />
-  <meta property="og:description" content={description} />
+  <meta property="og:title" content={ogTitle ?? title} />
+  <meta property="og:description" content={ogDescription ?? description} />
   <meta property="og:url" content={canonical} />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content={title} />
-  <meta name="twitter:description" content={description} />
+  <meta name="twitter:title" content={ogTitle ?? title} />
+  <meta name="twitter:description" content={ogDescription ?? description} />
   <ClientRouter />
 </head>
 <body data-chrome={chrome} data-channel-id={channel.id} data-channel-label={channel.label} data-flourish={channel.flourish ?? 'none'}>

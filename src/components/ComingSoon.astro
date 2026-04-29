@@ -1,0 +1,78 @@
+---
+interface Props {
+  name: string;
+}
+const { name } = Astro.props;
+const heading = name.toUpperCase();
+---
+<main class="coming-soon">
+  <div class="cs-block">
+    <p class="cs-line">&gt; {heading} · COMING SOON</p>
+    <p class="cs-rule">&gt; ─────────────────</p>
+    <p class="cs-line">&gt; CONTENT IN PRODUCTION</p>
+    <p class="cs-line">&gt; CHANNEL ACTIVE</p>
+    <p class="cs-line">&gt; CHECK BACK SOON</p>
+    <a href="/blog" class="cs-cta">[ BACK TO ARTICLES &rarr; ]</a>
+  </div>
+</main>
+
+<style>
+  .coming-soon {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2.5rem;
+  }
+  .cs-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    text-align: center;
+  }
+  .cs-line,
+  .cs-rule {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--light);
+  }
+  .cs-rule {
+    color: var(--rule-strong);
+    letter-spacing: 0.04em;
+  }
+  .cs-cta {
+    display: inline-block;
+    margin-top: 2.5rem;
+    padding: 1rem 1.75rem;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: transparent;
+    border: 1px solid var(--rule-strong);
+    text-decoration: none;
+    transition:
+      background var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+  .cs-cta:where(:hover, :focus-visible) {
+    background: var(--white);
+    color: var(--black);
+    border-color: var(--white);
+    outline: none;
+  }
+  @media (max-width: 900px) {
+    .coming-soon { padding: 3rem 1.5rem; }
+    .cs-line,
+    .cs-rule { font-size: 12px; letter-spacing: 0.18em; }
+    .cs-cta { font-size: 11px; padding: 0.85rem 1.4rem; }
+  }
+</style>
