@@ -139,22 +139,30 @@ If you recognized your product in any of these, the work is at the system layer.
 
 ## Where to start
 
-You will not design a complete system on the first pass. Nobody does. The work starts with one project. One human. One agent. One slice of the system you can name today.
+You will not design your whole system on the first pass. Nobody does. The work starts with one task, one week, and a comparison.
 
-Pick a project you are about to start. Open the worksheet. Write down the human in the seat. Write down the agent and what you have specified for it to do. Write down the system: every skill, every MCP connection, every authentication, every service the agent will reach into. Draw the web.
+Don't list what you have. List what would have to be there for the smallest agent task on your plate this week to succeed without anyone watching. Then list what is actually there. The gap is the system you have been assuming. It is also the system you are now responsible for.
 
-Look at what you wrote down. Most teams discover two things. The system was underspecified. The person who should have been designing it was nobody.
+**1. What's the smallest task you'll give an agent this week?**
 
-If that sounds like you, the worksheet is where you start.
+*Pro tip:* Pick a task you can describe with a verb, a recurrence, and a stop condition. "Help with bugs" is not a task. "Each morning, draft a triage comment for new bug reports and wait for approval before posting" is. The smallest task with all three roles visible beats the most ambitious task with only one.
 
-<div class="diag-embed">
-  <iframe
-    src="/diagnostic"
-    title="HAS-D Diagnostic — five-slider self-assessment"
-    loading="lazy"
-    referrerpolicy="no-referrer-when-downgrade"
-  ></iframe>
-  <a class="diag-embed-cta" href="/diagnostic" target="_blank" rel="noopener" role="button">
-    <span class="diag-embed-cta-label">Open the diagnostic in a new tab →</span>
-  </a>
-</div>
+**2. For that task to succeed when no one is watching, what has to exist?**
+
+*Pro tip:* Sort what you wrote into three columns — human, agent, system. If one column is empty or thin, you found a layer you've been assuming. The system column is where most teams come up short: credentials, audit trails, drafts queues, the place state lives between sessions. None of these configure themselves.
+
+**3. What of that is actually there right now? What isn't?**
+
+*Pro tip:* Most readers find their gaps cluster in one layer — usually the system. That clustering is the discovery. If your gaps are mostly "the agent needs a better prompt," re-read question two. You probably listed agent ergonomics dressed up as requirements.
+
+**4. If you had to build three things this week to close the gap, what are they — in order?**
+
+*Pro tip:* Build foundation-first. System scaffolding before human rules before agent configuration. The opposite order — configure the agent, patch the rules, bolt on the system — is how the chat trap closes around a team. The order is the lesson.
+
+**5. When you close the laptop, who owns this layer? When are you looking at it next?**
+
+*Pro tip:* A person, a cadence, a place. "The team," "I'll check on it," and "it runs itself" all mean no one is watching. Put your name, a recurring date, and a file or page on it. If you can't, you don't own it yet — and the work won't survive the next change.
+
+Most readers find the answer to question five is "no one" and "I don't know."
+
+That person is you. The work starts this week.
