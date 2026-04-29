@@ -884,23 +884,21 @@ body.hero-hover .hud-corner.tr { transform: translate(-8.49px,  8.49px); }
 body.hero-hover .hud-corner.bl { transform: translate( 8.49px, -8.49px); }
 body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
 
-/* ───────────── HERO TOOLTIP — ILI-776 ─────────────
+/* ───────────── HERO TOOLTIP — ILI-776 / ILI-780 ─────────────
    Mission-control welcome readout that trails the cursor
    inside the hero. JS positions via translate3d on
    mousemove; CSS owns the resting frame, fade, and
-   reduced-motion / touch fallbacks. */
+   reduced-motion / touch fallbacks. ILI-780 layers live
+   telemetry (coord/signal), entry scramble, blinking
+   cursor, pulsing hairline, and micro-shake on top. */
 .hero-tooltip {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 5;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
   padding: 12px 16px;
-  max-width: 280px;
+  max-width: 320px;
   background: var(--black);
-  border: 1px solid var(--rule-strong);
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 500;
@@ -913,8 +911,60 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
   transition: opacity 120ms var(--ease-out);
   will-change: transform, opacity;
 }
+/* Pulsing hairline border via overlay so the only animated
+   property is opacity (no border-color repaints). */
+.hero-tooltip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--rule-strong);
+  pointer-events: none;
+  opacity: 1;
+}
 .hero-tooltip.is-visible { opacity: 1; }
+.hero-tooltip.is-visible::before {
+  animation: hero-tooltip-border-pulse 2.5s ease-in-out infinite;
+}
+.hero-tooltip-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transform: translate3d(0, 0, 0);
+}
 .hero-tooltip-line { display: block; line-height: 1.4; }
+.hero-tooltip-line--telem { color: var(--dim); }
+.hero-tooltip-rule {
+  display: block;
+  height: 1px;
+  margin: 4px 0 2px;
+  background: var(--rule-strong);
+}
+.hero-tooltip-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--light);
+  animation: hero-tooltip-cursor-blink 1s steps(1, end) infinite;
+}
+#hero-tooltip-coord,
+#hero-tooltip-signal-bar,
+#hero-tooltip-signal-pct {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes hero-tooltip-border-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+@keyframes hero-tooltip-cursor-blink {
+  0%, 50%   { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+/* Reduced-motion: kill atmospheric effects, keep readable. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-tooltip.is-visible::before { animation: none; opacity: 1; }
+  .hero-tooltip-cursor { animation: none; opacity: 1; }
+}
 
 /* Reduced-motion: pin to the hero's top-right inset
    (matches the `.hud-corner.tr` resting position) and

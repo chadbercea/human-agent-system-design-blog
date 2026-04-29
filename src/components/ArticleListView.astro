@@ -129,9 +129,25 @@ const title = `HAS Design${pageSuffix}`;
         </span>
       </button>
       <div class="hero-tooltip" id="hero-tooltip" aria-hidden="true">
-        <span class="hero-tooltip-line">&gt; VISITOR ACQUIRED</span>
-        <span class="hero-tooltip-line">&gt; TELEMETRY NOMINAL</span>
-        <span class="hero-tooltip-line">&gt; ARCHIVE STANDING BY</span>
+        <div class="hero-tooltip-frame">
+          <span class="hero-tooltip-line">
+            <span class="hero-tooltip-text" data-target="> VISITOR ACQUIRED">&gt; VISITOR ACQUIRED</span>
+          </span>
+          <span class="hero-tooltip-line">
+            <span class="hero-tooltip-text" data-target="> TELEMETRY NOMINAL">&gt; TELEMETRY NOMINAL</span>
+          </span>
+          <span class="hero-tooltip-line">
+            <span class="hero-tooltip-text" data-target="> ARCHIVE STANDING BY">&gt; ARCHIVE STANDING BY</span>
+            <span class="hero-tooltip-cursor" aria-hidden="true">&#9646;</span>
+          </span>
+          <span class="hero-tooltip-rule" aria-hidden="true"></span>
+          <span class="hero-tooltip-line hero-tooltip-line--telem">
+            <span>&gt;&nbsp;COORD&nbsp;&nbsp;</span><span id="hero-tooltip-coord">X+0000.0  Y+0000.0</span>
+          </span>
+          <span class="hero-tooltip-line hero-tooltip-line--telem">
+            <span>&gt;&nbsp;SIGNAL&nbsp;</span><span id="hero-tooltip-signal-bar">██████████</span><span>&nbsp;</span><span id="hero-tooltip-signal-pct">100%</span>
+          </span>
+        </div>
       </div>
     </div>
     <div class="col col-list">
@@ -354,33 +370,88 @@ const title = `HAS Design${pageSuffix}`;
     </script>
 
     <script is:inline data-astro-rerun>
-      // ILI-776 — hero hover: corner-shift "lock on" + mouse-following
-      // welcome tooltip. Toggles `body.hero-hover` (CSS shifts the four
-      // corners inward as a unit) and translates `#hero-tooltip` to
-      // trail the cursor with a small offset, flipping against the
-      // viewport edges. Touch and reduced-motion paths short-circuit
-      // the cursor logic.
+      // ILI-776 + ILI-780 — hero hover: corner-shift "lock on" +
+      // mouse-following welcome tooltip with live telemetry, entry
+      // scramble, blinking cursor, pulsing hairline border (CSS),
+      // and occasional micro-shake. Toggles `body.hero-hover` (CSS
+      // shifts the four corners inward as a unit) and translates
+      // `#hero-tooltip` to trail the cursor with a small offset,
+      // flipping against the viewport edges. Touch and reduced-motion
+      // paths short-circuit the cursor logic; reduced-motion also
+      // freezes signal fluctuation, scramble, and micro-shake.
       (function () {
         var heroCol = document.querySelector('.col-hero');
         var stage = document.getElementById('stage');
         var tooltip = document.getElementById('hero-tooltip');
         if (!heroCol || !stage || !tooltip) return;
 
+        var frame = tooltip.querySelector('.hero-tooltip-frame');
+        var coordEl = document.getElementById('hero-tooltip-coord');
+        var signalBarEl = document.getElementById('hero-tooltip-signal-bar');
+        var signalPctEl = document.getElementById('hero-tooltip-signal-pct');
+        var textEls = tooltip.querySelectorAll('.hero-tooltip-text');
+
         var desktop = window.matchMedia('(min-width: 901px) and (hover: hover) and (pointer: fine)');
         var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
         var touch = window.matchMedia('(hover: none), (pointer: coarse)');
 
+        var SCRAMBLE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+
+        function fmtCoord(v) {
+          var sign = v >= 0 ? '+' : '-';
+          var abs = Math.abs(v);
+          var whole = Math.floor(abs);
+          var frac = Math.floor((abs - whole) * 10);
+          var w = String(whole);
+          while (w.length < 4) w = '0' + w;
+          return sign + w + '.' + frac;
+        }
+
+        function setCoord(cx, cy, rect) {
+          if (!coordEl) return;
+          var halfW = rect.width / 2;
+          var halfH = rect.height / 2;
+          var nx = halfW > 0 ? ((cx - halfW) / halfW) * 1000 : 0;
+          var ny = halfH > 0 ? ((halfH - cy) / halfH) * 1000 : 0;
+          coordEl.textContent = 'X' + fmtCoord(nx) + '  Y' + fmtCoord(ny);
+        }
+
+        function renderSignal(value) {
+          if (!signalBarEl || !signalPctEl) return;
+          var pct = Math.round(value);
+          var blocks = Math.round((value / 100) * 10);
+          if (blocks < 7) blocks = 7;
+          if (blocks > 10) blocks = 10;
+          var bar = '';
+          for (var i = 0; i < 10; i++) bar += i < blocks ? '█' : '░';
+          signalBarEl.textContent = bar;
+          var pStr = String(pct);
+          if (pStr.length < 2) pStr = '0' + pStr;
+          signalPctEl.textContent = pStr + '%';
+        }
+
+        // ─── Touch fallback ───────────────────────────────
         if (touch.matches) {
-          // No hover anchor on touch — pin the readout to the hero corner.
           tooltip.classList.add('hero-tooltip--static', 'is-visible');
+          renderSignal(90);
+          if (coordEl) coordEl.textContent = 'X+0000.0  Y+0000.0';
           return;
         }
 
+        // ─── Cursor follow state ──────────────────────────
         var rafId = 0;
         var targetX = 0, targetY = 0;
         var currentX = 0, currentY = 0;
         var hasFrame = false;
         var inside = false;
+
+        // ─── Telemetry state ──────────────────────────────
+        var signalCurrent = 90;
+        var signalAnimRaf = 0;
+        var signalTimeout = 0;
+        var shakeTimeout = 0;
+        var shakeResetTimeout = 0;
+        var hasScrambled = false;
 
         function eligible() {
           return desktop.matches && !stage.classList.contains('open');
@@ -411,6 +482,104 @@ const title = `HAS Design${pageSuffix}`;
           if (!rafId) rafId = requestAnimationFrame(tick);
         }
 
+        // ─── Scramble entry ───────────────────────────────
+        function scrambleLine(el, target, durationMs) {
+          if (!el) return;
+          var start = performance.now();
+          function step() {
+            var elapsed = performance.now() - start;
+            if (elapsed >= durationMs) { el.textContent = target; return; }
+            var locked = Math.floor((elapsed / durationMs) * target.length);
+            var out = '';
+            for (var i = 0; i < target.length; i++) {
+              var c = target.charAt(i);
+              if (c === ' ' || c === '>' || c === '·') {
+                out += c;
+              } else if (i < locked) {
+                out += c;
+              } else {
+                out += SCRAMBLE_CHARS.charAt(Math.floor(Math.random() * SCRAMBLE_CHARS.length));
+              }
+            }
+            el.textContent = out;
+            requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        }
+
+        function runEntryScramble() {
+          if (reduced.matches) return;
+          for (var i = 0; i < textEls.length; i++) {
+            (function (el, idx) {
+              var target = el.getAttribute('data-target') || el.textContent || '';
+              setTimeout(function () { scrambleLine(el, target, 250); }, idx * 80);
+            })(textEls[i], i);
+          }
+        }
+
+        // ─── Signal fluctuation ───────────────────────────
+        function tickSignal() {
+          var roll = Math.random();
+          var target;
+          if (roll < 0.08) {
+            target = 78 + Math.random() * 6;       // occasional dip
+          } else {
+            target = 82 + Math.random() * 13;      // 82–95 nominal
+          }
+          var startVal = signalCurrent;
+          var startT = performance.now();
+          var dur = 320;
+          function step() {
+            if (!inside || reduced.matches) return;
+            var t = (performance.now() - startT) / dur;
+            if (t > 1) t = 1;
+            var eased = 1 - Math.pow(1 - t, 3);
+            signalCurrent = startVal + (target - startVal) * eased;
+            renderSignal(signalCurrent);
+            if (t < 1) signalAnimRaf = requestAnimationFrame(step);
+          }
+          signalAnimRaf = requestAnimationFrame(step);
+          signalTimeout = window.setTimeout(tickSignal, 400 + Math.random() * 400);
+        }
+
+        function startSignal() {
+          if (reduced.matches) { renderSignal(90); return; }
+          stopSignal();
+          tickSignal();
+        }
+
+        function stopSignal() {
+          if (signalTimeout) { clearTimeout(signalTimeout); signalTimeout = 0; }
+          if (signalAnimRaf) { cancelAnimationFrame(signalAnimRaf); signalAnimRaf = 0; }
+        }
+
+        // ─── Micro-shake ──────────────────────────────────
+        function microShake() {
+          if (!frame || reduced.matches || !inside) return;
+          var dx = (Math.random() < 0.5 ? -1 : 1) * (1 + Math.random());
+          var dy = (Math.random() < 0.5 ? -1 : 1) * (1 + Math.random());
+          frame.style.transform =
+            'translate3d(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px,0)';
+          shakeResetTimeout = window.setTimeout(function () {
+            if (frame) frame.style.transform = '';
+          }, 80);
+        }
+
+        function scheduleShake() {
+          if (reduced.matches) return;
+          shakeTimeout = window.setTimeout(function () {
+            microShake();
+            scheduleShake();
+          }, 6000 + Math.random() * 4000);
+        }
+
+        function stopShake() {
+          if (shakeTimeout) { clearTimeout(shakeTimeout); shakeTimeout = 0; }
+          if (shakeResetTimeout) { clearTimeout(shakeResetTimeout); shakeResetTimeout = 0; }
+          if (frame) frame.style.transform = '';
+        }
+
+        // ─── Lifecycle ────────────────────────────────────
         function onEnter() {
           if (!eligible()) return;
           inside = true;
@@ -420,6 +589,12 @@ const title = `HAS Design${pageSuffix}`;
             tooltip.classList.add('hero-tooltip--pinned');
             setStaticPosition();
           }
+          if (!hasScrambled) {
+            hasScrambled = true;
+            runEntryScramble();
+          }
+          startSignal();
+          scheduleShake();
         }
 
         function onLeave() {
@@ -428,14 +603,18 @@ const title = `HAS Design${pageSuffix}`;
           tooltip.classList.remove('is-visible', 'hero-tooltip--pinned');
           hasFrame = false;
           if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+          stopSignal();
+          stopShake();
         }
 
         function onMove(e) {
-          if (!eligible() || !inside || reduced.matches) return;
+          if (!eligible() || !inside) return;
           var rect = heroCol.getBoundingClientRect();
           if (rect.width <= 0 || rect.height <= 0) return;
           var cx = e.clientX - rect.left;
           var cy = e.clientY - rect.top;
+          setCoord(cx, cy, rect);
+          if (reduced.matches) return;
           var ttW = tooltip.offsetWidth;
           var ttH = tooltip.offsetHeight;
           var pad = 8;
@@ -461,6 +640,11 @@ const title = `HAS Design${pageSuffix}`;
         }
         desktop.addEventListener('change', onGuardChange);
         reduced.addEventListener('change', onGuardChange);
+
+        // Seed initial readouts so the tooltip never flashes a blank
+        // bar/coords on its first paint before mousemove fires.
+        renderSignal(signalCurrent);
+        if (coordEl) coordEl.textContent = 'X+0000.0  Y+0000.0';
 
         var stageObserver = new MutationObserver(function () {
           if (stage.classList.contains('open')) onLeave();
