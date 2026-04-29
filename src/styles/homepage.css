@@ -102,8 +102,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   text-transform: uppercase;
   color: var(--dim);
   white-space: nowrap;
-  animation: rise 900ms cubic-bezier(.2,.8,.2,1) backwards;
-  animation-delay: 160ms;
 }
 
 .hud-corner {
@@ -115,14 +113,13 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   text-transform: uppercase;
   color: var(--mid);
   line-height: 1.7;
-  animation: rise 900ms cubic-bezier(.2,.8,.2,1) backwards;
 }
 .hud-corner strong { color: var(--white); font-weight: 600; display: block; margin-bottom: 4px; }
 .hud-corner .dim { color: var(--dim); }
-.hud-corner.tl { top: 40px; left: 72px; animation-delay: 420ms; }
-.hud-corner.tr { top: 40px; right: 72px; text-align: right; animation-delay: 480ms; }
-.hud-corner.bl { bottom: 40px; left: 72px; animation-delay: 540ms; }
-.hud-corner.br { bottom: 40px; right: 72px; text-align: right; animation-delay: 600ms; }
+.hud-corner.tl { top: 40px; left: 72px; }
+.hud-corner.tr { top: 40px; right: 72px; text-align: right; }
+.hud-corner.bl { bottom: 40px; left: 72px; }
+.hud-corner.br { bottom: 40px; right: 72px; text-align: right; }
 
 .hud-corner::before {
   content: "";
@@ -147,7 +144,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   width: 275.44px;
   height: 84.86px;
   margin: 0 auto 14.4px;
-  animation: rise 900ms cubic-bezier(.2,.8,.2,1) both;
 }
 .hero-logo .logo-stage {
   position: absolute;
@@ -183,10 +179,156 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   width: 275.44px;
   margin: 0 auto;
   color: var(--mid);
-  animation: rise 900ms cubic-bezier(.2,.8,.2,1) backwards;
-  animation-delay: 220ms;
 }
 .hero-sub svg { display: block; width: 100%; height: auto; }
+
+/* ───────────── HERO SEQUENCED REVEAL — ILI-781 ─────────────
+   First-load only choreographed entrance. An inline pre-paint
+   script in ArticleListView.astro adds `body.hero-sequence-play`
+   when sessionStorage hasn't seen the sequence yet AND
+   prefers-reduced-motion is off. The class scopes initial
+   states + keyframed entrances; the orchestrator clears the
+   class once stage 7 completes. Subsequent navigations and
+   reduced-motion users render in final state — no animation,
+   matching what a returning visitor expects.
+   ──────────────────────────────────────────────────────────── */
+
+@keyframes hero-seq-logo {
+  0%   { opacity: 0; transform: scale(1.05); }
+  35%  { opacity: 1; }
+  55%  { opacity: 0.3; }
+  75%  { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes hero-seq-bracket-tl {
+  from { clip-path: inset(0 100% 100% 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes hero-seq-bracket-tr {
+  from { clip-path: inset(0 0 100% 100%); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes hero-seq-bracket-bl {
+  from { clip-path: inset(100% 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes hero-seq-bracket-br {
+  from { clip-path: inset(100% 0 0 100%); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes hero-seq-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes hero-seq-title {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes hero-seq-rail {
+  from { clip-path: inset(0 0 100% 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes hero-seq-cursor {
+  0%, 50%      { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+/* While the sequence is playing, suppress the .stage rise from
+   entry.css so corners/title can choreograph against a static
+   container instead of fading in along with it. */
+body.hero-sequence-play .stage {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+body.hero-sequence-play .hero-logo {
+  opacity: 0;
+  transform: scale(1.05);
+  animation: hero-seq-logo 200ms var(--ease-out) 0ms forwards;
+  will-change: opacity, transform;
+}
+
+body.hero-sequence-play .hud-corner::before {
+  clip-path: inset(0 100% 100% 0);
+  will-change: clip-path;
+}
+body.hero-sequence-play .hud-corner.tl::before {
+  animation: hero-seq-bracket-tl 180ms var(--ease-out) 150ms forwards;
+}
+body.hero-sequence-play .hud-corner.tr::before {
+  animation: hero-seq-bracket-tr 180ms var(--ease-out) 200ms forwards;
+}
+body.hero-sequence-play .hud-corner.bl::before {
+  animation: hero-seq-bracket-bl 180ms var(--ease-out) 250ms forwards;
+}
+body.hero-sequence-play .hud-corner.br::before {
+  animation: hero-seq-bracket-br 180ms var(--ease-out) 300ms forwards;
+}
+
+/* Corner labels: hidden until JS typewrites them in stage 2.
+   `visibility: hidden` (not display:none) so layout doesn't
+   reflow when the strong line gets its text back. */
+body.hero-sequence-play .hud-corner-label {
+  visibility: hidden;
+}
+body.hero-sequence-play .hud-corner-label.is-typing,
+body.hero-sequence-play .hud-corner-label.is-typed {
+  visibility: visible;
+}
+
+/* Corner data (everything below the label): fades in at stage 6
+   alongside scramble/count-up/T+ kicking on. */
+body.hero-sequence-play .hud-corner-data {
+  opacity: 0;
+  animation: hero-seq-fade 300ms var(--ease-out) 1900ms forwards;
+  will-change: opacity;
+}
+
+/* Hero title — the SVG tagline. Clip-path reveal at stage 3. */
+body.hero-sequence-play .hero-sub {
+  clip-path: inset(0 100% 0 0);
+  animation: hero-seq-title 350ms var(--ease-out) 800ms forwards;
+  will-change: clip-path;
+}
+
+/* Hero subtitle — protocol chip. JS typewriter at stage 4. */
+body.hero-sequence-play .protocol-chip {
+  visibility: hidden;
+}
+body.hero-sequence-play .protocol-chip.is-typing,
+body.hero-sequence-play .protocol-chip.is-typed {
+  visibility: visible;
+}
+
+/* Trailing block cursor styling for both typewriter targets.
+   Renders inline next to the typed text and blinks until JS
+   removes it (~2 cycles after typing completes). */
+.hud-corner-label .seq-cursor,
+.protocol-chip .seq-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: inherit;
+  animation: hero-seq-cursor 0.6s steps(1, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.hero-sequence-play .hero-logo,
+  body.hero-sequence-play .hud-corner::before,
+  body.hero-sequence-play .hud-corner-data,
+  body.hero-sequence-play .hero-sub {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
+  body.hero-sequence-play .hud-corner-label,
+  body.hero-sequence-play .protocol-chip {
+    visibility: visible;
+  }
+  .hud-corner-label .seq-cursor,
+  .protocol-chip .seq-cursor { animation: none; opacity: 1; }
+}
 
 .back-btn {
   position: absolute;

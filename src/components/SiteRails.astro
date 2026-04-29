@@ -58,6 +58,23 @@ const {
   body.article-open .rail--left {
     transform: translateX(-100%);
   }
+
+  /* ILI-781 — left rail cascade. During the hero sequence the
+     rail is revealed top-to-bottom via clip-path inset; visually
+     reads as the vertical text writing in. The bg stays full-rail
+     so the reveal only affects the text glyphs, not the rail
+     itself. Stage 5 = 1400ms start, 400ms duration. */
+  body.hero-sequence-play .rail--left span {
+    clip-path: inset(0 0 100% 0);
+    animation: hero-seq-rail 400ms var(--ease-out) 1400ms forwards;
+    will-change: clip-path;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.hero-sequence-play .rail--left span {
+      animation: none;
+      clip-path: none;
+    }
+  }
   .rail span { writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap; }
   .rail em { color: var(--white); font-style: normal; font-weight: 600; }
 
