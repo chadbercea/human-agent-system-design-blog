@@ -58,6 +58,13 @@ const CHANNELS: Record<string, Channel> = {
     signal: 'SIGNAL RELAY',
     tag: '// RELAY · OUTBOUND',
   },
+  '/thanks': {
+    id: '06',
+    label: 'RELAY',
+    flourish: null,
+    signal: 'SIGNAL ACK',
+    tag: '// RELAY · ACK',
+  },
 };
 
 export function normalizePath(pathname: string): string {
