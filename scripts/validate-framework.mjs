@@ -7,6 +7,7 @@ const ROOT = new URL('..', import.meta.url).pathname;
 const CONCEPTS_DIR = join(ROOT, 'src/content/concepts');
 const CATEGORIES_DIR = join(ROOT, 'src/content/categories');
 const FRAMEWORK_DIR = join(ROOT, 'src/content/framework');
+const ARTICLES_DIR = join(ROOT, 'src/content/articles');
 
 const VALID_CATEGORIES = ['axioms', 'constraints', 'design-requirements'];
 const VALID_STATUSES = ['placeholder', 'canonical-entry', 'full-essay'];
@@ -66,21 +67,28 @@ function parseFrontmatter(raw, file) {
 }
 
 async function loadConcepts() {
-  const dir = CONCEPTS_DIR;
+  return loadMarkdownDir(CONCEPTS_DIR);
+}
+
+async function loadArticles() {
+  return loadMarkdownDir(ARTICLES_DIR);
+}
+
+async function loadMarkdownDir(dir) {
   if (!existsSync(dir)) return [];
   const entries = await readdir(dir);
   const files = entries
     .filter((f) => f.endsWith('.md') || f.endsWith('.mdx'))
     .map((f) => join(dir, f));
-  const concepts = [];
+  const out = [];
   for (const file of files) {
     const raw = await readFile(file, 'utf8');
     const data = parseFrontmatter(raw, file);
     if (!data) continue;
     const slug = basename(file).replace(/\.(md|mdx)$/, '');
-    concepts.push({ slug, file, data });
+    out.push({ slug, file, data });
   }
-  return concepts;
+  return out;
 }
 
 async function loadJson(dir) {
@@ -97,10 +105,11 @@ async function loadJson(dir) {
   return out;
 }
 
-const [concepts, categories, framework] = await Promise.all([
+const [concepts, categories, framework, articles] = await Promise.all([
   loadConcepts(),
   loadJson(CATEGORIES_DIR),
   loadJson(FRAMEWORK_DIR),
+  loadArticles(),
 ]);
 
 const conceptSlugs = new Set(concepts.map((c) => c.slug));
@@ -147,6 +156,15 @@ for (const f of framework) {
   }
 }
 
+/* ILI-806 — article references must resolve to real concept slugs. */
+for (const a of articles) {
+  for (const ref of a.data.references ?? []) {
+    if (!conceptSlugs.has(ref)) {
+      fail(`${a.file}: article references unknown concept slug "${ref}"`);
+    }
+  }
+}
+
 if (errors.length) {
   console.error('[validate-framework] FAIL');
   for (const e of errors) console.error('  - ' + e);
@@ -154,5 +172,5 @@ if (errors.length) {
 }
 
 console.log(
-  `[validate-framework] OK — ${concepts.length} concept(s), ${categories.length} categor${categories.length === 1 ? 'y' : 'ies'}, ${framework.length} framework root entr${framework.length === 1 ? 'y' : 'ies'}.`,
+  `[validate-framework] OK — ${concepts.length} concept(s), ${categories.length} categor${categories.length === 1 ? 'y' : 'ies'}, ${framework.length} framework root entr${framework.length === 1 ? 'y' : 'ies'}, ${articles.length} article(s).`,
 );

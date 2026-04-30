@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import HomepageLayout from '../layouts/HomepageLayout.astro';
 import PostCard from './PostCard.astro';
 import PaginationFooter from './PaginationFooter.astro';
+import FrameworkLocator from './FrameworkLocator.astro';
 
 export interface Props {
   pageArticles: CollectionEntry<'articles'>[];
@@ -57,9 +58,12 @@ const cards = pageArticles.map((a) => ({
   title: a.data.title,
   date: a.data.date,
   dek: a.data.description ?? '',
-  tags: a.data.tags ?? [],
   minutes: readMinutes(a.body),
   postNumber: a.data.postNumber,
+  /* ILI-806 — articles that connect to the framework declare a
+     non-empty references array; the reader shows the affordance
+     bar above the body for those, and hides it for everything else. */
+  hasFramework: (a.data.references ?? []).length > 0,
 }));
 
 const articleMeta = cards.map((c) => ({
@@ -69,7 +73,7 @@ const articleMeta = cards.map((c) => ({
   postId: `// POST ${String(c.postNumber).padStart(2, '0')}`,
   date: formatDate(c.date),
   read: `${c.minutes} MIN READ`,
-  tags: c.tags.map((t) => t.toUpperCase()),
+  hasFramework: c.hasFramework,
 }));
 
 const featured = pageArticles[0] ?? allArticles[0];
@@ -324,7 +328,6 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
             title={c.title}
             date={c.date}
             dek={c.dek}
-            tags={c.tags}
             minutes={c.minutes}
             active={defaultOpen?.idx === i}
           />
@@ -351,12 +354,10 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         </div>
         <h1 class="art-h1" id="art-h1">{defaultOpen ? defaultOpen.meta.title : ''}</h1>
         <p class="art-lede" id="art-lede">{defaultOpen ? defaultOpen.meta.lede : ''}</p>
-        <div class="art-tags" id="art-tags">
-          {defaultOpen && defaultOpen.meta.tags.length > 0
-            ? `TAGS · ${defaultOpen.meta.tags.join(' · ')}`
-            : ''}
-        </div>
         <hr class="art-rule" aria-hidden="true" />
+        <div class="art-framework" id="art-framework" hidden={!defaultOpen?.meta.hasFramework}>
+          <FrameworkLocator />
+        </div>
         <div class="art-body" id="art-body">
           {DefaultOpenContent && <DefaultOpenContent />}
         </div>
@@ -403,7 +404,7 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         var headReadEl = document.getElementById('art-head-read');
         var h1El = document.getElementById('art-h1');
         var ledeEl = document.getElementById('art-lede');
-        var tagsEl = document.getElementById('art-tags');
+        var frameworkEl = document.getElementById('art-framework');
         var bodyEl = document.getElementById('art-body');
         var prevBtn = document.getElementById('art-foot-prev');
         var nextBtn = document.getElementById('art-foot-next');
@@ -413,9 +414,13 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         var savedScrollY = 0;
         var currentIdx = -1;
 
-        function renderTags(tags) {
-          if (!tags || !tags.length) { tagsEl.textContent = ''; return; }
-          tagsEl.textContent = 'TAGS · ' + tags.join(' · ');
+        /* ILI-806 — show the framework affordance bar above the body
+           only for articles that declare references to concepts. The
+           locator markup is static (no current category in article
+           context); we just toggle visibility. */
+        function renderFramework(hasFramework) {
+          if (!frameworkEl) return;
+          frameworkEl.hidden = !hasFramework;
         }
 
         function renderFooter(idx) {
@@ -452,7 +457,7 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           headReadEl.textContent = data.read;
           h1El.textContent = data.title;
           ledeEl.textContent = data.lede || '';
-          renderTags(data.tags);
+          renderFramework(data.hasFramework);
           var src = document.getElementById('body-' + data.slug);
           bodyEl.innerHTML = src ? src.innerHTML : '';
           if (window.HASReveal) {
