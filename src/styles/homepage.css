@@ -1204,6 +1204,34 @@ body.is-index-booting.boot-stage-footer .site-footer {
   margin-top: 0.75rem;
 }
 
+/* ILI-804 — anchor framework CTA: inline locator block within
+   the anchor article body. Sits above the first major heading,
+   names the three categories, and lets the reader jump to any
+   hub in one click. */
+.art-body .anchor-framework-cta {
+  margin: 2.25em 0 2.5em;
+  padding: 1.25rem 1.25rem 1rem;
+  border: 1px solid var(--rule-strong);
+  background: rgba(255, 255, 255, 0.015);
+}
+.art-body .anchor-framework-cta-lede {
+  margin: 0 0 1rem;
+  color: var(--light);
+  font-family: var(--font-sans);
+  font-size: 0.95vw;
+  line-height: 1.5;
+}
+@media (max-width: 900px) {
+  .art-body .anchor-framework-cta { margin: 1.25em 0 1.75em; padding: 0.9rem; }
+  /* The cells name the categories visually; hide the prose lede on
+     mobile so the three hub links surface inside the fold. */
+  .art-body .anchor-framework-cta-lede { display: none; }
+}
+.art-body .anchor-framework-cta-lede strong {
+  color: var(--white);
+  font-weight: 600;
+}
+
 .art-body .diag-embed { margin: 2.5em 0; }
 .art-body .diag-embed iframe {
   display: block;
