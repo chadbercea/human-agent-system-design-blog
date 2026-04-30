@@ -70,24 +70,47 @@ const title = `HAS Design${pageSuffix}`;
 <HomepageLayout title={title} description={siteDescription} activeNav="articles">
   {heroVariant === 'frame' ? (
     <script is:inline data-astro-rerun>
-      /* ILI-787 — pre-paint gate for the frame hero on the
-         index page. Adds `body.has-hero-frame-play` only on the
-         first visit in the session and only when the OS isn't
-         reducing motion. CSS uses the class to scope the
-         initial hidden states (frame-block opacity:0, scan-stack
-         visible) so the boot sequence runs from rest. Without
-         the class, CSS shows the end-state at first paint —
-         which covers reduced-motion users and within-session
-         repeat visits in one path. */
+      /* ILI-789 — pre-paint gate for the index boot sequence.
+         The frame-hero scan (ILI-788) is now phase 1 of a larger
+         boot that also reveals header/rail/list/footer in order.
+         Adds `body.is-index-booting` (drives the four-panel mask
+         and reveal stages) plus `body.has-hero-frame-play` (kept
+         for the existing hero orchestrator). Conditions for play:
+         - sessionStorage `has_index_booted` not set
+         - sessionStorage `has_navigated_in_session` not set
+           (set by HomepageLayout on astro:before-preparation —
+           catches both in-app links and popstate back/forward)
+         - prefers-reduced-motion off
+         - performance navigation type is `navigate` or `reload`
+         Otherwise the page paints in end-state with no boot. */
       (function () {
         try {
-          var played = false;
-          try { played = sessionStorage.getItem('has_hero_played') === '1'; } catch (e) {}
+          var booted = false;
+          var navigated = false;
+          var heroPlayed = false;
+          try {
+            booted = sessionStorage.getItem('has_index_booted') === '1';
+            navigated = sessionStorage.getItem('has_navigated_in_session') === '1';
+            // Legacy ILI-788 flag — also set when the hero completes
+            // mid-boot. Treat it as a skip signal so a reload that
+            // happens after the hero ran (but before the panel reveals
+            // finished) doesn't replay the whole sequence.
+            heroPlayed = sessionStorage.getItem('has_hero_played') === '1';
+          } catch (e) {}
           var reduced = window.matchMedia
             && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          if (!played && !reduced) {
+          var navType = 'navigate';
+          try {
+            var entries = performance.getEntriesByType('navigation');
+            if (entries && entries[0] && entries[0].type) navType = entries[0].type;
+          } catch (e) {}
+          var coldLoad = navType === 'navigate' || navType === 'reload';
+          var shouldBoot = !booted && !navigated && !heroPlayed && !reduced && coldLoad;
+          if (shouldBoot) {
+            document.body.classList.add('is-index-booting');
             document.body.classList.add('has-hero-frame-play');
           } else {
+            document.body.classList.remove('is-index-booting');
             document.body.classList.remove('has-hero-frame-play');
           }
         } catch (e) {}
@@ -1005,6 +1028,54 @@ const title = `HAS Design${pageSuffix}`;
           try { sessionStorage.setItem('has_hero_played', '1'); } catch (e) {}
           document.body.classList.remove('has-hero-frame-play');
         }, totalDuration);
+      })();
+    </script>
+
+    <script is:inline data-astro-rerun>
+      /* ILI-789 — index boot orchestrator. Phase 1 (the frame
+         hero scan) is owned by the script above. This script
+         owns phase 2: after the hero's last frame-line settles,
+         reveal the four panels — header, rail, article list,
+         footer — at a 180ms cadence. Each stage class flips a
+         single panel's opacity/translateY transition; the body
+         background also fades from #000 to its natural color
+         when the header stage class is added. After the footer
+         stage settles, set sessionStorage and strip every boot
+         class so view-transition re-entries land on end-state.
+         Hero-completion timing is recomputed locally from the
+         same constants as the hero orchestrator. */
+      (function () {
+        if (!document.body.classList.contains('is-index-booting')) return;
+
+        var INITIAL_DELAY = 280;
+        var CADENCE = 145;
+        var HANDOFF_PAUSE = 280;
+        var FRAME_BREATH = 200;
+        var SCAN_LINES = 13;
+        var FRAME_LINES = 5;
+        var REVEAL_TRANSITION = 320;
+        var STAGE_CADENCE = 180;
+        var POST_FOOTER_DELAY = 400;
+
+        var lastScanAt = INITIAL_DELAY + (SCAN_LINES - 1) * CADENCE;
+        var frameStart = lastScanAt + HANDOFF_PAUSE + FRAME_BREATH;
+        var lastFrameAt = frameStart + Math.max(0, FRAME_LINES - 1) * CADENCE;
+        var heroSettleAt = lastFrameAt + REVEAL_TRANSITION;
+
+        var stages = ['boot-stage-header', 'boot-stage-rail', 'boot-stage-list', 'boot-stage-footer'];
+        stages.forEach(function (cls, i) {
+          window.setTimeout(function () {
+            if (!document.body.classList.contains('is-index-booting')) return;
+            document.body.classList.add(cls);
+          }, heroSettleAt + i * STAGE_CADENCE);
+        });
+
+        var endAt = heroSettleAt + (stages.length - 1) * STAGE_CADENCE + REVEAL_TRANSITION + POST_FOOTER_DELAY;
+        window.setTimeout(function () {
+          try { sessionStorage.setItem('has_index_booted', '1'); } catch (e) {}
+          document.body.classList.remove('is-index-booting');
+          stages.forEach(function (cls) { document.body.classList.remove(cls); });
+        }, endAt);
       })();
     </script>
   </Fragment>

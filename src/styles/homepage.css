@@ -603,6 +603,100 @@ body.has-hero-frame-play .has-hero-frame .frame-line.is-visible {
   }
 }
 
+/* ───────────── ILI-789: INDEX BOOT SEQUENCE ─────────────
+   Cold-load only. Body starts black; header / rail / article
+   list / footer are masked at opacity:0 + visibility:hidden +
+   translateY(8px) so layout is stable while the hero scans
+   in. After the hero RDY + frame settle, the orchestrator
+   adds boot-stage-* classes one at a time at a 180ms cadence
+   (header → rail → list → footer). The body background fades
+   from #000 to its natural canvas color when the header stage
+   lands; the hero block keeps its own #000 background.
+   Use `visibility` not `display:none` — the panels occupy
+   their final layout from initial paint, no shift on reveal. */
+html:has(body.is-index-booting),
+body.is-index-booting {
+  /* No transition — boot starts at full black on first paint.
+     The transition lives on the .boot-stage-header rule below
+     so it only fires when the panels start revealing. */
+  background-color: #000;
+}
+
+/* chrome.css decorates body::before with a 20px/100px gridlines
+   overlay (rgba white). Even at low alpha it disrupts the "entire
+   viewport is #000" requirement, so suppress both decorative
+   pseudo-elements while the boot mask is active. */
+body.is-index-booting::before,
+body.is-index-booting::after {
+  display: none;
+}
+
+body.is-index-booting .site-header,
+body.is-index-booting .rail,
+body.is-index-booting .col-list,
+body.is-index-booting .site-footer {
+  /* entry.css gives header/rail/footer a `fade` animation with
+     fill-mode:both — the persistent end value would override our
+     opacity:0. Cancel it so the boot mask wins. */
+  animation: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition:
+    opacity 0.32s cubic-bezier(.4, .1, .2, 1),
+    transform 0.32s cubic-bezier(.4, .1, .2, 1);
+}
+
+html:has(body.is-index-booting.boot-stage-header),
+body.is-index-booting.boot-stage-header {
+  background-color: var(--bg-canvas);
+  transition: background-color 0.32s cubic-bezier(.4, .1, .2, 1);
+}
+
+body.is-index-booting.boot-stage-header .site-header {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+body.is-index-booting.boot-stage-rail .rail {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+body.is-index-booting.boot-stage-list .col-list {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+body.is-index-booting.boot-stage-footer .site-footer {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Reduced-motion users land on end-state at first paint; the
+   gate above never adds is-index-booting under reduced-motion,
+   but harden the CSS in case it slips through. */
+@media (prefers-reduced-motion: reduce) {
+  html:has(body.is-index-booting),
+  body.is-index-booting {
+    background-color: var(--bg-canvas) !important;
+    transition: none !important;
+  }
+  body.is-index-booting .site-header,
+  body.is-index-booting .rail,
+  body.is-index-booting .col-list,
+  body.is-index-booting .site-footer {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 /* ───────────── COL 2: POST CARD LIST (HUD) ─────────────
    Spec-sheet cards — mono // POST NN + date header, Lato
    700 title, dek, mono tag + read-time footer. Hairline
