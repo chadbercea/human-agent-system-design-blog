@@ -1,0 +1,110 @@
+---
+import CategoryGlyph from './CategoryGlyph.astro';
+import {
+  categoryHref,
+  getAllCategories,
+  type CategorySlug,
+} from '../lib/has-framework';
+
+interface Props {
+  category: CategorySlug;
+  linkToHub?: boolean;
+  class?: string;
+}
+
+const { category, linkToHub = true, class: className } = Astro.props;
+
+const ORDER: CategorySlug[] = ['axioms', 'constraints', 'design-requirements'];
+const cats = await getAllCategories();
+const sorted = [...cats].sort(
+  (a, b) => ORDER.indexOf(a.data.slug) - ORDER.indexOf(b.data.slug),
+);
+const current = sorted.find((c) => c.data.slug === category);
+if (!current) throw new Error(`Unknown category: ${category}`);
+
+const currentLabel = current.data.plural;
+const currentSingular = current.data.singular;
+const currentIndex = sorted.findIndex((c) => c.data.slug === category) + 1;
+const total = sorted.length;
+const ariaLabel = `${currentSingular} — ${currentIndex} of ${total} HAS-D categories`;
+---
+
+{linkToHub ? (
+  <a
+    href={categoryHref(category)}
+    class:list={['cat-badge', `cat-badge--${category}`, className]}
+    aria-label={ariaLabel}
+  >
+    <span class="cat-badge-siblings" aria-hidden="true">
+      {sorted.map((c) => (
+        <span class:list={['cat-badge-pip', c.data.slug === category && 'is-current']}>
+          <CategoryGlyph category={c.data.slug} size={14} />
+        </span>
+      ))}
+    </span>
+    <span class="cat-badge-label">{currentLabel}</span>
+  </a>
+) : (
+  <span
+    class:list={['cat-badge', `cat-badge--${category}`, className]}
+    aria-label={ariaLabel}
+  >
+    <span class="cat-badge-siblings" aria-hidden="true">
+      {sorted.map((c) => (
+        <span class:list={['cat-badge-pip', c.data.slug === category && 'is-current']}>
+          <CategoryGlyph category={c.data.slug} size={14} />
+        </span>
+      ))}
+    </span>
+    <span class="cat-badge-label">{currentLabel}</span>
+  </span>
+)}
+
+<style>
+  .cat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px 6px 10px;
+    border: 1px solid var(--rule-strong);
+    border-radius: 999px;
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--mid);
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+    line-height: 1;
+  }
+  .cat-badge-siblings {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .cat-badge-pip {
+    display: inline-flex;
+    color: var(--dim);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .cat-badge--axioms .cat-badge-pip.is-current,
+  .cat-badge--axioms .cat-badge-label { color: var(--cat-axioms); }
+  .cat-badge--constraints .cat-badge-pip.is-current,
+  .cat-badge--constraints .cat-badge-label { color: var(--cat-constraints); }
+  .cat-badge--design-requirements .cat-badge-pip.is-current,
+  .cat-badge--design-requirements .cat-badge-label { color: var(--cat-design-requirements); }
+
+  a.cat-badge:hover { border-color: var(--rule-hud); }
+  a.cat-badge:focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 480px) {
+    .cat-badge { padding: 6px 12px 6px 8px; gap: 8px; }
+    .cat-badge-siblings { gap: 3px; }
+  }
+</style>

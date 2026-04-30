@@ -515,6 +515,37 @@ html, body {
   .cat-grid { grid-template-columns: 1fr; }
 }
 
+.cat-badge-preview {
+  margin-top: 32px;
+  padding: 28px 32px;
+  border: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.cat-badge-preview-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+.cat-badge-preview-note {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--mid);
+  max-width: 60ch;
+  margin: 0;
+}
+.cat-badge-preview-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
 .logo-stage--inv .bar { background: var(--black); }
 
 .scales-bed {

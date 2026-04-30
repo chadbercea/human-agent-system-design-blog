@@ -1,6 +1,7 @@
 ---
 import DesignSystemLayout from '../layouts/DesignSystemLayout.astro';
 import CategoryGlyph from '../components/CategoryGlyph.astro';
+import CategoryBadge from '../components/CategoryBadge.astro';
 import { getAllCategories, getCategoryBySlug } from '../lib/has-framework';
 
 const categories = await getAllCategories();
@@ -326,6 +327,20 @@ const categoriesWithMembers = await Promise.all(
           </div>
         </article>
       ))}
+    </div>
+
+    <div class="cat-badge-preview">
+      <span class="cat-badge-preview-label">// BADGE &middot; SIBLING AFFORDANCE</span>
+      <p class="cat-badge-preview-note">
+        Three category glyphs read as the sibling indicator. Current is colored,
+        siblings sit dim. Tells the reader where they are <em>and</em> what else exists,
+        in one mark.
+      </p>
+      <div class="cat-badge-preview-row">
+        {categoriesWithMembers.map((c) => (
+          <CategoryBadge category={c.data.slug} />
+        ))}
+      </div>
     </div>
   </section>
 
