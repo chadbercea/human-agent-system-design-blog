@@ -7,7 +7,11 @@ const articles = defineCollection({
     date: z.coerce.date(),
     description: z.string().optional(),
     draft: z.boolean().optional().default(false),
-    tags: z.array(z.string()).optional(),
+    /* ILI-806 — articles that connect to the HAS-D framework declare
+       which concepts they reference. The article reader uses this to
+       conditionally render the framework affordance bar (locator).
+       Empty/absent → no affordance bar. */
+    references: z.array(z.string()).optional(),
     postNumber: z.number().int().positive(),
   }),
 });

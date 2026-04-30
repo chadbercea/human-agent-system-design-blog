@@ -2,7 +2,6 @@
 title: "Hello, world."
 date: 2026-04-22
 description: "This is a new blog all about designing for the age of agents. Humans, agents, and systems shipping products together."
-tags: ["HAS-D"]
 draft: false
 postNumber: 1
 ---

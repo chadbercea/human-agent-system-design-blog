@@ -12,12 +12,11 @@ export interface Props {
   title: string;
   date: Date;
   dek?: string;
-  tags?: string[];
   minutes: number;
   active?: boolean;
 }
 
-const { index, postNumber, slug, title, date, dek, tags = [], minutes, active = false } = Astro.props;
+const { index, postNumber, slug, title, date, dek, minutes, active = false } = Astro.props;
 
 function formatDate(d: Date): string {
   const y = d.getUTCFullYear();
@@ -28,7 +27,6 @@ function formatDate(d: Date): string {
 
 const idLabel = `// POST ${String(postNumber).padStart(2, '0')}`;
 const dateLabel = formatDate(date);
-const tagLabel = tags.length > 0 ? tags.map((t) => t.toUpperCase()).join(' · ') : '';
 const readLabel = `${minutes} MIN READ`;
 ---
 <li class:list={['post-card reveal', active && 'active']} data-index={index} data-slug={slug} style={`--reveal-i: ${index}`}>
@@ -43,9 +41,7 @@ const readLabel = `${minutes} MIN READ`;
   </div>
 
   <div class="post-card-foot">
-    <span class="post-card-tags">
-      {tagLabel && <><span class="tag-label">TAGS:</span> {tagLabel}</>}
-    </span>
+    <span class="post-card-tags" aria-hidden="true"></span>
     <span class="post-card-read">
       <span>{readLabel}</span>
       <span class="arrow" aria-hidden="true">&rarr;</span>
