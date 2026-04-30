@@ -1,0 +1,202 @@
+---
+import HomepageLayout from './HomepageLayout.astro';
+import FrameworkLocator from '../components/FrameworkLocator.astro';
+import {
+  getCategoryBySlug,
+  getAllCategoriesWithMembers,
+  conceptHref,
+  categoryHref,
+  type CategorySlug,
+  type ConceptStatus,
+} from '../lib/has-framework';
+
+interface Props {
+  category: CategorySlug;
+}
+
+const { category } = Astro.props;
+const cat = await getCategoryBySlug(category);
+if (!cat) throw new Error(`Unknown category: ${category}`);
+
+const allCats = await getAllCategoriesWithMembers();
+const otherCats = allCats.filter((c) => c.data.slug !== category);
+
+const STATUS_LABEL: Record<ConceptStatus, string> = {
+  'placeholder': 'PLACEHOLDER',
+  'canonical-entry': 'CANONICAL',
+  'full-essay': 'ESSAY',
+};
+---
+
+<HomepageLayout
+  title={`${cat.data.plural} · HAS-D`}
+  description={cat.data.description}
+  railTag={`// ${cat.data.plural.toUpperCase()} · HAS-D`}
+>
+  <main class="prose-page">
+    <article class="prose-inner">
+      <FrameworkLocator currentCategory={category} class="hub-locator" />
+
+      <header class="hub-head">
+        <p class="eyebrow">HAS-D · {cat.member_count} {cat.data.singular.toUpperCase()}{cat.member_count === 1 ? '' : 'S'}</p>
+        <h1 class="prose-h1 hub-title">{cat.data.plural}</h1>
+        <p class="hub-description">{cat.data.description}</p>
+      </header>
+
+      <ol class="hub-list" data-category={category}>
+        {cat.members.map((m) => (
+          <li class="hub-list-item" data-status={m.data.status}>
+            <a href={conceptHref(m)} class="hub-list-link">
+              <span class="hub-list-index">{String(m.data.category_index).padStart(2, '0')}</span>
+              <div class="hub-list-body">
+                <div class="hub-list-title-row">
+                  <span class="hub-list-title">{m.data.title}</span>
+                  <span class="hub-list-status">{STATUS_LABEL[m.data.status]}</span>
+                </div>
+                <p class="hub-list-synopsis">{m.data.synopsis}</p>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ol>
+
+      <footer class="hub-foot">
+        <span class="eyebrow">// KEEP READING</span>
+        <ul class="hub-foot-links">
+          {otherCats.map((c) => (
+            <li>
+              <a href={categoryHref(c.data.slug)}>
+                <span class="hub-foot-arrow" aria-hidden="true">→</span>
+                <span class="hub-foot-name">{c.data.plural}</span>
+                <span class="hub-foot-count">{c.member_count}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </footer>
+    </article>
+  </main>
+</HomepageLayout>
+
+<style>
+  .hub-locator { margin-bottom: 3rem; }
+  .hub-head { margin-bottom: 2.5rem; }
+  .hub-title { margin-bottom: 1.25rem; }
+  .hub-description {
+    font-size: 1.1rem;
+    color: var(--mid);
+    max-width: 60ch;
+    margin: 0;
+  }
+
+  .hub-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid var(--rule-strong);
+  }
+  .hub-list-item { border-bottom: 1px solid var(--rule); }
+  .hub-list-link {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 1.5rem;
+    align-items: baseline;
+    padding: 1.6rem 0;
+    text-decoration: none;
+    color: inherit;
+  }
+  .hub-list-index {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: var(--dim);
+  }
+  .hub-list-body { display: flex; flex-direction: column; gap: 0.5rem; }
+  .hub-list-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.875rem;
+    flex-wrap: wrap;
+  }
+  .hub-list-title {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 1.4rem;
+    line-height: 1.2;
+    color: var(--white);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .hub-list-synopsis {
+    color: var(--mid);
+    line-height: 1.5;
+    margin: 0;
+  }
+  .hub-list-status {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border: 1px solid var(--rule);
+    color: var(--dim);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .hub-list-item[data-status="canonical-entry"] .hub-list-status { color: var(--mid); }
+  .hub-list-item[data-status="full-essay"] .hub-list-status {
+    color: var(--light);
+    border-color: var(--rule-strong);
+  }
+
+  .hub-list[data-category="axioms"] .hub-list-link:hover .hub-list-title { color: var(--cat-axioms); }
+  .hub-list[data-category="constraints"] .hub-list-link:hover .hub-list-title { color: var(--cat-constraints); }
+  .hub-list[data-category="design-requirements"] .hub-list-link:hover .hub-list-title { color: var(--cat-design-requirements); }
+
+  .hub-foot {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .hub-foot-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  .hub-foot-links li { background: var(--bg-canvas); }
+  .hub-foot-links a {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.875rem;
+    padding: 1.1rem 1.4rem;
+    text-decoration: none;
+    color: var(--mid);
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .hub-foot-arrow { color: var(--dim); transition: color var(--dur-fast) var(--ease-out); }
+  .hub-foot-name { color: var(--white); }
+  .hub-foot-count { color: var(--dim); }
+  .hub-foot-links a:hover { color: var(--light); }
+  .hub-foot-links a:hover .hub-foot-arrow { color: var(--white); }
+
+  @media (max-width: 720px) {
+    .hub-list-link { grid-template-columns: 40px 1fr; gap: 1rem; padding: 1.4rem 0; }
+    .hub-list-title { font-size: 1.2rem; }
+    .hub-foot-links { grid-template-columns: 1fr; }
+  }
+</style>
