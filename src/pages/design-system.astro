@@ -2,6 +2,7 @@
 import DesignSystemLayout from '../layouts/DesignSystemLayout.astro';
 import CategoryGlyph from '../components/CategoryGlyph.astro';
 import CategoryBadge from '../components/CategoryBadge.astro';
+import FrameworkLocator from '../components/FrameworkLocator.astro';
 import { getAllCategories, getCategoryBySlug } from '../lib/has-framework';
 
 const categories = await getAllCategories();
@@ -340,6 +341,26 @@ const categoriesWithMembers = await Promise.all(
         {categoriesWithMembers.map((c) => (
           <CategoryBadge category={c.data.slug} />
         ))}
+      </div>
+    </div>
+
+    <div class="cat-locator-preview">
+      <span class="cat-locator-preview-label">// FRAMEWORK LOCATOR</span>
+      <p class="cat-locator-preview-note">
+        Above-the-fold band on every hub and concept article. Three cells, member
+        counts derived from the data layer, current cell receives a category-tinted
+        rule and full-color label. The reader can see the whole structure and
+        reach any of it in one click.
+      </p>
+      <div class="cat-locator-preview-stack">
+        <span class="cat-locator-preview-state">CURRENT &middot; AXIOMS</span>
+        <FrameworkLocator currentCategory="axioms" />
+        <span class="cat-locator-preview-state">CURRENT &middot; CONSTRAINTS</span>
+        <FrameworkLocator currentCategory="constraints" />
+        <span class="cat-locator-preview-state">CURRENT &middot; DESIGN REQUIREMENTS</span>
+        <FrameworkLocator currentCategory="design-requirements" />
+        <span class="cat-locator-preview-state">NEUTRAL &middot; ANCHOR / NO CURRENT</span>
+        <FrameworkLocator />
       </div>
     </div>
   </section>

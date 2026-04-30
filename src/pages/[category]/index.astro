@@ -1,5 +1,6 @@
 ---
 import HomepageLayout from '../../layouts/HomepageLayout.astro';
+import FrameworkLocator from '../../components/FrameworkLocator.astro';
 import {
   getAllCategories,
   getCategoryBySlug,
@@ -24,6 +25,7 @@ if (!cat) throw new Error(`Unknown category: ${category}`);
 >
   <main class="prose-page">
     <article class="prose-inner">
+      <FrameworkLocator currentCategory={category} class="hub-stub-locator" />
       <p class="eyebrow">HAS-D · {cat.member_count} {cat.data.singular.toUpperCase()}{cat.member_count === 1 ? '' : 'S'}</p>
       <h1 class="prose-h1">{cat.data.plural}</h1>
       <div class="prose-body">
@@ -82,4 +84,5 @@ if (!cat) throw new Error(`Unknown category: ${category}`);
     font-size: 0.95rem;
   }
   .hub-stub-list a:hover .hub-stub-title { color: var(--light); }
+  .hub-stub-locator { margin-bottom: 2.5rem; }
 </style>

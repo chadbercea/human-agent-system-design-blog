@@ -84,6 +84,17 @@ export async function getCategoryBySlug(slug: CategorySlug): Promise<CategoryWit
   return { ...cat, member_count: members.length, members };
 }
 
+export async function getAllCategoriesWithMembers(): Promise<CategoryWithMembers[]> {
+  const cats = await getAllCategories();
+  const order: CategorySlug[] = ['axioms', 'constraints', 'design-requirements'];
+  const sorted = [...cats].sort(
+    (a, b) => order.indexOf(a.data.slug) - order.indexOf(b.data.slug),
+  );
+  return Promise.all(
+    sorted.map(async (c) => (await getCategoryBySlug(c.data.slug))!),
+  );
+}
+
 export async function getReferencedBy(slug: string): Promise<Concept[]> {
   await ensureValidated();
   const concepts = await getCollection('concepts');
