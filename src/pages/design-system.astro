@@ -3,6 +3,7 @@ import DesignSystemLayout from '../layouts/DesignSystemLayout.astro';
 import CategoryGlyph from '../components/CategoryGlyph.astro';
 import CategoryBadge from '../components/CategoryBadge.astro';
 import FrameworkLocator from '../components/FrameworkLocator.astro';
+import ConceptLink from '../components/ConceptLink.astro';
 import { getAllCategories, getCategoryBySlug } from '../lib/has-framework';
 
 const categories = await getAllCategories();
@@ -342,6 +343,25 @@ const categoriesWithMembers = await Promise.all(
           <CategoryBadge category={c.data.slug} />
         ))}
       </div>
+    </div>
+
+    <div class="cat-link-preview">
+      <span class="cat-link-preview-label">// INLINE CROSS-LINK</span>
+      <p class="cat-link-preview-note">
+        In running prose, a link to another concept carries its category as a
+        colored underline. The category is signal, not decoration — by the time
+        a reader reaches a reference, they already know what the underline color
+        means.
+      </p>
+      <p class="cat-link-preview-prose">
+        The <ConceptLink slug="gradient-descent">gradient descent problem</ConceptLink>
+        and the <ConceptLink slug="mirroring">mirroring constraint</ConceptLink> compound:
+        each tightens the loop the other operates within. To resist them, an agent must
+        practice <ConceptLink slug="adversarial-interdependence">adversarial interdependence</ConceptLink>,
+        which itself only holds because of <ConceptLink slug="bilateral-non-reducibility">bilateral
+        non-reducibility</ConceptLink> — the thing it pressure-tests is not just a reflection
+        of the prompt.
+      </p>
     </div>
 
     <div class="cat-locator-preview">

@@ -66,13 +66,19 @@ function parseFrontmatter(raw, file) {
 }
 
 async function loadConcepts() {
-  const files = await listFiles(CONCEPTS_DIR, '.md');
+  const dir = CONCEPTS_DIR;
+  if (!existsSync(dir)) return [];
+  const entries = await readdir(dir);
+  const files = entries
+    .filter((f) => f.endsWith('.md') || f.endsWith('.mdx'))
+    .map((f) => join(dir, f));
   const concepts = [];
   for (const file of files) {
     const raw = await readFile(file, 'utf8');
     const data = parseFrontmatter(raw, file);
     if (!data) continue;
-    concepts.push({ slug: basename(file, '.md'), file, data });
+    const slug = basename(file).replace(/\.(md|mdx)$/, '');
+    concepts.push({ slug, file, data });
   }
   return concepts;
 }
