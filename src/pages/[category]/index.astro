@@ -1,0 +1,85 @@
+---
+import HomepageLayout from '../../layouts/HomepageLayout.astro';
+import {
+  getAllCategories,
+  getCategoryBySlug,
+  conceptHref,
+  type CategorySlug,
+} from '../../lib/has-framework';
+
+export async function getStaticPaths() {
+  const categories = await getAllCategories();
+  return categories.map((c) => ({ params: { category: c.data.slug } }));
+}
+
+const { category } = Astro.params as { category: CategorySlug };
+const cat = await getCategoryBySlug(category);
+if (!cat) throw new Error(`Unknown category: ${category}`);
+---
+
+<HomepageLayout
+  title={`${cat.data.plural} · HAS-D`}
+  description={cat.data.description}
+  railTag={`// ${cat.data.plural.toUpperCase()} · HAS-D`}
+>
+  <main class="prose-page">
+    <article class="prose-inner">
+      <p class="eyebrow">HAS-D · {cat.member_count} {cat.data.singular.toUpperCase()}{cat.member_count === 1 ? '' : 'S'}</p>
+      <h1 class="prose-h1">{cat.data.plural}</h1>
+      <div class="prose-body">
+        <p>{cat.data.description}</p>
+        <p class="hub-stub-note">Hub stub. Visual template lands in ILI-801.</p>
+        <ul class="hub-stub-list">
+          {cat.members.map((m) => (
+            <li>
+              <a href={conceptHref(m)}>
+                <span class="hub-stub-title">{m.data.title}</span>
+                <span class="hub-stub-synopsis">{m.data.synopsis}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </article>
+  </main>
+</HomepageLayout>
+
+<style>
+  .hub-stub-note {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-top: 1rem;
+  }
+  .hub-stub-list {
+    list-style: none;
+    padding: 0;
+    margin: 2.5rem 0 0;
+    display: grid;
+    gap: 1px;
+    background: var(--rule);
+  }
+  .hub-stub-list li { background: var(--bg-canvas); }
+  .hub-stub-list a {
+    display: block;
+    padding: 1.25rem 0;
+    text-decoration: none;
+    color: inherit;
+  }
+  .hub-stub-title {
+    display: block;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--white);
+  }
+  .hub-stub-synopsis {
+    display: block;
+    margin-top: 0.4rem;
+    color: var(--mid);
+    font-size: 0.95rem;
+  }
+  .hub-stub-list a:hover .hub-stub-title { color: var(--light); }
+</style>

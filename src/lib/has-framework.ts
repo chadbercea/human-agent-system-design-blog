@@ -95,3 +95,11 @@ export async function getFramework(): Promise<FrameworkRoot | undefined> {
   const entries = await getCollection('framework');
   return entries[0];
 }
+
+export function categoryHref(category: CategorySlug): string {
+  return `/${category}`;
+}
+
+export function conceptHref(concept: Concept): string {
+  return `/${concept.data.category}/${concept.id}`;
+}

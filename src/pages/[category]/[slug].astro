@@ -1,0 +1,113 @@
+---
+import { render } from 'astro:content';
+import HomepageLayout from '../../layouts/HomepageLayout.astro';
+import {
+  getAllConcepts,
+  getCategoryBySlug,
+  getReferencedBy,
+  categoryHref,
+  conceptHref,
+  type CategorySlug,
+} from '../../lib/has-framework';
+
+export async function getStaticPaths() {
+  const concepts = await getAllConcepts();
+  return concepts.map((c) => ({
+    params: { category: c.data.category, slug: c.id },
+    props: { concept: c },
+  }));
+}
+
+const { concept } = Astro.props;
+const cat = await getCategoryBySlug(concept.data.category as CategorySlug);
+if (!cat) throw new Error(`Unknown category: ${concept.data.category}`);
+const referencedBy = await getReferencedBy(concept.id);
+const { Content } = await render(concept);
+---
+
+<HomepageLayout
+  title={`${concept.data.title} · HAS-D`}
+  description={concept.data.synopsis}
+  railTag={`// ${cat.data.singular.toUpperCase()} · HAS-D`}
+>
+  <main class="prose-page">
+    <article class="prose-inner">
+      <p class="eyebrow">
+        <a href={categoryHref(cat.data.slug)}>{cat.data.singular.toUpperCase()}</a>
+        &nbsp;·&nbsp; {concept.data.category_index} OF {cat.member_count}
+      </p>
+      <h1 class="prose-h1">{concept.data.title}</h1>
+      <div class="prose-body">
+        <p class="concept-synopsis">{concept.data.synopsis}</p>
+        <aside class="concept-implication">
+          <span class="concept-implication-label">FRAMEWORK IMPLICATION</span>
+          <p>{concept.data.framework_implication}</p>
+        </aside>
+        <Content />
+        {referencedBy.length > 0 && (
+          <section class="concept-referenced-by">
+            <h2 class="concept-section-h">Referenced by</h2>
+            <ul>
+              {referencedBy.map((r) => (
+                <li><a href={conceptHref(r)}>{r.data.title}</a></li>
+              ))}
+            </ul>
+          </section>
+        )}
+        <p class="concept-back"><a href={categoryHref(cat.data.slug)}>← Back to {cat.data.plural}</a></p>
+      </div>
+    </article>
+  </main>
+</HomepageLayout>
+
+<style>
+  .eyebrow a { color: inherit; text-decoration: none; }
+  .eyebrow a:hover { color: var(--white); }
+  .concept-synopsis {
+    font-size: 1.25rem;
+    color: var(--light);
+    margin-bottom: 2rem;
+  }
+  .concept-implication {
+    margin: 2.5rem 0;
+    padding: 1.5rem 0 1.5rem 1.5rem;
+    border-left: 1px solid var(--rule-strong);
+  }
+  .concept-implication-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 0.75rem;
+  }
+  .concept-referenced-by {
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--rule);
+  }
+  .concept-section-h {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 1rem;
+  }
+  .concept-referenced-by ul { list-style: none; padding: 0; margin: 0; }
+  .concept-referenced-by li { padding: 0.5rem 0; }
+  .concept-referenced-by a { color: var(--white); text-decoration: none; border-bottom: 1px solid var(--rule); }
+  .concept-referenced-by a:hover { border-bottom-color: var(--white); }
+  .concept-back {
+    margin-top: 3rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .concept-back a { color: var(--mid); text-decoration: none; }
+  .concept-back a:hover { color: var(--white); }
+</style>
