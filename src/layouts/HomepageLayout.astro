@@ -81,6 +81,14 @@ const railTagText = railTag ?? channel.tag;
     mountReveals();
     mountChannelTransitions();
     document.addEventListener('astro:page-load', () => mountReveals());
+
+    // ILI-789 — flag any in-app navigation (logo click, link, or
+    // popstate via ClientRouter) so a subsequent landing on `/`
+    // skips the cold-load boot sequence. Cleared only on tab
+    // close (sessionStorage scope).
+    document.addEventListener('astro:before-preparation', () => {
+      try { sessionStorage.setItem('has_navigated_in_session', '1'); } catch (e) {}
+    });
   </script>
 </body>
 </html>
