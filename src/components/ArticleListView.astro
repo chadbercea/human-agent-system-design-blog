@@ -13,9 +13,21 @@ export interface Props {
      boot sequence that resolves into a #FFF frame block. /blog
      paginated pages keep the original HUD hero. */
   heroVariant?: 'hud' | 'frame';
+  /* ILI-790 — when set, render the article-selected view at SSR
+     with this slug pre-opened. Used by /blog to default to the
+     latest published article without a flash of the empty
+     "waiting" state on initial paint. */
+  defaultOpenSlug?: string;
 }
 
-const { pageArticles, allArticles, currentPage, totalPages, heroVariant = 'hud' } = Astro.props;
+const {
+  pageArticles,
+  allArticles,
+  currentPage,
+  totalPages,
+  heroVariant = 'hud',
+  defaultOpenSlug,
+} = Astro.props;
 
 function formatDate(d: Date): string {
   const y = d.getUTCFullYear();
@@ -66,9 +78,36 @@ const siteDescription = featured?.data.description
 
 const pageSuffix = currentPage > 1 ? ` // Page ${String(currentPage).padStart(2, '0')}` : '';
 const title = `HAS Design${pageSuffix}`;
+
+/* ILI-790 — resolve the default-open article. defaultOpenSlug
+   must match an article in pageArticles so prev/next mapping
+   stays consistent with the rendered list. */
+const defaultOpenIdx = defaultOpenSlug
+  ? pageArticles.findIndex((a) => a.slug === defaultOpenSlug)
+  : -1;
+const defaultOpen = defaultOpenIdx >= 0
+  ? {
+      idx: defaultOpenIdx,
+      meta: articleMeta[defaultOpenIdx],
+      prev: articleMeta[defaultOpenIdx + 1],
+      next: articleMeta[defaultOpenIdx - 1],
+    }
+  : null;
+const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : null;
 ---
 <HomepageLayout title={title} description={siteDescription} activeNav="articles">
-  {heroVariant === 'frame' ? (
+  {defaultOpen && (
+    <script is:inline data-astro-rerun>
+      /* ILI-790 — when /blog renders the article-selected view at
+         SSR, mark the body so SiteRails (and any other body-scoped
+         open-state CSS) lands on the right state from first paint.
+         No flash of the left rail before JS catches up. */
+      (function () {
+        try { document.body.classList.add('article-open'); } catch (e) {}
+      })();
+    </script>
+  )}
+  {defaultOpen ? null : heroVariant === 'frame' ? (
     <script is:inline data-astro-rerun>
       /* ILI-789 — pre-paint gate for the index boot sequence.
          The frame-hero scan (ILI-788) is now phase 1 of a larger
@@ -142,7 +181,11 @@ const title = `HAS Design${pageSuffix}`;
       })();
     </script>
   )}
-  <div class="stage" id="stage">
+  <div
+    class:list={['stage', defaultOpen && 'open']}
+    id="stage"
+    data-default-open-idx={defaultOpen ? String(defaultOpen.idx) : undefined}
+  >
     {heroVariant === 'frame' ? (
       <div class="col col-hero has-hero-frame">
         <div class="frame-viewport" id="frame-viewport">
@@ -153,6 +196,10 @@ const title = `HAS Design${pageSuffix}`;
             <div class="frame-line"><h1 class="frame-h1">Human Agent System Design</h1></div>
             <div class="frame-line"><p class="frame-dek">Humans, agents, and the system they share. Three actors. Three design objects. One framework.</p></div>
             <div class="frame-line"><div class="frame-audience">&gt; FOR THE PEOPLE SHIPPING THEM</div></div>
+            <div class="frame-line"><a class="frame-cta" href="/blog">
+              <span class="frame-cta-label">Begin transmission</span>
+              <span class="frame-cta-arrow" aria-hidden="true">&rarr;</span>
+            </a></div>
           </div>
         </div>
         <div class="signal-strip" aria-hidden="true">
@@ -279,6 +326,7 @@ const title = `HAS Design${pageSuffix}`;
             dek={c.dek}
             tags={c.tags}
             minutes={c.minutes}
+            active={defaultOpen?.idx === i}
           />
         ))}
       </ul>
@@ -295,27 +343,33 @@ const title = `HAS Design${pageSuffix}`;
       </button>
       <article class="article-inner">
         <div class="art-head" id="art-head">
-          <span class="art-head-id" id="art-head-id"></span>
+          <span class="art-head-id" id="art-head-id">{defaultOpen ? defaultOpen.meta.postId : ''}</span>
           <span class="art-head-sep" aria-hidden="true">&middot;</span>
-          <span class="art-head-date" id="art-head-date"></span>
+          <span class="art-head-date" id="art-head-date">{defaultOpen ? defaultOpen.meta.date : ''}</span>
           <span class="art-head-sep" aria-hidden="true">&middot;</span>
-          <span class="art-head-read" id="art-head-read"></span>
+          <span class="art-head-read" id="art-head-read">{defaultOpen ? defaultOpen.meta.read : ''}</span>
         </div>
-        <h1 class="art-h1" id="art-h1"></h1>
-        <p class="art-lede" id="art-lede"></p>
-        <div class="art-tags" id="art-tags"></div>
+        <h1 class="art-h1" id="art-h1">{defaultOpen ? defaultOpen.meta.title : ''}</h1>
+        <p class="art-lede" id="art-lede">{defaultOpen ? defaultOpen.meta.lede : ''}</p>
+        <div class="art-tags" id="art-tags">
+          {defaultOpen && defaultOpen.meta.tags.length > 0
+            ? `TAGS · ${defaultOpen.meta.tags.join(' · ')}`
+            : ''}
+        </div>
         <hr class="art-rule" aria-hidden="true" />
-        <div class="art-body" id="art-body"></div>
+        <div class="art-body" id="art-body">
+          {DefaultOpenContent && <DefaultOpenContent />}
+        </div>
         <div class="art-end" aria-hidden="true">&middot;&nbsp;&middot;&nbsp;&middot;</div>
         <nav class="art-foot" aria-label="Article navigation">
-          <button class="art-foot-btn art-foot-prev" id="art-foot-prev" type="button">
+          <button class="art-foot-btn art-foot-prev" id="art-foot-prev" type="button" hidden={!defaultOpen?.prev}>
             <span class="art-foot-dir">&larr; PREV</span>
-            <span class="art-foot-title" id="art-foot-prev-title"></span>
+            <span class="art-foot-title" id="art-foot-prev-title">{defaultOpen?.prev?.title ?? ''}</span>
           </button>
-          <span class="art-foot-hash" id="art-foot-hash"></span>
-          <button class="art-foot-btn art-foot-next" id="art-foot-next" type="button">
+          <span class="art-foot-hash" id="art-foot-hash">{defaultOpen ? `#${defaultOpen.meta.slug}` : ''}</span>
+          <button class="art-foot-btn art-foot-next" id="art-foot-next" type="button" hidden={!defaultOpen?.next}>
             <span class="art-foot-dir">NEXT &rarr;</span>
-            <span class="art-foot-title" id="art-foot-next-title"></span>
+            <span class="art-foot-title" id="art-foot-next-title">{defaultOpen?.next?.title ?? ''}</span>
           </button>
         </nav>
       </article>
@@ -464,6 +518,22 @@ const title = `HAS Design${pageSuffix}`;
             if (meta[i].slug === initialHash) {
               openArticle(i, { updateHash: false });
               break;
+            }
+          }
+        } else if (stage.dataset.defaultOpenIdx) {
+          /* ILI-790 — page rendered with a default-open article at SSR.
+             Sync JS state to the static DOM (currentIdx + active card +
+             rails tag) without re-rendering the article body, so the
+             prev/next buttons and Escape-to-close still work. */
+          var defaultIdx = parseInt(stage.dataset.defaultOpenIdx, 10);
+          if (!isNaN(defaultIdx) && meta[defaultIdx]) {
+            currentIdx = defaultIdx;
+            var activeEl = items[defaultIdx];
+            if (activeEl) activeEl.classList.add('active');
+            if (window.HASRails) {
+              window.HASRails.set({
+                tag: '// DISPATCH · ' + (meta[defaultIdx].postId || '').replace(/^\/\/\s*/, ''),
+              });
             }
           }
         }
@@ -1052,7 +1122,7 @@ const title = `HAS Design${pageSuffix}`;
         var HANDOFF_PAUSE = 280;
         var FRAME_BREATH = 200;
         var SCAN_LINES = 13;
-        var FRAME_LINES = 5;
+        var FRAME_LINES = 6;
         var REVEAL_TRANSITION = 320;
         var STAGE_CADENCE = 180;
         var POST_FOOTER_DELAY = 400;
