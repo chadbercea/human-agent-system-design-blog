@@ -167,6 +167,10 @@ Most readers find the answer to question five is "no one" and "I don't know."
 
 That person is you. The work starts this week.
 
+## The diagnostic
+
+Below is the same exercise, scored. Five sliders across the system-layer dimensions — chat strategy, agent definition, system legibility, deliberate design, state and memory — rated one through five. The diagnosis updates as you slide. Ten minutes, and you leave with a picture of where the gaps cluster.
+
 <div class="diag-embed">
   <a class="diag-embed-cta" href="/diagnostic" target="_blank" rel="noopener" role="button">
     <span class="diag-embed-cta-label">Open the diagnostic in a new tab →</span>
