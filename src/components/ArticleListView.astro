@@ -396,6 +396,7 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         var items = document.querySelectorAll('.post-card');
         var backBtn = document.getElementById('back-btn');
         var mobileBack = document.getElementById('mobile-back');
+        var frameCta = document.querySelector('.frame-cta');
         var colArticle = document.querySelector('.col-article');
         var headIdEl = document.getElementById('art-head-id');
         var headDateEl = document.getElementById('art-head-date');
@@ -502,6 +503,17 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
 
         if (backBtn) backBtn.addEventListener('click', closeArticle);
         if (mobileBack) mobileBack.addEventListener('click', closeArticle);
+        /* ILI-793 — "Begin transmission" should slide the latest article
+           in via the same grid-template-columns transition the post cards
+           trigger, not a full-page nav to /blog (where the open state is
+           SSR'd statically and skips the animation). The href stays as
+           /blog so cmd/ctrl/middle-click and no-JS fallbacks still work. */
+        if (frameCta) frameCta.addEventListener('click', function (e) {
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
+          if (!meta.length) return;
+          e.preventDefault();
+          openArticle(0);
+        });
         if (prevBtn) prevBtn.addEventListener('click', function () {
           if (currentIdx >= 0 && meta[currentIdx + 1]) openArticle(currentIdx + 1);
         });
