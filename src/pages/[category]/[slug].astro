@@ -2,12 +2,13 @@
 import { render } from 'astro:content';
 import HomepageLayout from '../../layouts/HomepageLayout.astro';
 import FrameworkLocator from '../../components/FrameworkLocator.astro';
+import CategoryBadge from '../../components/CategoryBadge.astro';
+import ConceptLink from '../../components/ConceptLink.astro';
 import {
   getAllConcepts,
   getCategoryBySlug,
   getReferencedBy,
   categoryHref,
-  conceptHref,
   type CategorySlug,
 } from '../../lib/has-framework';
 
@@ -34,10 +35,12 @@ const { Content } = await render(concept);
   <main class="prose-page">
     <article class="prose-inner">
       <FrameworkLocator currentCategory={concept.data.category as CategorySlug} class="concept-locator" />
-      <p class="eyebrow">
-        <a href={categoryHref(cat.data.slug)}>{cat.data.singular.toUpperCase()}</a>
-        &nbsp;·&nbsp; {concept.data.category_index} OF {cat.member_count}
-      </p>
+      <div class="concept-meta">
+        <CategoryBadge category={concept.data.category as CategorySlug} />
+        <span class="concept-index">
+          {String(concept.data.category_index).padStart(2, '0')} / {String(cat.member_count).padStart(2, '0')}
+        </span>
+      </div>
       <h1 class="prose-h1">{concept.data.title}</h1>
       <div class="prose-body">
         <p class="concept-synopsis">{concept.data.synopsis}</p>
@@ -51,7 +54,7 @@ const { Content } = await render(concept);
             <h2 class="concept-section-h">Referenced by</h2>
             <ul>
               {referencedBy.map((r) => (
-                <li><a href={conceptHref(r)}>{r.data.title}</a></li>
+                <li><ConceptLink slug={r.id}>{r.data.title}</ConceptLink></li>
               ))}
             </ul>
           </section>
@@ -63,8 +66,20 @@ const { Content } = await render(concept);
 </HomepageLayout>
 
 <style>
-  .eyebrow a { color: inherit; text-decoration: none; }
-  .eyebrow a:hover { color: var(--white); }
+  .concept-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .concept-index {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: var(--dim);
+  }
   .concept-synopsis {
     font-size: 1.25rem;
     color: var(--light);
@@ -101,8 +116,6 @@ const { Content } = await render(concept);
   }
   .concept-referenced-by ul { list-style: none; padding: 0; margin: 0; }
   .concept-referenced-by li { padding: 0.5rem 0; }
-  .concept-referenced-by a { color: var(--white); text-decoration: none; border-bottom: 1px solid var(--rule); }
-  .concept-referenced-by a:hover { border-bottom-color: var(--white); }
   .concept-back {
     margin-top: 3rem;
     font-family: var(--font-mono);
