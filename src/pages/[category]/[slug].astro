@@ -1,6 +1,7 @@
 ---
 import { render } from 'astro:content';
 import HomepageLayout from '../../layouts/HomepageLayout.astro';
+import FrameworkLocator from '../../components/FrameworkLocator.astro';
 import {
   getAllConcepts,
   getCategoryBySlug,
@@ -32,6 +33,7 @@ const { Content } = await render(concept);
 >
   <main class="prose-page">
     <article class="prose-inner">
+      <FrameworkLocator currentCategory={concept.data.category as CategorySlug} class="concept-locator" />
       <p class="eyebrow">
         <a href={categoryHref(cat.data.slug)}>{cat.data.singular.toUpperCase()}</a>
         &nbsp;·&nbsp; {concept.data.category_index} OF {cat.member_count}
@@ -110,4 +112,5 @@ const { Content } = await render(concept);
   }
   .concept-back a { color: var(--mid); text-decoration: none; }
   .concept-back a:hover { color: var(--white); }
+  .concept-locator { margin-bottom: 2.5rem; }
 </style>
