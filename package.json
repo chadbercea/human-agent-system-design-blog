@@ -7,9 +7,10 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/validate-framework.mjs && astro build",
     "preview": "astro preview",
-    "check": "astro check",
+    "check": "node scripts/validate-framework.mjs && astro check",
+    "validate:framework": "node scripts/validate-framework.mjs",
     "test:e2e": "playwright test"
   },
   "dependencies": {
