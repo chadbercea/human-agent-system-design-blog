@@ -2,18 +2,32 @@
 import { getCollection } from 'astro:content';
 import ArticleListView from '../../components/ArticleListView.astro';
 
+/* ILI-790 — /blog renders the article-selected view at SSR with
+   the latest published article populated by default. Same template
+   as /, just with stage.open and the article body pre-filled so
+   there is no flash of the empty "waiting" state. Publishing a new
+   article and redeploying changes which article populates here
+   automatically. Tie-break on identical publish dates falls back
+   to the most recently updated entry. */
 const PAGE_SIZE = 5;
 
 const articles = (await getCollection('articles'))
   .filter((a) => !a.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+  .sort((a, b) => {
+    const dateDiff = b.data.date.valueOf() - a.data.date.valueOf();
+    if (dateDiff !== 0) return dateDiff;
+    return b.id.localeCompare(a.id);
+  });
 
 const totalPages = Math.max(1, Math.ceil(articles.length / PAGE_SIZE));
 const pageArticles = articles.slice(0, PAGE_SIZE);
+const latestSlug = pageArticles[0]?.slug;
 ---
 <ArticleListView
   pageArticles={pageArticles}
   allArticles={articles}
   currentPage={1}
   totalPages={totalPages}
+  heroVariant="frame"
+  defaultOpenSlug={latestSlug}
 />

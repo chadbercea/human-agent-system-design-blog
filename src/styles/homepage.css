@@ -434,7 +434,7 @@ body.hero-sequence-play .protocol-chip.is-typed {
   line-height: 32px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #fff;
+  color: #888888;
   white-space: nowrap;
   max-height: 0;
   opacity: 0;
@@ -447,9 +447,9 @@ body.hero-sequence-play .protocol-chip.is-typed {
   max-height: 32px;
   opacity: 1;
 }
-.scan-line .scan-t { color: #fff; opacity: 0.55; }
-.scan-line .scan-c { color: #fff; font-weight: 700; }
-.scan-line .scan-d { color: #fff; }
+.scan-line .scan-t { color: #888888; opacity: 0.7; }
+.scan-line .scan-c { color: #888888; font-weight: 700; }
+.scan-line .scan-d { color: #888888; }
 
 .frame-block {
   background: transparent;
@@ -471,7 +471,7 @@ body.hero-sequence-play .protocol-chip.is-typed {
 .frame-rule {
   width: 100%;
   height: 1px;
-  background: #fff;
+  background: #888888;
   margin-bottom: 32px;
 }
 
@@ -481,7 +481,7 @@ body.hero-sequence-play .protocol-chip.is-typed {
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #fff;
+  color: #888888;
   margin-bottom: 28px;
 }
 
@@ -491,7 +491,7 @@ body.hero-sequence-play .protocol-chip.is-typed {
   font-size: 80px;
   line-height: 1.05;
   letter-spacing: -0.01em;
-  color: #fff;
+  color: #ffffff;
   margin-bottom: 24px;
   hyphens: none;
 }
@@ -501,7 +501,7 @@ body.hero-sequence-play .protocol-chip.is-typed {
   font-weight: 300;
   font-size: 17px;
   line-height: 1.45;
-  color: #fff;
+  color: #888888;
   max-width: 60ch;
   margin-bottom: 32px;
 }
@@ -512,12 +512,96 @@ body.hero-sequence-play .protocol-chip.is-typed {
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #fff;
+  color: #888888;
+  margin-bottom: 28px;
+}
+
+/* ───────────── HERO CTA — ILI-790 ─────────────
+   Solid white pill with black text — the second
+   point of light alongside the H1. Two synchronized
+   1.4s loops on hover: the arrow translates +5px
+   and back (ease-in-out), and a soft scan band
+   sweeps left-to-right across the fill (linear).
+   Both loops share the same period so they read as
+   a single rhythm with two channels. ──────────── */
+.frame-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #000000;
+  background: #ffffff;
+  border: none;
+  text-decoration: none;
+  overflow: hidden;
+  isolation: isolate;
+}
+.frame-cta-label,
+.frame-cta-arrow {
+  position: relative;
+  z-index: 1;
+}
+.frame-cta-arrow {
+  display: inline-block;
+  letter-spacing: 0;
+}
+.frame-cta::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.12) 50%, transparent 100%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.frame-cta:hover .frame-cta-arrow,
+.frame-cta:focus-visible .frame-cta-arrow {
+  animation: frame-cta-arrow 1.4s ease-in-out infinite;
+}
+.frame-cta:hover::after,
+.frame-cta:focus-visible::after {
+  opacity: 1;
+  animation: frame-cta-sweep 1.4s linear infinite;
+}
+.frame-cta:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+@keyframes frame-cta-arrow {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(5px); }
+}
+@keyframes frame-cta-sweep {
+  from { left: -40%; }
+  to   { left: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame-cta:hover .frame-cta-arrow,
+  .frame-cta:focus-visible .frame-cta-arrow,
+  .frame-cta:hover::after,
+  .frame-cta:focus-visible::after {
+    animation: none;
+  }
+  .frame-cta:hover::after,
+  .frame-cta:focus-visible::after {
+    opacity: 0;
+  }
 }
 
 .signal-strip {
   flex: 0 0 auto;
-  border-top: 1px solid #fff;
+  border-top: 1px solid #888888;
   padding: 14px 40px;
   display: flex;
   align-items: center;
@@ -529,13 +613,13 @@ body.hero-sequence-play .protocol-chip.is-typed {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   background: #000000;
-  color: #fff;
+  color: #888888;
 }
-.signal-strip .signal-sep { opacity: 0.4; }
+.signal-strip .signal-sep { opacity: 0.6; }
 .signal-strip .signal-cursor {
   display: inline-block;
   margin-left: 2px;
-  color: #fff;
+  color: #888888;
   animation: signal-cursor-blink 1s steps(1, end) infinite;
 }
 @keyframes signal-cursor-blink {
@@ -590,7 +674,8 @@ body.has-hero-frame-play .has-hero-frame .frame-line.is-visible {
   .frame-eyebrow,
   .frame-h1,
   .frame-dek,
-  .frame-audience {
+  .frame-audience,
+  .frame-cta {
     transition: none !important;
     animation: none !important;
   }

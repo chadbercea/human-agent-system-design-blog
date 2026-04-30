@@ -14,9 +14,10 @@ export interface Props {
   dek?: string;
   tags?: string[];
   minutes: number;
+  active?: boolean;
 }
 
-const { index, postNumber, slug, title, date, dek, tags = [], minutes } = Astro.props;
+const { index, postNumber, slug, title, date, dek, tags = [], minutes, active = false } = Astro.props;
 
 function formatDate(d: Date): string {
   const y = d.getUTCFullYear();
@@ -30,7 +31,7 @@ const dateLabel = formatDate(date);
 const tagLabel = tags.length > 0 ? tags.map((t) => t.toUpperCase()).join(' · ') : '';
 const readLabel = `${minutes} MIN READ`;
 ---
-<li class="post-card reveal" data-index={index} data-slug={slug} style={`--reveal-i: ${index}`}>
+<li class:list={['post-card reveal', active && 'active']} data-index={index} data-slug={slug} style={`--reveal-i: ${index}`}>
   <div class="post-card-top">
     <span class="post-card-id">{idLabel}</span>
     <span class="post-card-date">{dateLabel}</span>
