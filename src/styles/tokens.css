@@ -20,6 +20,13 @@
   --mid: #8a8a8c;
   --light: #c4c4c6;
 
+  /* Color — category language (HAS-D taxonomy)
+     Three points of color on an otherwise monochrome canvas.
+     Each pick ladders from its category's semantic_intent. */
+  --cat-axioms: #8fc88f;              /* phosphor green — stable, foundational, given */
+  --cat-constraints: #d99a4f;         /* amber — forces acting on you, structural pressure */
+  --cat-design-requirements: #5fb3c8; /* cyan — calls to action, capabilities to build */
+
   /* Type families — the two voices */
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-sans: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;

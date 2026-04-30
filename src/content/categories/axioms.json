@@ -1,0 +1,9 @@
+{
+  "slug": "axioms",
+  "singular": "Axiom",
+  "plural": "Axioms",
+  "description": "Foundational truths HAS-D treats as given. These are not aspirational. They are structural properties of human-agent-system interaction that hold regardless of implementation.",
+  "semantic_intent": "stable, foundational, given",
+  "color_token": "--cat-axioms",
+  "glyph": "strata"
+}

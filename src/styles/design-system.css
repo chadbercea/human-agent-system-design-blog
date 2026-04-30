@@ -438,6 +438,83 @@ html, body {
 .palette-meta .k { font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.3em; color: var(--dim); text-transform: uppercase; }
 .palette-meta .v { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: var(--white); text-transform: uppercase; }
 
+/* ── Category visual language (HAS-D taxonomy) ──────────── */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--rule-strong);
+  border: 1px solid var(--rule-strong);
+}
+.cat-cell {
+  background: var(--bg-canvas);
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  position: relative;
+}
+.cat-glyph-stage {
+  color: var(--cat);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96px;
+  border: 1px solid var(--rule);
+}
+.cat-headline { display: flex; flex-direction: column; gap: 8px; }
+.cat-headline .cat-id {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: var(--cat);
+  text-transform: uppercase;
+}
+.cat-headline .cat-name {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--white);
+}
+.cat-headline .cat-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: var(--mid);
+  text-transform: uppercase;
+}
+.cat-spec {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+}
+.cat-spec div { display: flex; flex-direction: column; gap: 4px; }
+.cat-spec .k {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+.cat-spec .v {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  color: var(--light);
+}
+
+@media (max-width: 900px) {
+  .cat-grid { grid-template-columns: 1fr; }
+}
+
 .logo-stage--inv .bar { background: var(--black); }
 
 .scales-bed {

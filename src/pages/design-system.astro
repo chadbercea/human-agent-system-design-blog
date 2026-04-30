@@ -1,5 +1,12 @@
 ---
 import DesignSystemLayout from '../layouts/DesignSystemLayout.astro';
+import CategoryGlyph from '../components/CategoryGlyph.astro';
+import { getAllCategories, getCategoryBySlug } from '../lib/has-framework';
+
+const categories = await getAllCategories();
+const categoriesWithMembers = await Promise.all(
+  categories.map(async (c) => (await getCategoryBySlug(c.data.slug))!),
+);
 ---
 <DesignSystemLayout title="HAS Design System">
   <section class="hero">
@@ -294,9 +301,38 @@ import DesignSystemLayout from '../layouts/DesignSystemLayout.astro';
   </section>
 
   <section class="panel reveal">
-    <div class="panel-rail"><span><strong>05 &nbsp; READOUT</strong></span></div>
+    <div class="panel-rail"><span><strong>05 &nbsp; CATEGORIES</strong></span></div>
     <div class="panel-head">
       <span class="id">// 05</span>
+      <span class="title">CATEGORY LANGUAGE &middot; HAS-D TAXONOMY</span>
+      <span class="meta">3 CATEGORIES &middot; 13 CONCEPTS</span>
+    </div>
+
+    <div class="cat-grid">
+      {categoriesWithMembers.map((c) => (
+        <article class="cat-cell" style={`--cat: var(${c.data.color_token});`}>
+          <div class="cat-glyph-stage">
+            <CategoryGlyph category={c.data.slug} size={56} />
+          </div>
+          <div class="cat-headline">
+            <span class="cat-id">// {String(c.data.slug).toUpperCase()}</span>
+            <span class="cat-name">{c.data.plural}</span>
+            <span class="cat-count">{c.member_count} {c.member_count === 1 ? 'MEMBER' : 'MEMBERS'}</span>
+          </div>
+          <div class="cat-spec">
+            <div><span class="k">TOKEN</span><span class="v">{c.data.color_token}</span></div>
+            <div><span class="k">GLYPH</span><span class="v">{String(c.data.glyph).toUpperCase()}</span></div>
+            <div><span class="k">INTENT</span><span class="v">{c.data.semantic_intent}</span></div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="panel reveal">
+    <div class="panel-rail"><span><strong>06 &nbsp; READOUT</strong></span></div>
+    <div class="panel-head">
+      <span class="id">// 06</span>
       <span class="title">SYSTEM READOUT &middot; HUMAN &times; AGENT SESSION</span>
       <span class="meta">CHANNEL 01 &middot; LIVE</span>
     </div>
