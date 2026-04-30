@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import mdx from '@astrojs/mdx';
 
 const site =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, '') ||
@@ -33,7 +34,7 @@ const hasTerminalTheme = {
 
 export default defineConfig({
   site,
-  integrations: [sitemap()],
+  integrations: [mdx(), sitemap()],
   devToolbar: { enabled: !process.env.ASTRO_TEST },
   markdown: {
     shikiConfig: {

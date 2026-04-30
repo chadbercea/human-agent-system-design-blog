@@ -1,0 +1,56 @@
+---
+import {
+  conceptHref,
+  getConceptBySlug,
+} from '../lib/has-framework';
+
+interface Props {
+  slug: string;
+  class?: string;
+}
+
+const { slug, class: className } = Astro.props;
+const concept = await getConceptBySlug(slug);
+if (!concept) {
+  throw new Error(
+    `[ConceptLink] Unknown concept slug "${slug}". This is a build-time error — fix the slug or run \`npm run validate:framework\` to see the full reference graph.`,
+  );
+}
+
+const category = concept.data.category;
+const ariaLabel = `${concept.data.title} — ${category.replace(/-/g, ' ')}`;
+---
+
+<a
+  href={conceptHref(concept)}
+  class:list={['concept-link', `concept-link--${category}`, className]}
+  aria-label={ariaLabel}
+>
+  <slot>{concept.data.title}</slot>
+</a>
+
+<style>
+  .concept-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    text-decoration-skip-ink: auto;
+    transition:
+      text-decoration-thickness var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+  .concept-link--axioms { text-decoration-color: var(--cat-axioms); }
+  .concept-link--constraints { text-decoration-color: var(--cat-constraints); }
+  .concept-link--design-requirements { text-decoration-color: var(--cat-design-requirements); }
+
+  .concept-link:hover { text-decoration-thickness: 2px; }
+  .concept-link--axioms:hover { color: var(--cat-axioms); }
+  .concept-link--constraints:hover { color: var(--cat-constraints); }
+  .concept-link--design-requirements:hover { color: var(--cat-design-requirements); }
+
+  .concept-link:focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 2px;
+  }
+</style>

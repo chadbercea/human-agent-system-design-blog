@@ -16,7 +16,7 @@ const CATEGORY_SLUGS = ['axioms', 'constraints', 'design-requirements'] as const
 const CONCEPT_STATUSES = ['placeholder', 'canonical-entry', 'full-essay'] as const;
 
 const concepts = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/concepts' }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/concepts' }),
   schema: z.object({
     title: z.string(),
     category: z.enum(CATEGORY_SLUGS),
