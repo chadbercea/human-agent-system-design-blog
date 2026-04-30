@@ -75,4 +75,74 @@ out of scope and must not be duplicated here.
   it continues to render.
 - Use the outline's planned publish date for frontmatter `date`.
 - `description` is the thesis statement from the outline.
-- Tags should include `"HAS Design"` and `"Framework"` to group the series.
+
+## Content — Concepts and the framework
+
+`src/content/concepts/` holds the 13 HAS-D concepts (5 Axioms · 4 Constraints
+· 4 Design Requirements) that make up the framework's vocabulary. Each
+concept renders at `/<category>/<slug>` through `src/pages/[category]/[slug].astro`
+and lives in `src/lib/has-framework.ts`'s data layer.
+
+- **Categories** are fixed at three: `axioms`, `constraints`, `design-requirements`.
+  Defined in `src/content/categories/*.json` and `src/content/config.ts`. Don't
+  add a fourth without explicit direction — the visual language (colour tokens,
+  glyphs, badge pips) is built around three.
+- **Member counts are derived**, never hardcoded. `getCategoryBySlug()` and
+  `getAllCategoriesWithMembers()` count concepts per category at build time.
+  When you add or remove a concept, the hub page count, framework locator
+  count, and concept eyebrow `01 / 04` index update automatically.
+- **`category_index`** must be unique within a category. Build-time validator
+  (`scripts/validate-framework.mjs`) flags duplicates.
+
+### Frontmatter references and the framework affordance bar
+
+Two places use a `references: [conceptSlug, ...]` field, both validated at
+build time:
+
+- **Concept frontmatter** declares the concepts this concept depends on.
+  Drives `getReferencedBy()` for the inverse "Referenced by" footer on
+  concept pages — no manual back-linking. Example:
+  `references: [mirroring]` on `gradient-descent.mdx` causes Mirroring's
+  page to list Gradient Descent under Referenced by.
+- **Article frontmatter** declares which concepts the article connects to.
+  When non-empty, the article reader injects the framework affordance bar
+  (locator) between the rule and the body. Empty/absent → no bar. The
+  freeform `tags` field is gone; the bar conveys the framework connection
+  implicitly.
+
+Both kinds of `references` resolve against existing concept slugs. A typo or
+removed concept fails `npm run build` via the validator at
+`scripts/validate-framework.mjs`. The validator runs on every build and via
+`npm run check`; do not skip it.
+
+### Inline cross-references in MDX bodies
+
+Concept and article bodies should link to other concepts via `<ConceptLink>`,
+not raw `<a>`. The component picks up the destination's category colour for
+the underline (the cross-hub link pattern). Example:
+
+```mdx
+import ConceptLink from '../../components/ConceptLink.astro';
+
+This pairs with <ConceptLink slug="mirroring">Mirroring</ConceptLink>: …
+```
+
+Slugs are validated at build time — `<ConceptLink slug="typo">` fails the build.
+
+## Engineering gotchas (MDX + Astro)
+
+Two non-obvious pitfalls when mounting Astro components inside MDX bodies:
+
+1. **Indented markdown inside JSX `<p class="...">` splits into sibling
+   paragraphs.** MDX parses
+   `<p class="x">\n  Some text.\n</p>` as `<p class="x"></p><p>Some text.</p>` —
+   the class lands on an empty `<p>` and the prose escapes. Collapse the inner
+   content onto a single line.
+2. **Component-scoped `<style>` blocks don't load on pages that reach the
+   component only via content-collection rendering.** Astro tracks scoped CSS
+   dependencies through static `import` statements in page modules. If a
+   page renders a component only through `await render(article)` of an MDX
+   entry that imports it, the scoped stylesheet isn't linked. Extract the
+   structural CSS to `src/styles/<component>.css` and import it from
+   `HomepageLayout.astro`. Components currently using this pattern:
+   `FrameworkLocator`, `ConceptLink`.
