@@ -1,0 +1,7 @@
+{
+  "slug": "design-requirements",
+  "singular": "Design Requirement",
+  "plural": "Design Requirements",
+  "description": "Capabilities and patterns HAS-D must implement. These translate the axioms and constraints into actionable framework components.",
+  "semantic_intent": "calls to action, capabilities to build"
+}

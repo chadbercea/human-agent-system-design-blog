@@ -1,0 +1,7 @@
+{
+  "slug": "constraints",
+  "singular": "Constraint",
+  "plural": "Constraints",
+  "description": "Structural limitations inherent to human-agent-system interaction. These cannot be eliminated. They must be designed around. Ignoring them produces dysfunction.",
+  "semantic_intent": "forces acting on you, structural pressure"
+}
