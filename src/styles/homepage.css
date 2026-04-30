@@ -486,15 +486,14 @@ body.hero-sequence-play .protocol-chip.is-typed {
 }
 
 .frame-h1 {
-  font-family: var(--font-sans);
-  font-weight: 100;
-  font-size: 40px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 80px;
   line-height: 1.05;
   letter-spacing: -0.01em;
   color: #fff;
   margin-bottom: 24px;
   hyphens: none;
-  white-space: nowrap;
 }
 
 .frame-dek {
@@ -514,29 +513,6 @@ body.hero-sequence-play .protocol-chip.is-typed {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #fff;
-  margin-bottom: 32px;
-}
-
-.frame-cta {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #fff;
-  background: transparent;
-  border: 1px solid #fff;
-  padding: 12px 18px;
-  text-decoration: none;
-  transition:
-    background 120ms linear,
-    color 120ms linear;
-}
-.frame-cta:where(:hover, :focus-visible) {
-  background: #fff;
-  color: #000;
-  outline: none;
 }
 
 .signal-strip {
@@ -598,7 +574,7 @@ body.has-hero-frame-play .has-hero-frame .frame-line {
     opacity 0.18s linear 0.08s;
 }
 body.has-hero-frame-play .has-hero-frame .frame-line.is-visible {
-  max-height: 220px;
+  max-height: 320px;
   opacity: 1;
 }
 
@@ -614,8 +590,7 @@ body.has-hero-frame-play .has-hero-frame .frame-line.is-visible {
   .frame-eyebrow,
   .frame-h1,
   .frame-dek,
-  .frame-audience,
-  .frame-cta {
+  .frame-audience {
     transition: none !important;
     animation: none !important;
   }
@@ -1529,7 +1504,7 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
     padding: 56px 24px 40px;
   }
   .col-hero.has-hero-frame .frame-h1 {
-    font-size: 32px;
+    font-size: 64px;
     line-height: 1.08;
     white-space: normal;
     word-break: normal;

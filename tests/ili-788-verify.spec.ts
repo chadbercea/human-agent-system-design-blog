@@ -42,21 +42,19 @@ test.describe('ILI-788 — hero v2: black inversion + continuous print cadence',
       page.locator('.frame-h1').evaluate((el) => getComputedStyle(el).color),
       page.locator('.frame-dek').evaluate((el) => getComputedStyle(el).color),
       page.locator('.frame-audience').evaluate((el) => getComputedStyle(el).color),
-      page.locator('.frame-cta').evaluate((el) => getComputedStyle(el).color),
     ]);
     for (const c of textColors) expect(c).toBe('rgb(255, 255, 255)');
 
-    // CTA: 1px white border, transparent bg, white text. Hover → white bg + black text.
-    const ctaStyles = await page.locator('.frame-cta').evaluate((el) => {
+    // CTA removed (was a dead link).
+    expect(await page.locator('.frame-cta').count()).toBe(0);
+
+    // h1 is JetBrains Mono, 80px desktop.
+    const h1Style = await page.locator('.frame-h1').evaluate((el) => {
       const cs = getComputedStyle(el);
-      return {
-        border: cs.borderTopColor + ' ' + cs.borderTopWidth + ' ' + cs.borderTopStyle,
-        bg: cs.backgroundColor,
-      };
+      return { family: cs.fontFamily, size: cs.fontSize };
     });
-    expect(ctaStyles.border).toBe('rgb(255, 255, 255) 1px solid');
-    // transparent bg shows up as rgba(0,0,0,0)
-    expect(ctaStyles.bg).toMatch(/rgba\(0,\s*0,\s*0,\s*0\)|transparent/);
+    expect(h1Style.family.toLowerCase()).toMatch(/jetbrains mono/);
+    expect(h1Style.size).toBe('80px');
 
     // Frame rule is white.
     const ruleBg = await page.locator('.frame-rule').evaluate((el) =>
@@ -79,7 +77,7 @@ test.describe('ILI-788 — hero v2: black inversion + continuous print cadence',
 
     // B. Continuous print cadence — every frame element is wrapped in .frame-line.
     const wrapped = await page.evaluate(() => {
-      const sel = ['.frame-rule', '.frame-eyebrow', '.frame-h1', '.frame-dek', '.frame-audience', '.frame-cta'];
+      const sel = ['.frame-rule', '.frame-eyebrow', '.frame-h1', '.frame-dek', '.frame-audience'];
       return sel.every((s) => {
         const el = document.querySelector(s);
         return el && el.parentElement && el.parentElement.classList.contains('frame-line');
@@ -89,7 +87,7 @@ test.describe('ILI-788 — hero v2: black inversion + continuous print cadence',
 
     // No translateY transforms remain on hero elements at end-state.
     const transforms = await page.evaluate(() => {
-      const sel = ['.frame-rule', '.frame-eyebrow', '.frame-h1', '.frame-dek', '.frame-audience', '.frame-cta', '.frame-line'];
+      const sel = ['.frame-rule', '.frame-eyebrow', '.frame-h1', '.frame-dek', '.frame-audience', '.frame-line'];
       return sel.map((s) => {
         const el = document.querySelector(s);
         return el ? getComputedStyle(el).transform : 'none';
@@ -104,8 +102,6 @@ test.describe('ILI-788 — hero v2: black inversion + continuous print cadence',
       'Humans, agents, and the system they share. Three actors. Three design objects. One framework.'
     );
     await expect(page.locator('.frame-audience')).toHaveText('> FOR THE PEOPLE SHIPPING THEM');
-    await expect(page.locator('.frame-cta')).toHaveText(/Begin transmission/);
-    await expect(page.locator('.frame-cta')).toHaveAttribute('href', '/blog/were-assuming-the-system');
 
     // No em dashes in rendered hero copy.
     const heroText = await page.locator('.col-hero.has-hero-frame').textContent();
@@ -174,7 +170,8 @@ test.describe('ILI-788 — hero v2: black inversion + continuous print cadence',
     expect(overflow.docW).toBeLessThanOrEqual(overflow.winW);
 
     const h1Box = await page.locator('.frame-h1').boundingBox();
-    expect(h1Box?.height).toBeGreaterThan(34);
+    // 64px font + line-height 1.08 → ≥69px per line.
+    expect(h1Box?.height).toBeGreaterThan(69);
 
     await page.screenshot({
       path: 'verification-screenshots/ili-788-frame-mobile.png',

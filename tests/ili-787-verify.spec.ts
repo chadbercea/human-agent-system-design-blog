@@ -25,15 +25,14 @@ test.describe('ILI-787 — frame hero on index, HUD hero preserved on /blog', ()
     expect(await page.evaluate(() => document.body.classList.contains('has-hero-frame-play'))).toBe(false);
 
     const finalVisible = await page.locator('.frame-line.is-visible').count();
-    expect(finalVisible).toBe(6);
+    expect(finalVisible).toBe(5);
 
     // Final copy lands verbatim per spec — no em dashes, no edits.
     await expect(page.locator('.frame-eyebrow')).toHaveText('// FRAME · V1.0 · TRIAD VERIFIED');
     await expect(page.locator('.frame-h1')).toHaveText('Human Agent System Design');
     await expect(page.locator('.frame-dek')).toHaveText('Humans, agents, and the system they share. Three actors. Three design objects. One framework.');
     await expect(page.locator('.frame-audience')).toHaveText('> FOR THE PEOPLE SHIPPING THEM');
-    await expect(page.locator('.frame-cta')).toHaveText(/Begin transmission/);
-    await expect(page.locator('.frame-cta')).toHaveAttribute('href', '/blog/were-assuming-the-system');
+    expect(await page.locator('.frame-cta').count()).toBe(0);
 
     // No em dashes anywhere in the rendered hero copy.
     const heroText = await page.locator('.col-hero.has-hero-frame').textContent();
