@@ -553,6 +553,33 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           if (e.key === 'Escape') closeArticle();
         });
 
+        /* ILI-810 — let in-article links like <a href="/#were-assuming-the-system>
+           open the target article in the reader instead of leaving
+           a stale hash with the previous article still rendered.
+           Astro's ClientRouter intercepts <a> clicks and navigates
+           via pushState (no hashchange fires), so we delegate clicks
+           on the article body and route same-page article links
+           through openArticle directly. Plain "#section" intra-page
+           anchors are left alone. */
+        function handleBodyLinkClick(e) {
+          if (e.defaultPrevented) return;
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+          var a = e.target.closest && e.target.closest('a[href]');
+          if (!a || !bodyEl.contains(a)) return;
+          var href = a.getAttribute('href') || '';
+          var match = /^(?:\/)?#([^?#]+)$/.exec(href);
+          if (!match) return;
+          var slug = match[1];
+          for (var i = 0; i < meta.length; i++) {
+            if (meta[i].slug === slug) {
+              e.preventDefault();
+              openArticle(i);
+              return;
+            }
+          }
+        }
+        bodyEl.addEventListener('click', handleBodyLinkClick);
+
         var initialHash = (window.location.hash || '').replace(/^#/, '');
         if (initialHash) {
           for (var i = 0; i < meta.length; i++) {
