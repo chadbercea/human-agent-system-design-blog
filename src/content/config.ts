@@ -1,6 +1,8 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+const CATEGORY_SLUGS = ['axioms', 'constraints', 'design-requirements'] as const;
+
 const articles = defineCollection({
   schema: z.object({
     title: z.string(),
@@ -12,11 +14,12 @@ const articles = defineCollection({
        conditionally render the framework affordance bar (locator).
        Empty/absent → no affordance bar. */
     references: z.array(z.string()).optional(),
+    /* Category tag — files this article under one of the three
+       framework hubs. Renders in the post-card-tags footer slot. */
+    category: z.enum(CATEGORY_SLUGS).optional(),
     postNumber: z.number().int().positive(),
   }),
 });
-
-const CATEGORY_SLUGS = ['axioms', 'constraints', 'design-requirements'] as const;
 const CONCEPT_STATUSES = ['placeholder', 'canonical-entry', 'full-essay'] as const;
 
 const concepts = defineCollection({

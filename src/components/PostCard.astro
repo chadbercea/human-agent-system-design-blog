@@ -14,9 +14,10 @@ export interface Props {
   dek?: string;
   minutes: number;
   active?: boolean;
+  tag?: string;
 }
 
-const { index, postNumber, slug, title, date, dek, minutes, active = false } = Astro.props;
+const { index, postNumber, slug, title, date, dek, minutes, active = false, tag } = Astro.props;
 
 function formatDate(d: Date): string {
   const y = d.getUTCFullYear();
@@ -41,7 +42,9 @@ const readLabel = `${minutes} MIN READ`;
   </div>
 
   <div class="post-card-foot">
-    <span class="post-card-tags" aria-hidden="true"></span>
+    <span class="post-card-tags">
+      {tag && (<><span class="tag-label">TAG</span>{tag}</>)}
+    </span>
     <span class="post-card-read">
       <span>{readLabel}</span>
       <span class="arrow" aria-hidden="true">&rarr;</span>

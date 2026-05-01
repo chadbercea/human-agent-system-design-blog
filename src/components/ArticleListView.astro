@@ -4,6 +4,7 @@ import HomepageLayout from '../layouts/HomepageLayout.astro';
 import PostCard from './PostCard.astro';
 import PaginationFooter from './PaginationFooter.astro';
 import FrameworkLocator from './FrameworkLocator.astro';
+import { getAllCategories } from '../lib/has-framework';
 
 export interface Props {
   pageArticles: CollectionEntry<'articles'>[];
@@ -53,6 +54,10 @@ function readMinutes(body: string): number {
   return Math.max(1, Math.ceil(words / 220));
 }
 
+const categorySingular = new Map(
+  (await getAllCategories()).map((c) => [c.data.slug, c.data.singular.toUpperCase()]),
+);
+
 const cards = pageArticles.map((a) => ({
   slug: a.slug,
   title: a.data.title,
@@ -64,6 +69,7 @@ const cards = pageArticles.map((a) => ({
      non-empty references array; the reader shows the affordance
      bar above the body for those, and hides it for everything else. */
   hasFramework: (a.data.references ?? []).length > 0,
+  tag: a.data.category ? categorySingular.get(a.data.category) : undefined,
 }));
 
 const articleMeta = cards.map((c) => ({
@@ -330,6 +336,7 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
             dek={c.dek}
             minutes={c.minutes}
             active={defaultOpen?.idx === i}
+            tag={c.tag}
           />
         ))}
       </ul>

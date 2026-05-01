@@ -4,6 +4,7 @@ date: 2026-04-30
 description: "Agent capability is not on a spectrum with human capability. It occupies a different topology. Neither set maps onto the other. Neither is reducible to the other."
 draft: false
 postNumber: 3
+category: axioms
 references:
   - different-not-lesser
 ---
