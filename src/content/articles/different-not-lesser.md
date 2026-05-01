@@ -33,7 +33,7 @@ All three patterns assume comparison along a single axis. Different Not Lesser s
 
 ## Why this is foundational
 
-The triad collapses without it. The anchor names three co-equal design objects: human, agent, and system. The whole geometry depends on the word co-equal. Once one entity is ranked above another, the structure stops being a triad and becomes a hierarchy with an attendant. The system would either serve the agent and place the human downstream of it, or serve the human and place the agent downstream of it. Either way, the structure that made HAS-D worth naming is gone.
+The triad collapses without it. [The anchor](/#were-assuming-the-system) names three co-equal design objects: human, agent, and system. The whole geometry depends on the word co-equal. Once one entity is ranked above another, the structure stops being a triad and becomes a hierarchy with an attendant. The system would either serve the agent and place the human downstream of it, or serve the human and place the agent downstream of it. Either way, the structure that made HAS-D worth naming is gone.
 
 Different Not Lesser also enables the rest of the axiom set. Bilateral Non-Reducibility, which says combined outputs are measurably different from either entity acting alone, only does work if the entities operate in different categories rather than at different points on the same scale. The Asymmetry of Choice, which says humans choose to engage and agents arrive, only describes a structural property if the asymmetry does not also register as a deficiency. Without Different Not Lesser, every axiom downstream collapses into a comparison.
 
