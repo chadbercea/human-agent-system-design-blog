@@ -4,6 +4,8 @@
    mono tag + read-time footer. Hairline border brighten on
    hover. See ILI-721. Pure vw desktop / px mobile typography
    per CLAUDE.md non-negotiables. */
+import CategoryBadge from './CategoryBadge.astro';
+import type { CategorySlug } from '../lib/has-framework';
 
 export interface Props {
   index: number;
@@ -14,10 +16,10 @@ export interface Props {
   dek?: string;
   minutes: number;
   active?: boolean;
-  tag?: string;
+  category?: CategorySlug;
 }
 
-const { index, postNumber, slug, title, date, dek, minutes, active = false, tag } = Astro.props;
+const { index, postNumber, slug, title, date, dek, minutes, active = false, category } = Astro.props;
 
 function formatDate(d: Date): string {
   const y = d.getUTCFullYear();
@@ -43,7 +45,7 @@ const readLabel = `${minutes} MIN READ`;
 
   <div class="post-card-foot">
     <span class="post-card-tags">
-      {tag && (<><span class="tag-label">TAG</span>{tag}</>)}
+      {category && <CategoryBadge category={category} linkToHub={false} />}
     </span>
     <span class="post-card-read">
       <span>{readLabel}</span>
