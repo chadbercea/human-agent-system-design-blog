@@ -4,7 +4,6 @@ import FrameworkLocator from '../components/FrameworkLocator.astro';
 import {
   getCategoryBySlug,
   getAllCategoriesWithMembers,
-  conceptHref,
   categoryHref,
   type CategorySlug,
   type ConceptStatus,
@@ -47,16 +46,16 @@ const STATUS_LABEL: Record<ConceptStatus, string> = {
       <ol class="hub-list" data-category={category}>
         {cat.members.map((m) => (
           <li class="hub-list-item" data-status={m.data.status}>
-            <a href={conceptHref(m)} class="hub-list-link">
+            <div class="hub-list-link">
               <span class="hub-list-index">{String(m.data.category_index).padStart(2, '0')}</span>
               <div class="hub-list-body">
                 <div class="hub-list-title-row">
                   <span class="hub-list-title">{m.data.title}</span>
-                  <span class="hub-list-status">{STATUS_LABEL[m.data.status]}</span>
+                  <span class="hub-list-status">{cat.data.singular.toUpperCase()}</span>
                 </div>
                 <p class="hub-list-synopsis">{m.data.synopsis}</p>
               </div>
-            </a>
+            </div>
           </li>
         ))}
       </ol>

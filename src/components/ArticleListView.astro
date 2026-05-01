@@ -4,6 +4,10 @@ import HomepageLayout from '../layouts/HomepageLayout.astro';
 import PostCard from './PostCard.astro';
 import PaginationFooter from './PaginationFooter.astro';
 import FrameworkLocator from './FrameworkLocator.astro';
+import CategoryBadge from './CategoryBadge.astro';
+import { getAllCategories, type CategorySlug } from '../lib/has-framework';
+
+const CATEGORY_SLUGS: CategorySlug[] = ['axioms', 'constraints', 'design-requirements'];
 
 export interface Props {
   pageArticles: CollectionEntry<'articles'>[];
@@ -64,6 +68,7 @@ const cards = pageArticles.map((a) => ({
      non-empty references array; the reader shows the affordance
      bar above the body for those, and hides it for everything else. */
   hasFramework: (a.data.references ?? []).length > 0,
+  category: a.data.category,
 }));
 
 const articleMeta = cards.map((c) => ({
@@ -74,6 +79,7 @@ const articleMeta = cards.map((c) => ({
   date: formatDate(c.date),
   read: `${c.minutes} MIN READ`,
   hasFramework: c.hasFramework,
+  category: c.category ?? '',
 }));
 
 const featured = pageArticles[0] ?? allArticles[0];
@@ -330,6 +336,7 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
             dek={c.dek}
             minutes={c.minutes}
             active={defaultOpen?.idx === i}
+            category={c.category}
           />
         ))}
       </ul>
@@ -354,12 +361,21 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         </div>
         <h1 class="art-h1" id="art-h1">{defaultOpen ? defaultOpen.meta.title : ''}</h1>
         <p class="art-lede" id="art-lede">{defaultOpen ? defaultOpen.meta.lede : ''}</p>
-        <hr class="art-rule" aria-hidden="true" />
-        <div class="art-framework" id="art-framework" hidden={!defaultOpen?.meta.hasFramework}>
-          <FrameworkLocator />
+        <div class="art-tag" id="art-tag" hidden={!defaultOpen?.meta.category}>
+          {CATEGORY_SLUGS.map((slug) => (
+            <span class="art-tag-badge" data-cat={slug} hidden={defaultOpen?.meta.category !== slug}>
+              <CategoryBadge category={slug} linkToHub={true} />
+            </span>
+          ))}
         </div>
+        <hr class="art-rule" aria-hidden="true" />
         <div class="art-body" id="art-body">
           {DefaultOpenContent && <DefaultOpenContent />}
+        </div>
+        <div class="art-framework" id="art-framework" hidden={!defaultOpen?.meta.hasFramework}>
+          <h2 class="art-framework-h">Continue with the framework</h2>
+          <p class="art-framework-lede">HAS-D groups its working vocabulary into three hubs: axioms, constraints, and design requirements.</p>
+          <FrameworkLocator />
         </div>
         <div class="art-end" aria-hidden="true">&middot;&nbsp;&middot;&nbsp;&middot;</div>
         <nav class="art-foot" aria-label="Article navigation">
@@ -402,6 +418,8 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         var headIdEl = document.getElementById('art-head-id');
         var headDateEl = document.getElementById('art-head-date');
         var headReadEl = document.getElementById('art-head-read');
+        var tagEl = document.getElementById('art-tag');
+        var tagBadges = tagEl ? tagEl.querySelectorAll('.art-tag-badge') : [];
         var h1El = document.getElementById('art-h1');
         var ledeEl = document.getElementById('art-lede');
         var frameworkEl = document.getElementById('art-framework');
@@ -457,6 +475,12 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           headReadEl.textContent = data.read;
           h1El.textContent = data.title;
           ledeEl.textContent = data.lede || '';
+          if (tagEl) {
+            tagEl.hidden = !data.category;
+            tagBadges.forEach(function (b) {
+              b.hidden = b.getAttribute('data-cat') !== data.category;
+            });
+          }
           renderFramework(data.hasFramework);
           var src = document.getElementById('body-' + data.slug);
           bodyEl.innerHTML = src ? src.innerHTML : '';
