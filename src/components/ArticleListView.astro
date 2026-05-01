@@ -352,13 +352,6 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         <span>All Articles</span>
       </button>
       <article class="article-inner">
-        <div class="art-tag" id="art-tag" hidden={!defaultOpen?.meta.category}>
-          {CATEGORY_SLUGS.map((slug) => (
-            <span class="art-tag-badge" data-cat={slug} hidden={defaultOpen?.meta.category !== slug}>
-              <CategoryBadge category={slug} linkToHub={true} />
-            </span>
-          ))}
-        </div>
         <div class="art-head" id="art-head">
           <span class="art-head-id" id="art-head-id">{defaultOpen ? defaultOpen.meta.postId : ''}</span>
           <span class="art-head-sep" aria-hidden="true">&middot;</span>
@@ -368,6 +361,13 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         </div>
         <h1 class="art-h1" id="art-h1">{defaultOpen ? defaultOpen.meta.title : ''}</h1>
         <p class="art-lede" id="art-lede">{defaultOpen ? defaultOpen.meta.lede : ''}</p>
+        <div class="art-tag" id="art-tag" hidden={!defaultOpen?.meta.category}>
+          {CATEGORY_SLUGS.map((slug) => (
+            <span class="art-tag-badge" data-cat={slug} hidden={defaultOpen?.meta.category !== slug}>
+              <CategoryBadge category={slug} linkToHub={true} />
+            </span>
+          ))}
+        </div>
         <hr class="art-rule" aria-hidden="true" />
         <div class="art-body" id="art-body">
           {DefaultOpenContent && <DefaultOpenContent />}

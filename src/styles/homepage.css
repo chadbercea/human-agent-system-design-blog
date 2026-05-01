@@ -1009,7 +1009,7 @@ body.is-index-booting.boot-stage-footer .site-footer {
 }
 
 /* Header strip: // POST NN · DATE · MIN READ, mono caps. */
-.art-tag { margin-bottom: 0.9rem; }
+.art-tag { margin: 0.9rem 0 1.1rem; }
 .art-tag[hidden] { display: none; }
 .art-tag-badge[hidden] { display: none; }
 
