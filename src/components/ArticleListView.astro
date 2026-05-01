@@ -373,6 +373,8 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           {DefaultOpenContent && <DefaultOpenContent />}
         </div>
         <div class="art-framework" id="art-framework" hidden={!defaultOpen?.meta.hasFramework}>
+          <h2 class="art-framework-h">Continue with the framework</h2>
+          <p class="art-framework-lede">HAS-D groups its working vocabulary into three hubs: axioms, constraints, and design requirements.</p>
           <FrameworkLocator />
         </div>
         <div class="art-end" aria-hidden="true">&middot;&nbsp;&middot;&nbsp;&middot;</div>

@@ -1196,20 +1196,35 @@ body.is-index-booting.boot-stage-footer .site-footer {
   margin-top: 0.75rem;
 }
 
-/* ILI-806 — framework affordance bar in the article reader chrome.
-   Sits between the rule and the body, only visible for articles that
-   declare a non-empty `references` frontmatter array. The locator
-   markup itself is supplied by FrameworkLocator; this just positions
-   the wrapper. Scoped to the article reader, not the body, so it
-   doesn't compete with body prose. */
+/* ILI-806 — framework affordance bar at the bottom of the article
+   reader. Visible only for articles that declare a non-empty
+   `references` frontmatter array. Locator markup comes from
+   FrameworkLocator; the H2 + lead-in introduce it as a section. */
 .art-framework {
-  margin: 0 0 1.75em;
+  margin: 2.5em 0 1.75em;
 }
 .art-framework[hidden] {
   display: none;
 }
+.art-framework-h {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin: 0 0 0.5em;
+}
+.art-framework-lede {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: clamp(19px, 1.4vw, 22px);
+  line-height: 1.65;
+  color: var(--light);
+  margin: 0 0 1.5em;
+}
 @media (max-width: 900px) {
-  .art-framework { margin: 0 0 1.25em; }
+  .art-framework { margin: 1.75em 0 1.25em; }
 }
 
 .art-body .diag-embed { margin: 2.5em 0; }
