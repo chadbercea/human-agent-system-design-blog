@@ -80,6 +80,7 @@ const articleMeta = cards.map((c) => ({
   date: formatDate(c.date),
   read: `${c.minutes} MIN READ`,
   hasFramework: c.hasFramework,
+  tag: c.tag ?? '',
 }));
 
 const featured = pageArticles[0] ?? allArticles[0];
@@ -352,6 +353,10 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         <span>All Articles</span>
       </button>
       <article class="article-inner">
+        <div class="art-tag" id="art-tag" hidden={!defaultOpen?.meta.tag}>
+          <span class="art-tag-label">TAG</span>
+          <span class="art-tag-value" id="art-tag-value">{defaultOpen?.meta.tag ?? ''}</span>
+        </div>
         <div class="art-head" id="art-head">
           <span class="art-head-id" id="art-head-id">{defaultOpen ? defaultOpen.meta.postId : ''}</span>
           <span class="art-head-sep" aria-hidden="true">&middot;</span>
@@ -362,11 +367,11 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         <h1 class="art-h1" id="art-h1">{defaultOpen ? defaultOpen.meta.title : ''}</h1>
         <p class="art-lede" id="art-lede">{defaultOpen ? defaultOpen.meta.lede : ''}</p>
         <hr class="art-rule" aria-hidden="true" />
-        <div class="art-framework" id="art-framework" hidden={!defaultOpen?.meta.hasFramework}>
-          <FrameworkLocator />
-        </div>
         <div class="art-body" id="art-body">
           {DefaultOpenContent && <DefaultOpenContent />}
+        </div>
+        <div class="art-framework" id="art-framework" hidden={!defaultOpen?.meta.hasFramework}>
+          <FrameworkLocator />
         </div>
         <div class="art-end" aria-hidden="true">&middot;&nbsp;&middot;&nbsp;&middot;</div>
         <nav class="art-foot" aria-label="Article navigation">
@@ -409,6 +414,8 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         var headIdEl = document.getElementById('art-head-id');
         var headDateEl = document.getElementById('art-head-date');
         var headReadEl = document.getElementById('art-head-read');
+        var tagEl = document.getElementById('art-tag');
+        var tagValueEl = document.getElementById('art-tag-value');
         var h1El = document.getElementById('art-h1');
         var ledeEl = document.getElementById('art-lede');
         var frameworkEl = document.getElementById('art-framework');
@@ -464,6 +471,15 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           headReadEl.textContent = data.read;
           h1El.textContent = data.title;
           ledeEl.textContent = data.lede || '';
+          if (tagEl && tagValueEl) {
+            if (data.tag) {
+              tagValueEl.textContent = data.tag;
+              tagEl.hidden = false;
+            } else {
+              tagValueEl.textContent = '';
+              tagEl.hidden = true;
+            }
+          }
           renderFramework(data.hasFramework);
           var src = document.getElementById('body-' + data.slug);
           bodyEl.innerHTML = src ? src.innerHTML : '';

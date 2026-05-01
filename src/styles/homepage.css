@@ -1009,6 +1009,21 @@ body.is-index-booting.boot-stage-footer .site-footer {
 }
 
 /* Header strip: // POST NN · DATE · MIN READ, mono caps. */
+.art-tag {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4em;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.75vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+.art-tag[hidden] { display: none; }
+.art-tag-label { color: var(--dim); }
+.art-tag-value { color: var(--white); }
+
 .art-head {
   display: flex;
   align-items: baseline;
