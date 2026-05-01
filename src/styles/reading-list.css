@@ -80,9 +80,9 @@
 .reading-entry-cite {
   font-family: var(--font-sans);
   font-weight: 700;
-  font-size: clamp(20px, 2vw, 26px);
-  line-height: 1.25;
-  letter-spacing: -0.015em;
+  font-size: clamp(24px, 2.6vw, 34px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   color: var(--white);
   margin: 0;
 }
@@ -93,9 +93,9 @@
 .reading-entry-cite .reading-entry-meta {
   font-family: var(--font-mono);
   font-style: normal;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--dim);
   margin-left: 8px;
@@ -144,7 +144,7 @@
     padding: 28px 0;
   }
   .reading-entry-index { padding-top: 0; }
-  .reading-entry-cite { font-size: 20px; }
+  .reading-entry-cite { font-size: 24px; line-height: 1.2; }
   .reading-entry-body p { font-size: 16px; }
   .reading-entry-cite .reading-entry-meta {
     display: block;
