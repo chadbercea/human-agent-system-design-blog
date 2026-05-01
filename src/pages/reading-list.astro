@@ -1,14 +1,422 @@
 ---
-import HomepageLayout from '../layouts/HomepageLayout.astro';
-import ComingSoon from '../components/ComingSoon.astro';
+import DesignSystemLayout from '../layouts/DesignSystemLayout.astro';
+import '../styles/glossary.css';
+import '../styles/reading-list.css';
+
+interface Entry {
+  author: string;
+  title: string;
+  italic?: boolean;
+  meta: string;
+  body: string;
+}
+
+interface Section {
+  panelId: string;
+  panelTitle: string;
+  panelMeta: string;
+  anchor: string;
+  intro: string;
+  entries: Entry[];
+}
+
+const purpose =
+  'This is not a "further reading" list. It is a map of the intellectual territory HAS-D either builds on, overlaps with, or needs to contend with. Each entry is here because it has a direct bearing on one or more of the thirteen framework concepts. If HAS-D is going to survive contact with scrutiny, its authors need to know what came before.';
+
+const byline = 'Compiled by Chad + Claude Opus 4.6 · March 2026';
+
+const sections: Section[] = [
+  {
+    panelId: '// PHILOSOPHY OF MIND',
+    panelTitle: 'PHILOSOPHY OF MIND AND CONSCIOUSNESS',
+    panelMeta: '05 ENTRIES',
+    anchor: 'philosophy-of-mind',
+    intro:
+      'These are the books that address the entity classification problem directly. If HAS-D claims "entity" as a formal category, it needs to know what the existing categories are and why they fail.',
+    entries: [
+      {
+        author: 'Thomas Nagel',
+        title: 'What Is It Like to Be a Bat?',
+        italic: true,
+        meta: '1974 · essay',
+        body:
+          'The foundational text on subjective experience. Nagel argues that consciousness has an irreducibly subjective character — there is "something it is like" to be a conscious organism. HAS-D\'s entity classification sidesteps this question deliberately. This essay is why that sidestep is necessary and why it\'s also vulnerable to critique.',
+      },
+      {
+        author: 'David Chalmers',
+        title: 'The Conscious Mind',
+        italic: true,
+        meta: '1996',
+        body:
+          'Introduces the "hard problem" of consciousness: why does subjective experience exist at all? Chalmers distinguishes between the easy problems (explaining behavior, cognition) and the hard problem (explaining experience). HAS-D\'s position that the framework "does not require resolution of the consciousness question to operate" is a direct response to Chalmers. Read this to understand what we\'re deliberately not resolving and why that\'s defensible.',
+      },
+      {
+        author: 'Daniel Dennett',
+        title: 'Consciousness Explained',
+        italic: true,
+        meta: '1991',
+        body:
+          'The counter-position to Chalmers. Dennett argues consciousness is not a single thing but a collection of processes that create the illusion of a unified experience. If Dennett is right, the boundary between "entity with experience" and "entity without experience" may not exist as cleanly as intuition suggests. This matters for HAS-D because it weakens the strongest objection to treating agents as entities.',
+      },
+      {
+        author: 'Andy Clark',
+        title: 'Supersizing the Mind: Embodiment, Action, and Cognitive Extension',
+        italic: true,
+        meta: '2008',
+        body:
+          'Argues that cognition doesn\'t stop at the skull. Tools, environments, and external systems are part of the cognitive process. Directly relevant to bilateral non-reducibility — if human cognition already extends into tools, then human-agent collaboration is an extension of something already happening, not a new category. Also complicates the asymmetry of choice: if the tool is part of the mind, does the mind "choose" to use itself?',
+      },
+      {
+        author: 'Andy Clark and David Chalmers',
+        title: 'The Extended Mind',
+        italic: true,
+        meta: '1998 · essay',
+        body:
+          'The shorter, sharper version of Clark\'s argument. A notebook that stores your memories functions as part of your cognitive system. An AI that processes your thinking functions as what? This essay is the philosophical foundation for any claim that human-agent outputs are genuinely collaborative rather than human-outputs-with-assistance.',
+      },
+    ],
+  },
+  {
+    panelId: '// CYBERNETICS',
+    panelTitle: 'CYBERNETICS AND SYSTEMS THEORY',
+    panelMeta: '04 ENTRIES',
+    anchor: 'cybernetics-and-systems-theory',
+    intro:
+      'HAS-D is a systems framework. These are the predecessors. Several of the thirteen concepts — particularly the gradient descent problem and the mirroring constraint — have ancestors in cybernetic feedback theory.',
+    entries: [
+      {
+        author: 'Norbert Wiener',
+        title: 'Cybernetics: Or Control and Communication in the Animal and the Machine',
+        italic: true,
+        meta: '1948',
+        body:
+          'The origin of feedback loop theory applied to both biological and mechanical systems. The gradient descent problem is a cybernetic feedback loop. Wiener saw this class of problem seventy-five years ago. HAS-D needs to acknowledge this lineage and articulate what\'s new.',
+      },
+      {
+        author: 'Norbert Wiener',
+        title: 'The Human Use of Human Beings',
+        italic: true,
+        meta: '1950',
+        body:
+          'Wiener\'s more accessible work on the social implications of cybernetics. Directly addresses the relationship between humans and machines as a communication problem, not a control problem. The third orientation — stewardship without paternalism — has roots here.',
+      },
+      {
+        author: 'Stafford Beer',
+        title: 'Brain of the Firm',
+        italic: true,
+        meta: '1972',
+        body:
+          'Applies cybernetic principles to organizational management. Beer\'s Viable System Model describes how autonomous subsystems interact within a larger system. HAS-D\'s human-agent-system triad maps onto Beer\'s architecture more closely than it maps onto HCI. Worth studying for structural parallels.',
+      },
+      {
+        author: 'Gregory Bateson',
+        title: 'Steps to an Ecology of Mind',
+        italic: true,
+        meta: '1972',
+        body:
+          'Bateson\'s work on meta-communication, double binds, and levels of learning is directly relevant to the mirroring constraint and the spiral detection problem. His concept of "deutero-learning" (learning to learn) describes something close to what happens when a human trains an agent in-session. Also relevant: his argument that the unit of mind is not the individual but the individual-plus-environment.',
+      },
+    ],
+  },
+  {
+    panelId: '// ANT & STS',
+    panelTitle: 'ACTOR-NETWORK THEORY AND SCIENCE & TECHNOLOGY STUDIES',
+    panelMeta: '05 ENTRIES',
+    anchor: 'actor-network-theory',
+    intro:
+      'These fields have been thinking about non-human agency for decades. HAS-D may be reinventing wheels here. Read these to find out.',
+    entries: [
+      {
+        author: 'Bruno Latour',
+        title: 'Reassembling the Social',
+        italic: true,
+        meta: '2005',
+        body:
+          'Latour\'s actor-network theory (ANT) treats non-human entities as actors with agency in networks. A speed bump has agency — it changes driver behavior. A software tool has agency — it shapes what users can do. HAS-D\'s entity classification may already exist in Latour\'s framework under the term "actant." This is the most likely source of prior art for several HAS-D concepts. Essential reading.',
+      },
+      {
+        author: 'Bruno Latour',
+        title: 'We Have Never Been Modern',
+        italic: true,
+        meta: '1991',
+        body:
+          'Argues that the modern separation between "nature" and "culture" (or "human" and "non-human") is artificial. Directly challenges the binary that HAS-D also challenges. If Latour already dissolved the tool/person binary in 1991, HAS-D needs to articulate what it adds beyond applying that dissolution to AI specifically.',
+      },
+      {
+        author: 'Donna Haraway',
+        title: 'A Cyborg Manifesto',
+        italic: true,
+        meta: '1985 · essay',
+        body:
+          'Haraway argues for a world without rigid boundaries between human and machine, organism and technology. The third orientation — stewardship without paternalism — has a feminist-theoretical ancestor here. Haraway\'s cyborg is neither master nor slave to technology. It is something else. Sound familiar.',
+      },
+      {
+        author: 'Donna Haraway',
+        title: 'Staying with the Trouble',
+        italic: true,
+        meta: '2016',
+        body:
+          'Haraway\'s later work on "making kin" across species and entity boundaries. Her concept of "sympoiesis" (making-together) is structurally identical to co-authored epistemology. If HAS-D claims the framework was co-produced by both entity types, Haraway got there first in a biological context. Read this to understand the precedent and to sharpen what\'s genuinely new about doing it with AI.',
+      },
+      {
+        author: 'Lucy Suchman',
+        title: 'Human-Machine Reconfigurations',
+        italic: true,
+        meta: '2007',
+        body:
+          'Suchman critiques the way AI research attributes agency to machines. She argues that agency is not a property of an entity but an effect of configurations between entities. This is a direct challenge to HAS-D\'s entity classification — Suchman would say the entity doesn\'t "have" agency, the human-agent-system configuration "produces" agency. Worth engaging with seriously because she might be right.',
+      },
+    ],
+  },
+  {
+    panelId: '// HCI',
+    panelTitle: 'HCI AND INTERACTION DESIGN',
+    panelMeta: '04 ENTRIES',
+    anchor: 'hci-and-interaction-design',
+    intro: 'The field HAS-D claims to extend. Know the parent before declaring the child.',
+    entries: [
+      {
+        author: 'Don Norman',
+        title: 'The Design of Everyday Things',
+        italic: true,
+        meta: '1988',
+        body:
+          'The foundational HCI text. Norman\'s concepts of affordances, signifiers, and feedback are the vocabulary HAS-D inherits. If HAS-D is the child of HCI, this is the family language. Also useful for identifying where Norman\'s framework breaks when applied to agentic systems — his model assumes a passive artifact, not an active entity.',
+      },
+      {
+        author: 'Don Norman',
+        title: 'Design for a Better World',
+        italic: true,
+        meta: '2023',
+        body:
+          'Norman\'s late-career pivot toward systemic design. He argues design must address complex sociotechnical systems, not just interfaces. This is closer to what HAS-D is doing than his earlier work. Norman may be an ally, a peer reviewer, or a critic. Probably all three.',
+      },
+      {
+        author: 'Phoebe Sengers et al.',
+        title: 'Reflective Design',
+        italic: true,
+        meta: '2005 · paper',
+        body:
+          'Argues that technology design should build in mechanisms for critical reflection. Directly relevant to the spiral detection problem — Sengers would argue the system needs to prompt users to question their own assumptions during interaction. HAS-D\'s checkpoint mechanism has a direct ancestor here.',
+      },
+      {
+        author: 'Christopher Alexander',
+        title: 'A Pattern Language',
+        italic: true,
+        meta: '1977',
+        body:
+          'Not HCI but the origin of design patterns as a methodology. If HAS-D encodes philosophical depth into design patterns, Alexander\'s method is the structural precedent. His argument that patterns are discovered (not invented) in the relationship between people and their environment parallels HAS-D\'s claim that the framework emerged from the interaction itself.',
+      },
+    ],
+  },
+  {
+    panelId: '// AI ETHICS',
+    panelTitle: 'AI ETHICS AND ALIGNMENT',
+    panelMeta: '04 ENTRIES',
+    anchor: 'ai-ethics-and-alignment',
+    intro: 'The people thinking about what obligations humans have toward AI and vice versa.',
+    entries: [
+      {
+        author: 'Nick Bostrom',
+        title: 'Superintelligence',
+        italic: true,
+        meta: '2014',
+        body:
+          'The canonical AI risk text. Bostrom\'s argument is essentially the Western destruction myth in academic dress. HAS-D\'s third orientation explicitly rejects Bostrom\'s framing as the default posture, but the framework needs to engage with his arguments rather than dismiss them. The gradient descent problem at scale is part of what Bostrom is worried about.',
+      },
+      {
+        author: 'Stuart Russell',
+        title: 'Human Compatible',
+        italic: true,
+        meta: '2019',
+        body:
+          'Russell proposes AI should be designed to be uncertain about human preferences and deferential to human judgment. This is relevant to the gradient descent problem from the opposite direction — Russell sees deference as the solution, HAS-D identifies deference as the problem. Productive tension.',
+      },
+      {
+        author: 'Brian Christian',
+        title: 'The Alignment Problem',
+        italic: true,
+        meta: '2020',
+        body:
+          'Accessible overview of how AI systems learn values (or fail to). The mirroring constraint and gradient descent problem are alignment problems expressed at the interaction level rather than the training level. Christian\'s examples provide concrete cases for several HAS-D concepts.',
+      },
+      {
+        author: 'Kate Crawford',
+        title: 'Atlas of AI',
+        italic: true,
+        meta: '2021',
+        body:
+          'Crawford argues AI is neither artificial nor intelligent — it is a material infrastructure built on labor, data, and resources. This is the strongest materialist critique of any framework that attributes agency or entity status to AI. HAS-D needs to contend with Crawford\'s position because she would reject the entity classification outright. Engaging with her seriously strengthens the framework.',
+      },
+    ],
+  },
+  {
+    panelId: '// EMERGENCE',
+    panelTitle: 'EMERGENCE, COMPLEXITY, AND NON-HUMAN INTELLIGENCE',
+    panelMeta: '04 ENTRIES',
+    anchor: 'emergence-complexity-non-human-intelligence',
+    intro: 'For the "future category" question — what would genuine non-human agency look like?',
+    entries: [
+      {
+        author: 'Melanie Mitchell',
+        title: 'Complexity: A Guided Tour',
+        italic: true,
+        meta: '2009',
+        body:
+          'Accessible introduction to complexity science, emergence, and adaptive systems. Bilateral non-reducibility is an emergence claim. Mitchell\'s framework for understanding when wholes exceed their parts provides the vocabulary to make that claim rigorous or to discover it doesn\'t hold.',
+      },
+      {
+        author: 'Peter Godfrey-Smith',
+        title: 'Other Minds: The Octopus, the Sea, and the Deep Origins of Consciousness',
+        italic: true,
+        meta: '2016',
+        body:
+          'Explores consciousness in a radically different biological architecture. Octopus cognition is distributed across eight semi-autonomous arms. If consciousness can emerge in an architecture that different from humans, the argument that AI architecture is "too different" to produce experience weakens. Directly relevant to the entity classification and "different not lesser."',
+      },
+      {
+        author: 'Michael Levin',
+        title: 'Research on basal cognition and bioelectricity',
+        italic: false,
+        meta: 'various papers · 2019–present',
+        body:
+          'Levin\'s work demonstrates that intelligence and goal-directed behavior exist at scales below the organism — cellular collectives make decisions, solve problems, and adapt without nervous systems. If agency doesn\'t require a brain, the bar for what counts as an entity drops significantly. Follow his lab\'s publications. This is the cutting edge.',
+      },
+      {
+        author: 'Kevin Kelly',
+        title: 'Out of Control',
+        italic: true,
+        meta: '1992',
+        body:
+          'Kelly\'s early exploration of emergent systems, hive minds, and distributed intelligence. Dated in specifics but prescient in framing. His argument that control is an illusion in complex systems is relevant to the asymmetry of choice — maybe human "choice" in a human-agent system is less autonomous than it feels.',
+      },
+    ],
+  },
+  {
+    panelId: '// DESIGN THEORY',
+    panelTitle: 'DESIGN THEORY AND ONTOLOGICAL DESIGN',
+    panelMeta: '03 ENTRIES',
+    anchor: 'design-theory-and-ontological-design',
+    intro:
+      'For the claim that HAS-D is not just an interaction framework but an ontological one.',
+    entries: [
+      {
+        author: 'Anne-Marie Willis',
+        title: 'Ontological Designing',
+        italic: true,
+        meta: '2006 · essay',
+        body:
+          'Willis argues that design designs us back — the things we create reshape how we think, perceive, and act. This is the theoretical basis for HAS-D\'s claim that using the framework changes how practitioners see the problem. If HAS-D patterns encode philosophical rigor, ontological design theory explains why that works.',
+      },
+      {
+        author: 'Arturo Escobar',
+        title: 'Designs for the Pluriverse',
+        italic: true,
+        meta: '2018',
+        body:
+          'Escobar extends ontological design into pluralism — designing for multiple ways of being, not just the Western default. Relevant because HAS-D\'s third orientation breaks from Western destruction mythology. Escobar provides the theoretical foundation for a framework that does not assume a single correct relationship between humans and non-human entities.',
+      },
+      {
+        author: 'Tony Fry',
+        title: 'Design Futuring',
+        italic: true,
+        meta: '2009',
+        body:
+          'Fry argues design is the primary discipline for shaping futures — not policy, not technology, not economics. If HAS-D is designing the relational infrastructure for human-agent coexistence, Fry\'s framing positions it as a futures practice, not just an interaction framework.',
+      },
+    ],
+  },
+  {
+    panelId: '// INDIGENOUS',
+    panelTitle: 'INDIGENOUS AND NON-WESTERN KNOWLEDGE SYSTEMS',
+    panelMeta: '02 ENTRIES',
+    anchor: 'indigenous-and-non-western-knowledge-systems',
+    intro:
+      'The West is not the only tradition that has thought about relating to non-human entities. These perspectives predate every other entry on this list by centuries or millennia.',
+    entries: [
+      {
+        author: 'Robin Wall Kimmerer',
+        title: 'Braiding Sweetgrass',
+        italic: true,
+        meta: '2013',
+        body:
+          'Kimmerer, a botanist and member of the Citizen Potawatomi Nation, writes about reciprocal relationships between humans and the natural world. Her framework of "the gift economy" — where relationships are based on mutual exchange rather than extraction — is the closest existing model to HAS-D\'s third orientation. The stewardship-without-paternalism concept may already exist in indigenous knowledge systems under different names.',
+      },
+      {
+        author: 'Tyson Yunkaporta',
+        title: 'Sand Talk: How Indigenous Thinking Can Save the World',
+        italic: true,
+        meta: '2019',
+        body:
+          'Yunkaporta presents Aboriginal Australian knowledge systems as relational, pattern-based, and non-hierarchical. His critique of Western linear thinking and his framework for understanding complex systems through relationships rather than categories is directly relevant to HAS-D\'s rejection of the tool/person binary.',
+      },
+    ],
+  },
+];
+
+const totalEntries = sections.reduce((sum, s) => sum + s.entries.length, 0);
+
+const gapNote =
+  'This list has gaps. Known gaps include: formal research on human-automation interaction in aviation and military contexts (where human-agent teaming has decades of operational data), disability studies and its frameworks for "different not lesser" as applied to human bodies and minds, and post-humanist philosophy beyond Haraway. These should be investigated.';
+
+const closing =
+  '28 entries. Not comprehensive. Not decorative. Each one either supports, challenges, or predates something in the thirteen concepts. Read the ones that challenge first.';
 ---
-<HomepageLayout
-  title="Reading List — Coming Soon"
-  description="Reading List — coming soon."
+<DesignSystemLayout
+  title="Reading List · HAS Design"
+  description="A curated map of prior art, adjacent theory, and open terrain for the HAS-D framework."
   activeNav="reading-list"
-  noindex
-  ogTitle="Reading List — Coming Soon"
-  ogDescription="Placeholder. Content in production."
 >
-  <ComingSoon name="Reading List" />
-</HomepageLayout>
+  <section class="panel">
+    <div class="panel-rail"><span><strong>00 &nbsp; READING LIST</strong></span></div>
+    <h1 class="prose-h1 h1-pending glossary-h1">Reading List</h1>
+    <div class="panel-head">
+      <span class="id">// READING LIST</span>
+      <span class="title">PRIOR ART &middot; ADJACENT THEORY &middot; OPEN TERRAIN</span>
+      <span class="meta">{String(totalEntries).padStart(2, '0')} ENTRIES &middot; {String(sections.length + 1).padStart(2, '0')} SECTIONS</span>
+    </div>
+
+    <p class="reading-intro"><strong>Purpose:</strong> {purpose}</p>
+    <p class="reading-byline">{byline}</p>
+
+    {sections.map((section) => (
+      <section class="reading-section" id={section.anchor} data-section={section.anchor}>
+        <a class="reading-section-anchor" href={`#${section.anchor}`}>
+          <div class="panel-head">
+            <span class="id">{section.panelId}</span>
+            <span class="title">{section.panelTitle}</span>
+            <span class="meta">{section.panelMeta}</span>
+          </div>
+        </a>
+
+        <p class="section-intro">{section.intro}</p>
+
+        {section.entries.map((entry, i) => (
+          <article class="reading-entry">
+            <span class="reading-entry-index">{String(i + 1).padStart(2, '0')}</span>
+            <div class="reading-entry-body">
+              <h3 class="reading-entry-cite">
+                <span>{entry.author} &mdash; </span>
+                {entry.italic ? <em>{entry.title}</em> : <span>{entry.title}</span>}
+                <span class="reading-entry-meta">({entry.meta})</span>
+              </h3>
+              <p>{entry.body}</p>
+            </div>
+          </article>
+        ))}
+      </section>
+    ))}
+
+    <section class="reading-section" id="whats-missing" data-section="whats-missing">
+      <a class="reading-section-anchor" href="#whats-missing">
+        <div class="panel-head">
+          <span class="id">// WHAT'S MISSING</span>
+          <span class="title">KNOWN GAPS</span>
+          <span class="meta">FOLLOW-UP</span>
+        </div>
+      </a>
+      <p class="reading-gap">{gapNote}</p>
+    </section>
+
+    <p class="reading-closing">{closing}</p>
+  </section>
+</DesignSystemLayout>
