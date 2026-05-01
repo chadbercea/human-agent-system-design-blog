@@ -4,7 +4,7 @@ category: design-requirements
 category_index: 1
 synopsis: >
   The productive mode between human and agent is not request/response. It
-  is adversarial in service of thinking — the agent pressure-tests the
+  is adversarial in service of thinking. The agent pressure-tests the
   human's position against terrain the human has not covered.
 framework_implication: >
   HAS-D must name and spec this pattern as a first-class interaction mode.
