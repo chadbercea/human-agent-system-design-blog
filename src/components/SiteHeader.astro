@@ -1,9 +1,10 @@
 ---
 interface Props {
-  activeNav?: 'articles' | 'glossary' | 'design-system' | 'diagnostic' | 'reading-list' | 'system-recipes' | 'about' | 'contact';
+  activeNav?: 'articles' | 'framework' | 'glossary' | 'design-system' | 'diagnostic' | 'reading-list' | 'system-recipes' | 'about' | 'contact';
 }
 
 const { activeNav = 'articles' } = Astro.props;
+const isFrameworkActive = activeNav === 'framework';
 const isResourcesActive =
   activeNav === 'glossary' ||
   activeNav === 'design-system' ||
@@ -31,24 +32,49 @@ const isResourcesActive =
   <nav class="nav">
     <a href="/blog" aria-current={activeNav === 'articles' ? 'page' : undefined}>Articles</a>
 
-    <div class="nav-resources" data-resources>
+    <div class="nav-dropdown" data-nav-dropdown>
       <button
-        class="nav-resources-trigger"
+        class="nav-dropdown-trigger"
+        type="button"
+        aria-expanded="false"
+        aria-haspopup="menu"
+        aria-controls="nav-framework-panel"
+        aria-current={isFrameworkActive ? 'page' : undefined}
+        data-nav-dropdown-trigger
+      >
+        <span>Framework</span>
+        <span class="nav-dropdown-chevron" aria-hidden="true">▾</span>
+      </button>
+      <div
+        class="nav-dropdown-panel"
+        id="nav-framework-panel"
+        role="menu"
+        data-nav-dropdown-panel
+      >
+        <a href="/axioms" role="menuitem">Axioms</a>
+        <a href="/constraints" role="menuitem">Constraints</a>
+        <a href="/design-requirements" role="menuitem">Design Requirements</a>
+      </div>
+    </div>
+
+    <div class="nav-dropdown" data-nav-dropdown>
+      <button
+        class="nav-dropdown-trigger"
         type="button"
         aria-expanded="false"
         aria-haspopup="menu"
         aria-controls="nav-resources-panel"
         aria-current={isResourcesActive ? 'page' : undefined}
-        data-resources-trigger
+        data-nav-dropdown-trigger
       >
         <span>Resources</span>
-        <span class="nav-resources-chevron" aria-hidden="true">▾</span>
+        <span class="nav-dropdown-chevron" aria-hidden="true">▾</span>
       </button>
       <div
-        class="nav-resources-panel"
+        class="nav-dropdown-panel"
         id="nav-resources-panel"
         role="menu"
-        data-resources-panel
+        data-nav-dropdown-panel
       >
         <a href="/glossary" role="menuitem" aria-current={activeNav === 'glossary' ? 'page' : undefined}>Glossary</a>
         <a href="/design-system" role="menuitem" aria-current={activeNav === 'design-system' ? 'page' : undefined}>Design System</a>
@@ -93,33 +119,64 @@ const isResourcesActive =
     <nav
       class="sh-drawer-nav"
       aria-label="Primary"
-      data-resources-active={isResourcesActive ? 'true' : 'false'}
     >
       <a href="/blog" data-text="Articles" aria-current={activeNav === 'articles' ? 'page' : undefined}>Articles</a>
 
-      <div class="sh-drawer-resources" data-mobile-resources>
+      <div
+        class="sh-drawer-dropdown"
+        data-mobile-dropdown
+        data-dropdown-active={isFrameworkActive ? 'true' : 'false'}
+      >
         <button
-          class="sh-drawer-resources-trigger"
+          class="sh-drawer-dropdown-trigger"
+          type="button"
+          aria-expanded={isFrameworkActive ? 'true' : 'false'}
+          aria-controls="sh-drawer-framework-children"
+          aria-current={isFrameworkActive ? 'page' : undefined}
+          data-text="Framework"
+          data-mobile-dropdown-trigger
+        >
+          <span class="link-typed">Framework</span>
+          <span class="sh-drawer-dropdown-chevron" aria-hidden="true">▾</span>
+        </button>
+        <div
+          class="sh-drawer-dropdown-children"
+          id="sh-drawer-framework-children"
+          data-mobile-dropdown-children
+        >
+          <a href="/axioms" data-text="Axioms" data-dropdown-child>Axioms</a>
+          <a href="/constraints" data-text="Constraints" data-dropdown-child>Constraints</a>
+          <a href="/design-requirements" data-text="Design Requirements" data-dropdown-child>Design Requirements</a>
+        </div>
+      </div>
+
+      <div
+        class="sh-drawer-dropdown"
+        data-mobile-dropdown
+        data-dropdown-active={isResourcesActive ? 'true' : 'false'}
+      >
+        <button
+          class="sh-drawer-dropdown-trigger"
           type="button"
           aria-expanded={isResourcesActive ? 'true' : 'false'}
           aria-controls="sh-drawer-resources-children"
           aria-current={isResourcesActive ? 'page' : undefined}
           data-text="Resources"
-          data-mobile-resources-trigger
+          data-mobile-dropdown-trigger
         >
           <span class="link-typed">Resources</span>
-          <span class="sh-drawer-resources-chevron" aria-hidden="true">▾</span>
+          <span class="sh-drawer-dropdown-chevron" aria-hidden="true">▾</span>
         </button>
         <div
-          class="sh-drawer-resources-children"
+          class="sh-drawer-dropdown-children"
           id="sh-drawer-resources-children"
-          data-mobile-resources-children
+          data-mobile-dropdown-children
         >
-          <a href="/glossary" data-text="Glossary" data-resources-child aria-current={activeNav === 'glossary' ? 'page' : undefined}>Glossary</a>
-          <a href="/design-system" data-text="Design System" data-resources-child aria-current={activeNav === 'design-system' ? 'page' : undefined}>Design System</a>
-          <a href="/diagnostic" data-text="Diagnostic" data-resources-child aria-current={activeNav === 'diagnostic' ? 'page' : undefined}>Diagnostic</a>
-          <a href="/reading-list" data-text="Reading List" data-resources-child aria-current={activeNav === 'reading-list' ? 'page' : undefined}>Reading List</a>
-          <a href="/system-recipes" data-text="System Recipes" data-resources-child aria-current={activeNav === 'system-recipes' ? 'page' : undefined}>System Recipes</a>
+          <a href="/glossary" data-text="Glossary" data-dropdown-child aria-current={activeNav === 'glossary' ? 'page' : undefined}>Glossary</a>
+          <a href="/design-system" data-text="Design System" data-dropdown-child aria-current={activeNav === 'design-system' ? 'page' : undefined}>Design System</a>
+          <a href="/diagnostic" data-text="Diagnostic" data-dropdown-child aria-current={activeNav === 'diagnostic' ? 'page' : undefined}>Diagnostic</a>
+          <a href="/reading-list" data-text="Reading List" data-dropdown-child aria-current={activeNav === 'reading-list' ? 'page' : undefined}>Reading List</a>
+          <a href="/system-recipes" data-text="System Recipes" data-dropdown-child aria-current={activeNav === 'system-recipes' ? 'page' : undefined}>System Recipes</a>
         </div>
       </div>
 
@@ -203,71 +260,83 @@ const isResourcesActive =
     window.addEventListener('scroll', onScroll, { passive: true });
   })();
 
-  // Desktop Resources dropdown — click to open, outside click / Escape to
-  // close, keyboard Enter/Space to open, ↓ to move into panel, Tab to cycle.
+  // Desktop nav dropdowns (Framework, Resources) — click to open, outside
+  // click / Escape to close, ↓ to move into panel. Opening one closes any
+  // other open dropdown so the two never overlap.
   (function () {
-    var wrap = document.querySelector('[data-resources]');
-    if (!wrap) return;
-    var trigger = wrap.querySelector('[data-resources-trigger]');
-    var panel = wrap.querySelector('[data-resources-panel]');
-    if (!trigger || !panel) return;
-    var items = panel.querySelectorAll('a');
+    var wraps = document.querySelectorAll('[data-nav-dropdown]');
+    if (!wraps.length) return;
 
-    function isOpen() { return wrap.classList.contains('is-open'); }
-    function open() {
-      wrap.classList.add('is-open');
-      trigger.setAttribute('aria-expanded', 'true');
-    }
-    function close(returnFocus) {
-      wrap.classList.remove('is-open');
-      trigger.setAttribute('aria-expanded', 'false');
-      if (returnFocus) trigger.focus();
-    }
+    function setupOne(wrap) {
+      var trigger = wrap.querySelector('[data-nav-dropdown-trigger]');
+      var panel = wrap.querySelector('[data-nav-dropdown-panel]');
+      if (!trigger || !panel) return;
+      var items = panel.querySelectorAll('a');
 
-    trigger.addEventListener('click', function (e) {
-      e.stopPropagation();
-      if (isOpen()) close(false); else open();
-    });
-
-    trigger.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        if (!isOpen()) open();
-        if (items[0]) items[0].focus();
-      } else if (e.key === 'Escape' && isOpen()) {
-        e.preventDefault();
-        close(true);
+      function isOpen() { return wrap.classList.contains('is-open'); }
+      function open() {
+        wraps.forEach(function (other) {
+          if (other === wrap) return;
+          other.classList.remove('is-open');
+          var otherTrigger = other.querySelector('[data-nav-dropdown-trigger]');
+          if (otherTrigger) otherTrigger.setAttribute('aria-expanded', 'false');
+        });
+        wrap.classList.add('is-open');
+        trigger.setAttribute('aria-expanded', 'true');
       }
-    });
+      function close(returnFocus) {
+        wrap.classList.remove('is-open');
+        trigger.setAttribute('aria-expanded', 'false');
+        if (returnFocus) trigger.focus();
+      }
 
-    panel.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && isOpen()) {
-        e.preventDefault();
-        close(true);
-      } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-        e.preventDefault();
-        var idx = -1;
-        for (var i = 0; i < items.length; i++) {
-          if (items[i] === document.activeElement) { idx = i; break; }
+      trigger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (isOpen()) close(false); else open();
+      });
+
+      trigger.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (!isOpen()) open();
+          if (items[0]) items[0].focus();
+        } else if (e.key === 'Escape' && isOpen()) {
+          e.preventDefault();
+          close(true);
         }
-        var next = e.key === 'ArrowDown' ? idx + 1 : idx - 1;
-        if (next < 0) next = items.length - 1;
-        if (next >= items.length) next = 0;
-        items[next].focus();
-      }
-    });
+      });
 
-    document.addEventListener('click', function (e) {
-      if (!isOpen()) return;
-      if (wrap.contains(e.target)) return;
-      close(false);
-    });
+      panel.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && isOpen()) {
+          e.preventDefault();
+          close(true);
+        } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          var idx = -1;
+          for (var i = 0; i < items.length; i++) {
+            if (items[i] === document.activeElement) { idx = i; break; }
+          }
+          var next = e.key === 'ArrowDown' ? idx + 1 : idx - 1;
+          if (next < 0) next = items.length - 1;
+          if (next >= items.length) next = 0;
+          items[next].focus();
+        }
+      });
 
-    document.addEventListener('focusin', function (e) {
-      if (!isOpen()) return;
-      if (wrap.contains(e.target)) return;
-      close(false);
-    });
+      document.addEventListener('click', function (e) {
+        if (!isOpen()) return;
+        if (wrap.contains(e.target)) return;
+        close(false);
+      });
+
+      document.addEventListener('focusin', function (e) {
+        if (!isOpen()) return;
+        if (wrap.contains(e.target)) return;
+        close(false);
+      });
+    }
+
+    wraps.forEach(setupOne);
   })();
 
   (function () {
@@ -280,21 +349,34 @@ const isResourcesActive =
     // Re-running after a view transition can leave html overflow stuck
     // hidden if the previous page was unloaded with the drawer open.
     document.documentElement.style.overflow = '';
-    var drawerNav = drawer.querySelector('.sh-drawer-nav');
-    var resourcesActive = drawerNav && drawerNav.getAttribute('data-resources-active') === 'true';
-    var mobileResources = drawer.querySelector('[data-mobile-resources]');
-    var mobileResourcesTrigger = drawer.querySelector('[data-mobile-resources-trigger]');
-    var mobileResourcesChildren = drawer.querySelector('[data-mobile-resources-children]');
-    var resourceChildLinks = drawer.querySelectorAll('[data-resources-child]');
+    var dropdowns = [];
+    drawer.querySelectorAll('[data-mobile-dropdown]').forEach(function (wrap) {
+      var trigger = wrap.querySelector('[data-mobile-dropdown-trigger]');
+      var children = wrap.querySelector('[data-mobile-dropdown-children]');
+      if (!trigger || !children) return;
+      dropdowns.push({
+        wrap: wrap,
+        trigger: trigger,
+        children: children,
+        childLinks: wrap.querySelectorAll('[data-dropdown-child]'),
+        active: wrap.getAttribute('data-dropdown-active') === 'true',
+      });
+    });
     var closers = drawer.querySelectorAll('[data-sh-close], a');
     var STEP_MS = 22;       // per-char interval
     var GAP_MS = 60;        // pause between items
     var typeTimers = [];
 
-    function setMobileResourcesOpen(isOpen) {
-      if (!mobileResources || !mobileResourcesTrigger) return;
-      mobileResources.classList.toggle('is-open', isOpen);
-      mobileResourcesTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    function setMobileDropdownOpen(dd, isOpen) {
+      if (!dd) return;
+      dd.wrap.classList.toggle('is-open', isOpen);
+      dd.trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+    function findDropdownByTrigger(trigger) {
+      for (var i = 0; i < dropdowns.length; i++) {
+        if (dropdowns[i].trigger === trigger) return dropdowns[i];
+      }
+      return null;
     }
 
     function clearTypeTimers() {
@@ -302,16 +384,19 @@ const isResourcesActive =
       typeTimers = [];
     }
 
-    // Build the typewriter sequence. Top-level rows always type. Resource
-    // children only type when the accordion is initially expanded — i.e.
-    // when the current route is a Resources child.
+    // Build the typewriter sequence. Top-level rows always type. Dropdown
+    // children only type when their accordion is initially expanded — i.e.
+    // when the current route is inside that dropdown.
     function getTypeSequence() {
-      var rows = drawer.querySelectorAll('.sh-drawer-nav > a, [data-mobile-resources-trigger]');
+      var rows = drawer.querySelectorAll('.sh-drawer-nav > a, [data-mobile-dropdown-trigger]');
       var seq = [];
       rows.forEach(function (row) {
         seq.push(row);
-        if (row.hasAttribute('data-mobile-resources-trigger') && resourcesActive) {
-          resourceChildLinks.forEach(function (child) { seq.push(child); });
+        if (row.hasAttribute('data-mobile-dropdown-trigger')) {
+          var dd = findDropdownByTrigger(row);
+          if (dd && dd.active) {
+            dd.childLinks.forEach(function (child) { seq.push(child); });
+          }
         }
       });
       return seq;
@@ -353,8 +438,10 @@ const isResourcesActive =
           }
         }
       });
-      resourceChildLinks.forEach(function (child) {
-        if (seq.indexOf(child) === -1) restoreLink(child);
+      dropdowns.forEach(function (dd) {
+        dd.childLinks.forEach(function (child) {
+          if (seq.indexOf(child) === -1) restoreLink(child);
+        });
       });
 
       function typeOne(idx) {
@@ -382,7 +469,7 @@ const isResourcesActive =
 
     function resetLinks() {
       clearTypeTimers();
-      var allRows = drawer.querySelectorAll('.sh-drawer-nav a, [data-mobile-resources-trigger]');
+      var allRows = drawer.querySelectorAll('.sh-drawer-nav a, [data-mobile-dropdown-trigger]');
       allRows.forEach(function (el) { restoreLink(el); });
     }
 
@@ -391,9 +478,11 @@ const isResourcesActive =
       burger.classList.add('is-open');
       burger.setAttribute('aria-expanded', 'true');
       document.documentElement.style.overflow = 'hidden';
-      // Each menu open: accordion starts collapsed unless the route is
-      // inside Resources, in which case it auto-expands.
-      setMobileResourcesOpen(!!resourcesActive);
+      // Each menu open: each accordion starts collapsed unless the route
+      // is inside it, in which case it auto-expands.
+      dropdowns.forEach(function (dd) {
+        setMobileDropdownOpen(dd, dd.active);
+      });
       typeTimers.push(window.setTimeout(typeLinks, 80));
     }
     function close() {
@@ -413,18 +502,18 @@ const isResourcesActive =
       if (e.key === 'Escape' && drawer.classList.contains('is-open')) close();
     });
 
-    if (mobileResourcesTrigger) {
-      mobileResourcesTrigger.addEventListener('click', function () {
-        var willOpen = !mobileResources.classList.contains('is-open');
+    dropdowns.forEach(function (dd) {
+      dd.trigger.addEventListener('click', function () {
+        var willOpen = !dd.wrap.classList.contains('is-open');
         // When the user expands mid-session, restore child labels so they
         // render immediately (no typewriter — that's reserved for the
         // initial open animation).
         if (willOpen) {
-          resourceChildLinks.forEach(function (child) { restoreLink(child); });
+          dd.childLinks.forEach(function (child) { restoreLink(child); });
         }
-        setMobileResourcesOpen(willOpen);
+        setMobileDropdownOpen(dd, willOpen);
       });
-    }
+    });
   })();
 </script>
 
@@ -507,7 +596,7 @@ const isResourcesActive =
     align-items: center;
   }
   .site-header .nav a,
-  .site-header .nav-resources-trigger {
+  .site-header .nav-dropdown-trigger {
     font-family: var(--font-mono);
     font-weight: 500;
     font-size: 11px;
@@ -521,7 +610,7 @@ const isResourcesActive =
       color var(--dur-fast) var(--ease-out),
       border-color var(--dur-fast) var(--ease-out);
   }
-  .site-header .nav-resources-trigger {
+  .site-header .nav-dropdown-trigger {
     background: transparent;
     border-top: none;
     border-left: none;
@@ -533,35 +622,35 @@ const isResourcesActive =
     margin: 0;
   }
   .site-header .nav a:where(:hover, :focus-visible),
-  .site-header .nav-resources-trigger:where(:hover, :focus-visible) {
+  .site-header .nav-dropdown-trigger:where(:hover, :focus-visible) {
     color: var(--white);
     border-bottom-color: var(--white);
   }
   .site-header .nav a[aria-current="page"],
-  .site-header .nav-resources-trigger[aria-current="page"] {
+  .site-header .nav-dropdown-trigger[aria-current="page"] {
     color: var(--white);
     border-bottom-color: var(--white);
   }
   .site-header .nav a:focus-visible,
-  .site-header .nav-resources-trigger:focus-visible {
+  .site-header .nav-dropdown-trigger:focus-visible {
     outline: none;
   }
 
-  /* Resources dropdown */
-  .site-header .nav-resources {
+  /* Nav dropdown (Framework, Resources) */
+  .site-header .nav-dropdown {
     position: relative;
     display: inline-flex;
   }
-  .site-header .nav-resources-chevron {
+  .site-header .nav-dropdown-chevron {
     display: inline-block;
     line-height: 1;
     transform: translateY(-1px) rotate(0deg);
     transition: transform var(--dur-fast) var(--ease-out);
   }
-  .site-header .nav-resources.is-open .nav-resources-chevron {
+  .site-header .nav-dropdown.is-open .nav-dropdown-chevron {
     transform: translateY(-1px) rotate(180deg);
   }
-  .site-header .nav-resources-panel {
+  .site-header .nav-dropdown-panel {
     position: absolute;
     top: calc(100% + 12px);
     right: 0;
@@ -572,10 +661,10 @@ const isResourcesActive =
     flex-direction: column;
     z-index: 110;
   }
-  .site-header .nav-resources.is-open .nav-resources-panel {
+  .site-header .nav-dropdown.is-open .nav-dropdown-panel {
     display: flex;
   }
-  .site-header .nav-resources-panel a {
+  .site-header .nav-dropdown-panel a {
     font-family: var(--font-mono);
     font-weight: 500;
     font-size: 11px;
@@ -589,11 +678,11 @@ const isResourcesActive =
       color var(--dur-fast) var(--ease-out),
       background-color var(--dur-fast) var(--ease-out);
   }
-  .site-header .nav-resources-panel a:last-child { border-bottom: none; }
-  .site-header .nav-resources-panel a[aria-current="page"] {
+  .site-header .nav-dropdown-panel a:last-child { border-bottom: none; }
+  .site-header .nav-dropdown-panel a[aria-current="page"] {
     color: var(--white);
   }
-  .site-header .nav-resources-panel a:where(:hover, :focus-visible) {
+  .site-header .nav-dropdown-panel a:where(:hover, :focus-visible) {
     background: var(--white);
     color: var(--black);
     outline: none;
@@ -769,7 +858,7 @@ const isResourcesActive =
     gap: 4px;
   }
   .sh-drawer-nav > a,
-  .sh-drawer-resources-trigger {
+  .sh-drawer-dropdown-trigger {
     position: relative;
     display: block;
     width: 100%;
@@ -791,13 +880,13 @@ const isResourcesActive =
   .sh-drawer-nav > a:hover,
   .sh-drawer-nav > a:focus-visible,
   .sh-drawer-nav > a[aria-current="page"],
-  .sh-drawer-resources-trigger:hover,
-  .sh-drawer-resources-trigger:focus-visible,
-  .sh-drawer-resources-trigger[aria-current="page"] { color: var(--white); }
+  .sh-drawer-dropdown-trigger:hover,
+  .sh-drawer-dropdown-trigger:focus-visible,
+  .sh-drawer-dropdown-trigger[aria-current="page"] { color: var(--white); }
   .sh-drawer-nav a .link-typed,
-  .sh-drawer-resources-trigger .link-typed { white-space: pre; }
+  .sh-drawer-dropdown-trigger .link-typed { white-space: pre; }
   .sh-drawer-nav a .link-cursor,
-  .sh-drawer-resources-trigger .link-cursor {
+  .sh-drawer-dropdown-trigger .link-cursor {
     display: none;
     width: 0.45ch;
     height: 0.78em;
@@ -808,17 +897,17 @@ const isResourcesActive =
     animation: cursor-blink 0.6s step-end infinite;
   }
   .sh-drawer-nav a.is-typing .link-cursor,
-  .sh-drawer-resources-trigger.is-typing .link-cursor { display: inline-block; }
+  .sh-drawer-dropdown-trigger.is-typing .link-cursor { display: inline-block; }
 
-  /* Mobile Resources accordion */
-  .sh-drawer-resources-trigger {
+  /* Mobile dropdown accordion (Framework, Resources) */
+  .sh-drawer-dropdown-trigger {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
   }
-  .sh-drawer-resources-trigger:focus-visible { outline: none; }
-  .sh-drawer-resources-chevron {
+  .sh-drawer-dropdown-trigger:focus-visible { outline: none; }
+  .sh-drawer-dropdown-chevron {
     font-size: 16px;
     line-height: 1;
     color: var(--mid);
@@ -826,19 +915,19 @@ const isResourcesActive =
       transform var(--dur-fast) var(--ease-out),
       color var(--dur-fast) var(--ease-out);
   }
-  .sh-drawer-resources.is-open .sh-drawer-resources-chevron {
+  .sh-drawer-dropdown.is-open .sh-drawer-dropdown-chevron {
     transform: rotate(180deg);
     color: var(--white);
   }
-  .sh-drawer-resources-children {
+  .sh-drawer-dropdown-children {
     overflow: hidden;
     max-height: 0;
     transition: max-height var(--dur-base) var(--ease-out);
   }
-  .sh-drawer-resources.is-open .sh-drawer-resources-children {
+  .sh-drawer-dropdown.is-open .sh-drawer-dropdown-children {
     max-height: 320px;
   }
-  .sh-drawer-resources-children a {
+  .sh-drawer-dropdown-children a {
     display: block;
     padding: 10px 0 10px 24px;
     font-family: var(--font-sans);
@@ -851,16 +940,16 @@ const isResourcesActive =
     text-decoration: none;
     transition: color var(--dur-fast) var(--ease-out);
   }
-  .sh-drawer-resources-children a:last-child { border-bottom: none; }
-  .sh-drawer-resources-children a:hover,
-  .sh-drawer-resources-children a:focus-visible,
-  .sh-drawer-resources-children a[aria-current="page"] { color: var(--white); }
+  .sh-drawer-dropdown-children a:last-child { border-bottom: none; }
+  .sh-drawer-dropdown-children a:hover,
+  .sh-drawer-dropdown-children a:focus-visible,
+  .sh-drawer-dropdown-children a[aria-current="page"] { color: var(--white); }
   @keyframes cursor-blink {
     50% { background-color: transparent; }
   }
   @media (prefers-reduced-motion: reduce) {
     .sh-drawer-nav a .link-cursor,
-    .sh-drawer-resources-trigger .link-cursor { animation: none; }
+    .sh-drawer-dropdown-trigger .link-cursor { animation: none; }
   }
 
   @media (max-width: 900px) {
