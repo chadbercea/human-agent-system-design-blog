@@ -51,7 +51,7 @@ const STATUS_LABEL: Record<ConceptStatus, string> = {
               <div class="hub-list-body">
                 <div class="hub-list-title-row">
                   <span class="hub-list-title">{m.data.title}</span>
-                  <span class="hub-list-status">{STATUS_LABEL[m.data.status]}</span>
+                  <span class="hub-list-status">{cat.data.singular.toUpperCase()}</span>
                 </div>
                 <p class="hub-list-synopsis">{m.data.synopsis}</p>
               </div>
