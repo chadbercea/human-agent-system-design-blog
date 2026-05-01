@@ -6,10 +6,6 @@ draft: false
 postNumber: 3
 references:
   - different-not-lesser
-  - bilateral-non-reducibility
-  - asymmetry-of-choice
-  - entity-classification
-  - co-authored-epistemology
 ---
 
 The framework rests on five axioms: Different Not Lesser, Bilateral Non-Reducibility, the Asymmetry of Choice, the Entity Classification, and Co-Authored Epistemology. Before turning to the first one, the category itself is worth defining.
