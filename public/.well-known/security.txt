@@ -1,0 +1,7 @@
+# Responsible disclosure for humanagentsystem.design
+# RFC 9116: https://datatracker.ietf.org/doc/html/rfc9116
+
+Contact: mailto:chadbercea@gmail.com
+Expires: 2027-05-01T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://humanagentsystem.design/.well-known/security.txt
