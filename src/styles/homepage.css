@@ -1734,7 +1734,7 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
      against the rule above without a hidden gap. */
   .has-hero-frame .frame-line:has(.frame-eyebrow) { display: none; }
 
-  /* Hero view fills exactly header + col-hero = 100vh on mobile.
+  /* Hero view fills exactly header + col-hero = 100svh on mobile.
      Hide the SiteFooter when the pager is on the hero so the page
      doesn't scroll to reveal a chrome rail beneath the lander.
      List/article views still show the footer at the bottom of
@@ -1743,6 +1743,20 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
   body:has(#stage:not([data-view])) .site-footer,
   body:has(#stage[data-view="hero"]) .site-footer {
     display: none;
+  }
+
+  /* Hard-lock the document to the visible viewport on the hero so
+     the page cannot scroll regardless of any minor layout drift
+     (e.g. boot-state translateY on chrome panels, or a stray
+     min-height somewhere). header + col-hero are still calculated
+     to 100svh; this lock is belt-and-suspenders against the third
+     "hero still scrolls" report. */
+  html:has(#stage:not([data-view])),
+  html:has(#stage[data-view="hero"]),
+  body:has(#stage:not([data-view])),
+  body:has(#stage[data-view="hero"]) {
+    overflow: hidden;
+    height: 100svh;
   }
 
   /* Frame hero (ILI-787) on mobile — col-hero already fills the
