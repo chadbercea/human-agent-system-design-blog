@@ -1456,18 +1456,24 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           var isMobile = window.matchMedia
             && window.matchMedia('(max-width: 900px)').matches;
           if (!isMobile) {
-            /* Block currently sits flex-end at the viewport bottom.
-               Once the rule + eyebrow lines collapse, the block's
-               effective height shrinks by their combined heights.
-               We translate the block up by half the empty space
-               that opens above so the kept content (h1, dek,
-               audience, cta) lands vertically centered. */
+            /* Block currently sits flex-end at the bottom of
+               frame-viewport, which itself sits above the
+               signal-strip. After the swap to .hero-stripped,
+               signal-strip drops out (display:none), frame-viewport
+               grows to fill the column, and justify-content:center
+               recentres the block. To make the swap seamless,
+               --strip-y is measured against the full col-hero
+               height (signal-strip space included) so the visual
+               position at the end of the 500ms animation matches
+               the post-swap flex-centered position. */
+            var signalStrip = hero.querySelector('.signal-strip');
             var lines = block.querySelectorAll('.frame-line');
             var ruleLineH = lines[0] ? lines[0].offsetHeight : 0;
             var eyebrowLineH = lines[1] ? lines[1].offsetHeight : 0;
             var keptH = block.offsetHeight - ruleLineH - eyebrowLineH;
-            var viewportH = viewport.offsetHeight;
-            var deltaY = -(viewportH - keptH) / 2;
+            var colHeroH = hero.offsetHeight;
+            var signalStripH = signalStrip ? signalStrip.offsetHeight : 0;
+            var deltaY = -(colHeroH - keptH) / 2 + signalStripH;
             hero.style.setProperty('--strip-y', deltaY + 'px');
           }
 

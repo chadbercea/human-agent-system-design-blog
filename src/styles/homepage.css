@@ -786,24 +786,27 @@ body.is-index-booting.boot-stage-footer .site-footer {
    Cold load: after the ILI-789 boot finishes (header → rail
    → list → footer panels) plus a 600ms hold, the hero strips
    itself down to just the message — H1, dek, audience, CTA —
-   recentered in the now-empty column. Chrome that fades:
-   .scan-stack (the 13-line scan log), the .frame-rule
-   hairline, and the .frame-eyebrow line. Signal-strip is
-   persistent chrome (default per the spec's open decision)
-   and stays.
+   recentered in the now-empty column. Chrome that fades on
+   desktop: .scan-stack, the .frame-rule hairline, the
+   .frame-eyebrow line, and the .signal-strip (which carries
+   the second hairline + the VISITOR ACQUIRED · TELEMETRY ·
+   ARCHIVE · SIGNAL telemetry row).
 
    Two classes drive the lifecycle:
    - body.hero-stripping: transient, runs the 500ms animated
-     transition. Chrome collapses (opacity + max-height) while
-     .frame-block translates from bottom-anchored to centered
-     using --strip-y measured at trigger time.
+     transition. Chrome collapses (opacity + max-height on
+     scan/eyebrow/rule lines; opacity-only on signal-strip so
+     it stays in flow during the animation) while .frame-block
+     translates from bottom-anchored to centered using
+     --strip-y measured at trigger time.
    - body.hero-stripped: final resting state. Chrome
      display:none; frame-viewport justify-content:center.
      Pre-paint gate sets this directly on return visits and
      reduced-motion so first paint = resting state. The cold-
      load orchestrator swaps stripping → stripped at 500ms;
-     the swap is visually seamless because both states place
-     the kept block at the same vertical center.
+     the swap is visually seamless because --strip-y was
+     computed against the col-hero column height (signal-strip
+     space included), matching the post-swap centered layout.
    ───────────────────────────────────────────────────── */
 body.hero-stripping .has-hero-frame .scan-stack,
 body.hero-stripping .has-hero-frame .frame-line:has(.frame-rule),
@@ -818,6 +821,15 @@ body.hero-stripping .has-hero-frame .frame-line:has(.frame-eyebrow) {
     max-height 500ms var(--ease-out),
     margin 500ms var(--ease-out);
 }
+/* Signal-strip stays in layout during the animation (no
+   max-height collapse) so frame-viewport keeps its size and
+   the JS-measured --strip-y stays accurate. Display:none
+   in the stripped state drops it from layout post-swap. */
+body.hero-stripping .has-hero-frame .signal-strip {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 500ms var(--ease-out);
+}
 body.hero-stripping .has-hero-frame .frame-block {
   transform: translateY(var(--strip-y, 0));
   transition: transform 500ms var(--ease-out);
@@ -829,7 +841,8 @@ body.hero-stripped .has-hero-frame .frame-viewport {
 }
 body.hero-stripped .has-hero-frame .scan-stack,
 body.hero-stripped .has-hero-frame .frame-line:has(.frame-rule),
-body.hero-stripped .has-hero-frame .frame-line:has(.frame-eyebrow) {
+body.hero-stripped .has-hero-frame .frame-line:has(.frame-eyebrow),
+body.hero-stripped .has-hero-frame .signal-strip {
   display: none;
 }
 body.hero-stripped .has-hero-frame .frame-block {
@@ -838,8 +851,16 @@ body.hero-stripped .has-hero-frame .frame-block {
 
 @media (max-width: 900px) {
   /* Strip-down is a desktop refinement. Mobile keeps the
-     bottom-anchored layout and skips the recenter; chrome
-     still hides so the message sits clean post-boot. */
+     bottom-anchored layout AND the signal-strip (its smaller
+     mobile chrome reads as part of the hero, not desktop
+     theatre); only the eyebrow/rule/scan log get cleaned up
+     by the existing mobile rules. */
+  body.hero-stripping .has-hero-frame .signal-strip,
+  body.hero-stripped .has-hero-frame .signal-strip {
+    opacity: 1;
+    pointer-events: auto;
+    display: flex;
+  }
   body.hero-stripping .has-hero-frame .frame-block {
     transform: none;
     transition: none;
@@ -856,6 +877,7 @@ body.hero-stripped .has-hero-frame .frame-block {
   body.hero-stripping .has-hero-frame .scan-stack,
   body.hero-stripping .has-hero-frame .frame-line:has(.frame-rule),
   body.hero-stripping .has-hero-frame .frame-line:has(.frame-eyebrow),
+  body.hero-stripping .has-hero-frame .signal-strip,
   body.hero-stripping .has-hero-frame .frame-block {
     transition: none !important;
   }

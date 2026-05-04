@@ -70,6 +70,13 @@ test.describe('ILI-818 — hero strip-down', () => {
     });
     expect(ruleDisplay).toBe('none');
 
+    // Signal-strip (second hairline + telemetry row) gone on desktop.
+    const signalStripDisplay = await page.evaluate(() => {
+      const el = document.querySelector('.signal-strip');
+      return el ? getComputedStyle(el).display : null;
+    });
+    expect(signalStripDisplay).toBe('none');
+
     // Frame-viewport now centers content.
     const justifyContent = await page.locator('.frame-viewport').evaluate((el) => getComputedStyle(el).justifyContent);
     expect(justifyContent).toBe('center');
