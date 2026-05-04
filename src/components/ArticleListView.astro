@@ -474,13 +474,21 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         function setMobileView(view, opts) {
           if (!isMobile()) return;
           var prev = currentView();
-          if (prev !== view) stage.setAttribute('data-view', view);
+          var changed = prev !== view;
+          if (changed) stage.setAttribute('data-view', view);
           var state = { hasdView: view };
           var url = window.location.href;
           try {
             if (opts && opts.replace) history.replaceState(state, '', url);
             else if (opts && opts.push) history.pushState(state, '', url);
           } catch (e) {}
+          /* Reset document scroll on forward nav. The pager swaps which
+             col is in-flow, so a scroll position carried from the
+             previous (often shorter) view leaves the user mid-content
+             of the new one. Skip on replace (popstate / boot sync). */
+          if (changed && (!opts || !opts.replace)) {
+            try { window.scrollTo(0, 0); } catch (e) {}
+          }
         }
         var headIdEl = document.getElementById('art-head-id');
         var headDateEl = document.getElementById('art-head-date');
@@ -585,8 +593,15 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
                 history.replaceState({ hasdView: 'article' }, '', nextUrl);
               }
             } catch (e) {}
+            var prevViewWas = stage.getAttribute('data-view');
             stage.setAttribute('data-view', 'article');
-            if (colArticle) colArticle.scrollTop = 0;
+            /* Document scroll, not col scroll — the col is in body
+               flow now. Only reset on a real forward nav (pushHist
+               true and view actually changed) so popstate-driven
+               restoration doesn't snap the page to the top. */
+            if (pushHist && prevViewWas !== 'article') {
+              try { window.scrollTo(0, 0); } catch (e) {}
+            }
           } else {
             if (!opts || opts.updateHash !== false) {
               if (history && history.replaceState) {
