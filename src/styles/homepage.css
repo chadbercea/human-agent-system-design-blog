@@ -1617,7 +1617,11 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
 
   .shell {
     height: auto;
-    min-height: 100vh;
+    /* `svh` (small viewport height) — `vh` includes the mobile
+       browser chrome (URL bar) so `min-height: 100vh` made the
+       shell ~94px taller than the visible viewport, leaving
+       empty scrollable space below the hero. */
+    min-height: 100svh;
   }
 
   /* ILI-817 — pager lives in body's natural flow on mobile so the
