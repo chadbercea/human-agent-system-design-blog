@@ -1719,6 +1719,22 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
   .hero-stack { margin: 0.5rem 0 2rem; }
   .hero-meta { margin-top: 2rem; }
 
+  /* Frame eyebrow (// FRAME · V1.0 · TRIAD VERIFIED) is desktop-only
+     theatre too — drop the whole frame-line so the heading sits flush
+     against the rule above without a hidden gap. */
+  .has-hero-frame .frame-line:has(.frame-eyebrow) { display: none; }
+
+  /* Hero view fills exactly header + col-hero = 100vh on mobile.
+     Hide the SiteFooter when the pager is on the hero so the page
+     doesn't scroll to reveal a chrome rail beneath the lander.
+     List/article views still show the footer at the bottom of
+     their scroll. Both selectors cover the default (no data-view)
+     and the explicit hero state set after popstate. */
+  body:has(#stage:not([data-view])) .site-footer,
+  body:has(#stage[data-view="hero"]) .site-footer {
+    display: none;
+  }
+
   /* Frame hero (ILI-787) on mobile — col-hero already fills the
      stage box (header→footer) via the pager's inset:0, so no
      explicit height is needed. The flex column inside (frame-viewport
