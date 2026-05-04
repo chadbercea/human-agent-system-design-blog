@@ -349,7 +349,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 
 /* ── Mobile ──────────────────────────────────────────── */
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .diag-panel { padding: 32px 20px 0; }
   .panel-head {
     grid-template-columns: 1fr;
@@ -357,33 +357,38 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     margin-bottom: 28px;
   }
   .diag-title { font-size: 26px; }
-  .diag-help  { font-size: 22px; margin-bottom: 36px; }
-  .slider-head { gap: 4px; margin-bottom: 10px; }
-  .slider-label { font-size: 20px; }
-  .slider-prompt { font-size: 22px; }
-  .slider-track { height: 18px; }
-  .slider-thumb { width: 12px; height: 18px; }
+  .diag-help  { font-size: 18px; line-height: 1.4; margin-bottom: 32px; }
+  .slider { padding: 14px 0 12px; }
+  .slider-head { gap: 4px; margin-bottom: 12px; }
+  .slider-label { font-size: 16px; letter-spacing: 0.04em; }
+  .slider-prompt { font-size: 16px; line-height: 1.35; }
+  .slider-track { height: 44px; } /* 44px touch target on mobile */
+  .slider-thumb { width: 16px; height: 24px; }
+  .slider-tick { height: 8px; }
+  .segment-numbers { margin-top: 6px; font-size: 10px; }
   .diag-grid {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 40px;
     margin-bottom: 32px;
   }
-  .diag-grid > .sliders,
-  .diag-grid > .paragraph-block { grid-column: 1; grid-row: auto; }
-  .diagnosis-title { font-size: 44px; margin-bottom: 20px; }
-  .paragraph { font-size: 19px; line-height: 1.45; }
-  .actions { flex-wrap: wrap; }
-  .btn { flex: 1; min-width: 140px; }
+  /* Sliders first on mobile so users can interact immediately;
+     diagnosis follows. Desktop ordering is reversed via CSS above. */
+  .diag-grid > .sliders        { grid-column: 1; grid-row: 1; }
+  .diag-grid > .paragraph-block { grid-column: 1; grid-row: 2; }
+  .diagnosis-title { font-size: 32px; margin-bottom: 16px; }
+  .paragraph { font-size: 17px; line-height: 1.45; }
+  .actions { flex-wrap: wrap; margin-top: 24px; padding-top: 16px; }
+  .btn { flex: 1; min-width: 140px; padding: 16px 20px; }
   .diag-foot {
     grid-template-columns: 1fr;
     gap: 20px;
     font-size: 9px;
-    padding-top: 48px; /* sticky-footer gap on mobile */
+    padding-top: 32px; /* sticky-footer gap on mobile */
   }
   .diag-foot-logo { justify-self: start; }
   .diag-foot-meta { justify-self: start; gap: 12px; }
   .diag-foot-actions { justify-self: stretch; }
-  .diag-foot-actions .btn { flex: 1; }
+  .diag-foot-actions .btn { flex: 1; padding: 14px 18px; }
 }
 
 /* ── Share modal ─────────────────────────────────────── */
@@ -482,7 +487,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .share-close:hover { background: var(--white); color: var(--black); }
 .share-close:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .share-modal { padding: 4vh 4vw; }
   .share-modal-panel { width: 100%; }
   .share-close { top: -36px; width: 28px; height: 28px; font-size: 16px; }
