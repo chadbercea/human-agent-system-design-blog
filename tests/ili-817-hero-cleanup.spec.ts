@@ -36,7 +36,7 @@ test('mobile hero — // FRAME eyebrow is hidden, footer is not visible, page do
   await page.screenshot({ path: 'screenshots/ili-817/12-mobile-hero-no-eyebrow-no-footer.png' });
 });
 
-test('mobile list/article — footer reappears once user pages off the hero', async ({ page }) => {
+test('mobile list/article — footer stays hidden on every view', async ({ page }) => {
   await page.setViewportSize(MOBILE);
   await page.goto('http://localhost:4321/');
   await page.waitForSelector('.stage', { state: 'attached' });
@@ -48,7 +48,7 @@ test('mobile list/article — footer reappears once user pages off the hero', as
   const listFooterDisplay = await page.evaluate(() => {
     return getComputedStyle(document.querySelector('.site-footer')!).display;
   });
-  expect(listFooterDisplay).not.toBe('none');
+  expect(listFooterDisplay).toBe('none');
 
   await page.click('.post-card[data-index="0"]');
   await page.waitForTimeout(450);
@@ -56,7 +56,7 @@ test('mobile list/article — footer reappears once user pages off the hero', as
   const articleFooterDisplay = await page.evaluate(() => {
     return getComputedStyle(document.querySelector('.site-footer')!).display;
   });
-  expect(articleFooterDisplay).not.toBe('none');
+  expect(articleFooterDisplay).toBe('none');
 });
 
 test('desktop hero — eyebrow + footer both visible, no regression', async ({ page }) => {

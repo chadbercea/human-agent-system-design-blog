@@ -63,11 +63,10 @@ try {
   .site-footer .kv .v { color: var(--white); }
 
   @media (max-width: 900px) {
-    .site-footer {
-      padding: 20px 32px;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    .site-footer .sf-spacer { display: none; }
+    /* Footer is hidden on every mobile view, every page. The hero
+       calculates header + col-hero = 100svh exactly; list/article
+       scroll within their own content; nothing on phones reads as
+       better-with-a-chrome-rail-at-the-bottom. */
+    .site-footer { display: none; }
   }
 </style>
