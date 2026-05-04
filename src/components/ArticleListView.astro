@@ -168,9 +168,14 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           if (shouldBoot) {
             document.body.classList.add('is-index-booting');
             document.body.classList.add('has-hero-frame-play');
+            document.body.classList.remove('hero-stripped');
           } else {
             document.body.classList.remove('is-index-booting');
             document.body.classList.remove('has-hero-frame-play');
+            // ILI-818 — return visits and reduced-motion land
+            // directly on the post-strip resting state. Adding
+            // the class pre-paint means no transition fires.
+            document.body.classList.add('hero-stripped');
           }
         } catch (e) {}
       })();
@@ -1404,6 +1409,78 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           document.body.classList.remove('is-index-booting');
           stages.forEach(function (cls) { document.body.classList.remove(cls); });
         }, endAt);
+      })();
+    </script>
+
+    <script is:inline data-astro-rerun>
+      /* ILI-818 — hero strip-down orchestrator. Cold-load only;
+         the pre-paint gate already lands return visits and
+         reduced-motion directly on body.hero-stripped (no
+         animation needed there). Timing chains off ILI-789's
+         constants: after the footer panel reveal completes,
+         hold ~600ms, then run the 500ms strip-and-recenter.
+         Measure the kept-block height before triggering so
+         the translate matches the final centered position. */
+      (function () {
+        if (!document.body.classList.contains('is-index-booting')) return;
+
+        var INITIAL_DELAY = 280;
+        var CADENCE = 145;
+        var HANDOFF_PAUSE = 280;
+        var FRAME_BREATH = 200;
+        var SCAN_LINES = 13;
+        var FRAME_LINES = 6;
+        var REVEAL_TRANSITION = 320;
+        var STAGE_CADENCE = 180;
+        var STAGES = 4;
+        var STRIP_HOLD = 600;
+        var STRIP_DURATION = 500;
+
+        var lastScanAt = INITIAL_DELAY + (SCAN_LINES - 1) * CADENCE;
+        var frameStart = lastScanAt + HANDOFF_PAUSE + FRAME_BREATH;
+        var lastFrameAt = frameStart + Math.max(0, FRAME_LINES - 1) * CADENCE;
+        var heroSettleAt = lastFrameAt + REVEAL_TRANSITION;
+        var footerSettleAt = heroSettleAt + (STAGES - 1) * STAGE_CADENCE + REVEAL_TRANSITION;
+        var stripAt = footerSettleAt + STRIP_HOLD;
+
+        function startStrip() {
+          var hero = document.querySelector('.col-hero.has-hero-frame');
+          if (!hero) return;
+          var viewport = hero.querySelector('.frame-viewport');
+          var block = hero.querySelector('.frame-block');
+          if (!viewport || !block) return;
+
+          /* Recenter is desktop-only; mobile keeps bottom-anchored
+             layout (see homepage.css mobile override). Skip the
+             measurement on mobile so --strip-y stays at 0. */
+          var isMobile = window.matchMedia
+            && window.matchMedia('(max-width: 900px)').matches;
+          if (!isMobile) {
+            /* Block currently sits flex-end at the viewport bottom.
+               Once the rule + eyebrow lines collapse, the block's
+               effective height shrinks by their combined heights.
+               We translate the block up by half the empty space
+               that opens above so the kept content (h1, dek,
+               audience, cta) lands vertically centered. */
+            var lines = block.querySelectorAll('.frame-line');
+            var ruleLineH = lines[0] ? lines[0].offsetHeight : 0;
+            var eyebrowLineH = lines[1] ? lines[1].offsetHeight : 0;
+            var keptH = block.offsetHeight - ruleLineH - eyebrowLineH;
+            var viewportH = viewport.offsetHeight;
+            var deltaY = -(viewportH - keptH) / 2;
+            hero.style.setProperty('--strip-y', deltaY + 'px');
+          }
+
+          document.body.classList.add('hero-stripping');
+
+          window.setTimeout(function () {
+            document.body.classList.remove('hero-stripping');
+            document.body.classList.add('hero-stripped');
+            hero.style.removeProperty('--strip-y');
+          }, STRIP_DURATION);
+        }
+
+        window.setTimeout(startStrip, stripAt);
       })();
     </script>
   </Fragment>
