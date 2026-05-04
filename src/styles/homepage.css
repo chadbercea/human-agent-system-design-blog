@@ -1638,8 +1638,10 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
     flex: 1 1 auto;
     /* At least viewport-minus-header so a short hero still pushes
        the footer below the fold; the user has something to scroll
-       to. Falls back to content height when content is taller. */
-    min-height: calc(100vh - 80px);
+       to. Falls back to content height when content is taller.
+       `svh` (small viewport height) excludes the mobile browser
+       chrome so the math doesn't push content under the URL bar. */
+    min-height: calc(100svh - 80px);
   }
   .stage.open { grid-template-columns: none; height: auto; }
 
@@ -1649,8 +1651,9 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
     overflow: visible;
     /* At least viewport-minus-header. Lets the bottom-anchored frame
        hero have a flex container to justify-end against, and stops a
-       short list from collapsing the stage above its min-height. */
-    min-height: calc(100vh - 80px);
+       short list from collapsing the stage above its min-height.
+       `svh` excludes mobile browser chrome (URL bar). */
+    min-height: calc(100svh - 80px);
     transition: transform 320ms cubic-bezier(.4, 0, .2, 1);
     will-change: transform;
   }
@@ -1687,14 +1690,17 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
     .col { transition: none; }
   }
 
-  /* Hero column. Pinned to viewport-minus-header so the bottom-
-     anchored frame block (signal-strip, CTA) lays out against a
-     fixed flex container; without an explicit height the
-     `justify-content: flex-end` inside frame-viewport has nothing
-     to push against and content collapses to the top. */
+  /* Hero column. Pinned to small-viewport-minus-header so the
+     bottom-anchored frame block (signal-strip, CTA) lays out
+     against a fixed flex container; without an explicit height
+     the `justify-content: flex-end` inside frame-viewport has
+     nothing to push against and content collapses to the top.
+     `svh` (small viewport height) excludes the mobile browser
+     chrome so the signal strip and CTA aren't pushed under the
+     URL bar. */
   .col-hero {
     border-bottom: none;
-    height: calc(100vh - 80px);
+    height: calc(100svh - 80px);
   }
   .hero-inner {
     width: 100%;
