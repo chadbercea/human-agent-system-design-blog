@@ -1684,16 +1684,23 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
   .hero-stack { margin: 0.5rem 0 2rem; }
   .hero-meta { margin-top: 2rem; }
 
-  /* Frame hero (ILI-787) on mobile — viewport gets a fixed min-height
-     so the absolutely-positioned frame-block has room to land, scan
-     lines stay readable at 12px, and content paddings drop to phone
-     scale. Border-right collapses with the column. */
+  /* Frame hero (ILI-787) on mobile — hero fills the visible viewport
+     beneath the 80px sticky header so the bottom-anchored frame-block
+     and its top divider rule sit proportionally on every device,
+     instead of cramming into a fixed 540px box and leaving the
+     divider stranded mid-screen on tall phones (ILI-814).
+     Use `height` (not `min-height`): the scan-stack reveals 15+
+     lines at 32px each, so without an upper bound the col-hero
+     would grow taller than the viewport and break the bottom-
+     anchored layout. With a fixed height, frame-viewport's
+     `overflow: hidden` clips old scan lines off the top — same
+     behaviour the desktop grid track gives the column.
+     `svh` excludes the mobile browser's collapsing chrome, so the
+     hero never overflows when address/toolbars retract. */
   .col-hero.has-hero-frame {
     border-right: none;
     border-bottom: 1px solid #000;
-  }
-  .col-hero.has-hero-frame .frame-viewport {
-    min-height: 540px;
+    height: calc(100svh - 80px);
   }
   .col-hero.has-hero-frame .scan-stack {
     padding: 16px 20px 20px;
