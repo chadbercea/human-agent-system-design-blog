@@ -111,9 +111,19 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
       /* ILI-790 — when /blog renders the article-selected view at
          SSR, mark the body so SiteRails (and any other body-scoped
          open-state CSS) lands on the right state from first paint.
-         No flash of the left rail before JS catches up. */
+         No flash of the left rail before JS catches up.
+         ILI-815 — on mobile the article reader is a full-screen
+         overlay, so /blog should land on the article list instead.
+         Skip the body class here on mobile; the post-stage script
+         below also strips stage.open + active card so SSR's
+         article-selected state collapses cleanly to list view. */
       (function () {
-        try { document.body.classList.add('article-open'); } catch (e) {}
+        try {
+          var isMobile = window.matchMedia
+            && window.matchMedia('(max-width: 900px)').matches;
+          if (isMobile) return;
+          document.body.classList.add('article-open');
+        } catch (e) {}
       })();
     </script>
   )}
@@ -393,6 +403,34 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
     </div>
   </div>
 
+  {defaultOpen && (
+    <script is:inline data-astro-rerun>
+      /* ILI-815 — strip the SSR'd article-selected state on mobile
+         so /blog (and the Articles nav link / "Begin transmission"
+         CTA that point there) lands on the article list instead of
+         the full-screen reader overlay. Runs synchronously after
+         the stage div is parsed but before paint, so no flash of
+         the open state. data-default-open-idx is removed so the
+         later state-sync block also skips, leaving currentIdx at
+         -1 — mobile users start fresh on the list. */
+      (function () {
+        try {
+          var isMobile = window.matchMedia
+            && window.matchMedia('(max-width: 900px)').matches;
+          if (!isMobile) return;
+          var stage = document.getElementById('stage');
+          if (!stage) return;
+          stage.classList.remove('open');
+          stage.removeAttribute('data-default-open-idx');
+          var active = stage.querySelectorAll('.post-card.active');
+          for (var i = 0; i < active.length; i++) {
+            active[i].classList.remove('active');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  )}
+
   <Fragment slot="after-shell">
     <div hidden aria-hidden="true">
       {rendered.map(({ article, Content }) => (
@@ -536,9 +574,17 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
            in via the same grid-template-columns transition the post cards
            trigger, not a full-page nav to /blog (where the open state is
            SSR'd statically and skips the animation). The href stays as
-           /blog so cmd/ctrl/middle-click and no-JS fallbacks still work. */
+           /blog so cmd/ctrl/middle-click and no-JS fallbacks still work.
+           ILI-815 — on mobile the slide-in becomes a full-screen overlay,
+           which is the wrong landing for a "browse articles" CTA. Skip
+           the JS handler so the default link navigation to /blog
+           proceeds; mobile /blog now strips its SSR'd open state and
+           shows the list. */
         if (frameCta) frameCta.addEventListener('click', function (e) {
           if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
+          var isMobile = window.matchMedia
+            && window.matchMedia('(max-width: 900px)').matches;
+          if (isMobile) return;
           if (!meta.length) return;
           e.preventDefault();
           openArticle(0);
