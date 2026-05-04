@@ -334,6 +334,10 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
       </div>
     )}
     <div class="col col-list">
+      <button class="mobile-back mobile-back--list" id="mobile-back-list" aria-label="Back to home">
+        <span>&larr;</span>
+        <span>Home</span>
+      </button>
       <span class="list-label">Published Articles</span>
       <ul class="post-card-list" id="article-list">
         {cards.map((c, i) => (
@@ -412,7 +416,10 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
          the stage div is parsed but before paint, so no flash of
          the open state. data-default-open-idx is removed so the
          later state-sync block also skips, leaving currentIdx at
-         -1 — mobile users start fresh on the list. */
+         -1 — mobile users start fresh on the list.
+         ILI-817 — also set data-view="list" so the pager lands on
+         the article list from first paint instead of the (empty)
+         hero column. */
       (function () {
         try {
           var isMobile = window.matchMedia
@@ -422,6 +429,7 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           if (!stage) return;
           stage.classList.remove('open');
           stage.removeAttribute('data-default-open-idx');
+          stage.setAttribute('data-view', 'list');
           var active = stage.querySelectorAll('.post-card.active');
           for (var i = 0; i < active.length; i++) {
             active[i].classList.remove('active');
@@ -451,8 +459,29 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         var items = document.querySelectorAll('.post-card');
         var backBtn = document.getElementById('back-btn');
         var mobileBack = document.getElementById('mobile-back');
+        var mobileBackList = document.getElementById('mobile-back-list');
         var frameCta = document.querySelector('.frame-cta');
         var colArticle = document.querySelector('.col-article');
+
+        /* ILI-817 — mobile is a 3-screen pager (hero → list → article).
+           data-view on .stage drives translateX on each col; history
+           entries mirror each forward nav so hardware back walks the
+           stack. On desktop, isMobile() is false and these helpers
+           are no-ops; the existing grid-based open/close model runs. */
+        var mobileMq = window.matchMedia ? window.matchMedia('(max-width: 900px)') : { matches: false };
+        function isMobile() { return !!mobileMq.matches; }
+        function currentView() { return stage.getAttribute('data-view') || 'hero'; }
+        function setMobileView(view, opts) {
+          if (!isMobile()) return;
+          var prev = currentView();
+          if (prev !== view) stage.setAttribute('data-view', view);
+          var state = { hasdView: view };
+          var url = window.location.href;
+          try {
+            if (opts && opts.replace) history.replaceState(state, '', url);
+            else if (opts && opts.push) history.pushState(state, '', url);
+          } catch (e) {}
+        }
         var headIdEl = document.getElementById('art-head-id');
         var headDateEl = document.getElementById('art-head-date');
         var headReadEl = document.getElementById('art-head-read');
@@ -538,27 +567,53 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
               tag: '// DISPATCH · ' + (data.postId || '').replace(/^\/\/\s*/, ''),
             });
           }
-          if (!opts || opts.updateHash !== false) {
-            if (history && history.replaceState) {
-              history.replaceState(null, '', '#' + data.slug);
-            } else {
-              window.location.hash = data.slug;
+          /* History — mobile and desktop diverge here.
+             Desktop: hash-only replaceState, no view state used.
+             Mobile: pushState the article view + hash in one entry.
+             The previous list-view entry must NOT be replaced, or
+             history.back from article lands on a null state and the
+             popstate handler defaults to hero. */
+          var nextUrl = (!opts || opts.updateHash !== false)
+            ? '#' + data.slug
+            : window.location.href;
+          if (isMobile()) {
+            var pushHist = !opts || opts.pushHistory !== false;
+            try {
+              if (pushHist) {
+                history.pushState({ hasdView: 'article' }, '', nextUrl);
+              } else {
+                history.replaceState({ hasdView: 'article' }, '', nextUrl);
+              }
+            } catch (e) {}
+            stage.setAttribute('data-view', 'article');
+            if (colArticle) colArticle.scrollTop = 0;
+          } else {
+            if (!opts || opts.updateHash !== false) {
+              if (history && history.replaceState) {
+                history.replaceState(null, '', nextUrl);
+              } else {
+                window.location.hash = data.slug;
+              }
             }
+            window.scrollTo(0, 0);
+            if (colArticle) colArticle.scrollTop = 0;
           }
-          window.scrollTo(0, 0);
-          if (colArticle) colArticle.scrollTop = 0;
         }
 
-        function closeArticle() {
+        function closeArticle(opts) {
           stage.classList.remove('open');
           document.body.classList.remove('article-open');
           items.forEach(function (el) { el.classList.remove('active'); });
           currentIdx = -1;
           if (window.HASRails) window.HASRails.reset();
           if (history && history.replaceState) {
-            history.replaceState(null, '', window.location.pathname + window.location.search);
+            history.replaceState(
+              opts && opts.state ? opts.state : null,
+              '',
+              window.location.pathname + window.location.search
+            );
           }
-          window.scrollTo(0, savedScrollY);
+          if (!isMobile()) window.scrollTo(0, savedScrollY);
         }
 
         items.forEach(function (el) {
@@ -568,23 +623,30 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           });
         });
 
-        if (backBtn) backBtn.addEventListener('click', closeArticle);
-        if (mobileBack) mobileBack.addEventListener('click', closeArticle);
-        /* ILI-793 — "Begin transmission" should slide the latest article
-           in via the same grid-template-columns transition the post cards
-           trigger, not a full-page nav to /blog (where the open state is
-           SSR'd statically and skips the animation). The href stays as
-           /blog so cmd/ctrl/middle-click and no-JS fallbacks still work.
-           ILI-815 — on mobile the slide-in becomes a full-screen overlay,
-           which is the wrong landing for a "browse articles" CTA. Skip
-           the JS handler so the default link navigation to /blog
-           proceeds; mobile /blog now strips its SSR'd open state and
-           shows the list. */
+        if (backBtn) backBtn.addEventListener('click', function () { closeArticle(); });
+        /* ILI-817 — on mobile the back buttons walk the history stack
+           (article→list, list→hero) so the hardware back button stays
+           in sync. On desktop, mobile-back is hidden and the article
+           back-btn closes the reader directly. */
+        if (mobileBack) mobileBack.addEventListener('click', function () {
+          if (isMobile()) { history.back(); }
+          else { closeArticle(); }
+        });
+        if (mobileBackList) mobileBackList.addEventListener('click', function () {
+          if (isMobile()) { history.back(); }
+        });
+        /* ILI-793 — "Begin transmission" slides the latest article in
+           on desktop via the grid-template-columns transition.
+           ILI-817 — on mobile, the same CTA advances the pager from
+           hero → list (no full-page nav, no flash). The href stays
+           /blog for cmd/ctrl/middle-click + no-JS fallbacks. */
         if (frameCta) frameCta.addEventListener('click', function (e) {
           if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
-          var isMobile = window.matchMedia
-            && window.matchMedia('(max-width: 900px)').matches;
-          if (isMobile) return;
+          if (isMobile()) {
+            e.preventDefault();
+            setMobileView('list', { push: true });
+            return;
+          }
           if (!meta.length) return;
           e.preventDefault();
           openArticle(0);
@@ -596,7 +658,12 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           if (currentIdx >= 0 && meta[currentIdx - 1]) openArticle(currentIdx - 1);
         });
         document.addEventListener('keydown', function (e) {
-          if (e.key === 'Escape') closeArticle();
+          if (e.key !== 'Escape') return;
+          if (isMobile()) {
+            if (currentView() === 'article') history.back();
+          } else {
+            closeArticle();
+          }
         });
 
         /* ILI-810 — let in-article links like <a href="/#were-assuming-the-system>
@@ -630,7 +697,21 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         if (initialHash) {
           for (var i = 0; i < meta.length; i++) {
             if (meta[i].slug === initialHash) {
-              openArticle(i, { updateHash: false });
+              if (isMobile()) {
+                /* ILI-817 — deep-link entry on mobile: synthesize the
+                   hero → list → article history stack so hardware back
+                   walks views (article→list→hero→exit) the same as if
+                   the user navigated forward through the pager. URL
+                   stays as the deep-link throughout; only state changes. */
+                try {
+                  history.replaceState({ hasdView: 'hero' }, '', window.location.href);
+                  history.pushState({ hasdView: 'list' }, '', window.location.href);
+                  history.pushState({ hasdView: 'article' }, '', window.location.href);
+                } catch (e) {}
+                openArticle(i, { updateHash: false, pushHistory: false });
+              } else {
+                openArticle(i, { updateHash: false });
+              }
               break;
             }
           }
@@ -650,6 +731,54 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
               });
             }
           }
+        }
+
+        /* ILI-817 — seed the initial history state on mobile so popstate
+           knows what to restore. The deep-link branch above already
+           synthesized its own stack. Only seed if the current state
+           lacks hasdView — re-runs of this script (Astro view
+           transitions, data-astro-rerun) must not clobber a state
+           pushed by the user navigating the pager. */
+        if (isMobile() && !initialHash) {
+          try {
+            var existingState = history.state || {};
+            if (!existingState.hasdView) {
+              history.replaceState({ hasdView: currentView() }, '', window.location.href);
+            } else {
+              /* Re-run after view transition: sync the DOM to the state
+                 that the browser already has so the pager paints in the
+                 right view. */
+              stage.setAttribute('data-view', existingState.hasdView);
+            }
+          } catch (e) {}
+        }
+
+        /* ILI-817 — popstate restores the view recorded in history.
+           Hardware back/forward and the in-page back buttons (which
+           call history.back) funnel through here. Guarded with a
+           window flag so data-astro-rerun re-runs don't accumulate
+           duplicate listeners. */
+        if (!window.__ili817PopstateMounted) {
+          window.__ili817PopstateMounted = true;
+          window.addEventListener('popstate', function (e) {
+            var mq = window.matchMedia && window.matchMedia('(max-width: 900px)');
+            if (!mq || !mq.matches) return;
+            var s = document.getElementById('stage');
+            if (!s) return;
+            var state = e.state || {};
+            var view = state.hasdView;
+            if (view !== 'hero' && view !== 'list' && view !== 'article') {
+              view = 'hero';
+            }
+            s.setAttribute('data-view', view);
+            if (view !== 'article') {
+              s.classList.remove('open');
+              document.body.classList.remove('article-open');
+              var cards = s.querySelectorAll('.post-card.active');
+              for (var i = 0; i < cards.length; i++) cards[i].classList.remove('active');
+              if (window.HASRails) window.HASRails.reset();
+            }
+          });
         }
 
         // ILI-771 — diagnostic iframe self-reports its content height so the

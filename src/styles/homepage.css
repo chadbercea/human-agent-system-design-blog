@@ -1604,13 +1604,15 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
    ═══════════════════════════════════════════════ */
 @media (max-width: 900px) {
 
+  /* Universal mobile rules — apply to every page that loads
+     homepage.css (about, contact, prose pages). html owns the
+     document scroll; body must NOT be a scroll container or
+     `position: sticky` on the header pins to body instead of
+     the viewport. */
   html, body {
     overflow-x: clip;
     height: auto;
   }
-  /* html owns the document scroll; body must NOT be a scroll container
-     or `position: sticky` on the header pins to body (which doesn't
-     scroll) instead of the viewport. */
   html { overflow-y: auto; }
 
   .shell {
@@ -1618,52 +1620,87 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
     min-height: 100vh;
   }
 
-  /* Stage: collapse grid to stacked block. Reset the desktop
-     calc height so taller content (card list + footer) lays
-     out naturally instead of overlapping. */
+  /* ILI-817 — pager-only shell. Pages that contain `.stage`
+     (homepage, /blog) become a fixed-viewport pager: shell takes
+     the full svh and clips so cols can slide in from the right
+     without a document scroll fighting the transform. */
+  html:has(.stage),
+  body:has(.stage) {
+    overflow: hidden;
+    height: 100svh;
+  }
+  body:has(.stage) .shell {
+    height: 100svh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Stage: positioned pager. Each col is an absolute scroll
+     container; transform on the col handles horizontal slide. */
   .stage {
     display: block;
-    overflow: visible;
+    position: relative;
+    overflow: hidden;
     transition: none;
     grid-template-columns: none;
     height: auto;
+    flex: 1 1 auto;
+    min-height: 0;
   }
   .stage.open { grid-template-columns: none; height: auto; }
 
-  /* Reset the desktop document-scroll rules. Mobile already page-scrolls */
-  .stage.open .col-hero,
-  .stage.open .col-list {
-    position: static;
-    height: auto;
-    top: auto;
-    overflow: visible;
-  }
-  /* Must NOT be a scroll container on mobile. overflow:auto here
-     made .col-article the sticky-containing-block for .mobile-back,
-     so its `top: 80px` was measured from inside this column instead
-     of the viewport — the back button rendered ~80px lower than the
-     header and floated over the article H1. It also intercepted
-     touch scroll, since a nested scroller swallows wheel/swipe even
-     when its content fits exactly. Let the body own the scroll. */
-  .stage.open .col-article {
-    overflow: visible;
-    height: auto;
-  }
-
   .col {
+    position: absolute;
+    inset: 0;
     width: 100%;
     border-right: none;
-    position: static;
-    overflow: visible;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    transition: transform 320ms cubic-bezier(.4, 0, .2, 1);
+    will-change: transform;
   }
 
-  /* Hero: natural height, full width, always visible */
+  /* Resting positions — hero on screen, list and article waiting
+     to the right. data-view on .stage moves the cols. Selectors use
+     `#stage` so the id raises specificity above the boot CSS at
+     `body.is-index-booting.boot-stage-list .col-list` (0,0,3,1)
+     which would otherwise force translateY(0) on the list during
+     the ~5s boot sequence. */
+  #stage > .col-hero    { transform: translateX(0); }
+  #stage > .col-list    { transform: translateX(100%); }
+  #stage > .col-article { transform: translateX(100%); }
+
+  #stage[data-view="list"] > .col-hero    { transform: translateX(-100%); }
+  #stage[data-view="list"] > .col-list    { transform: translateX(0); }
+  #stage[data-view="list"] > .col-article { transform: translateX(100%); }
+
+  #stage[data-view="article"] > .col-hero    { transform: translateX(-200%); }
+  #stage[data-view="article"] > .col-list    { transform: translateX(-100%); }
+  #stage[data-view="article"] > .col-article { transform: translateX(0); }
+
+  /* Boot reveal hides .col-list (opacity:0, visibility:hidden) until
+     the boot-stage-list class lands. On mobile the pager owns
+     visibility — keep it visible so a user who taps "Begin
+     Transmission" during boot sees the list, not an empty panel. */
+  body.is-index-booting .col-list,
+  body.is-index-booting.boot-stage-list .col-list {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .col { transition: none; }
+  }
+
+  /* Hero column. The col itself is the scroll container (set above);
+     hero-inner just lays out content inside it. */
   .col-hero {
-    border-bottom: 1px solid #1c1c1c;
+    border-bottom: none;
   }
   .hero-inner {
     width: 100%;
-    height: auto;
+    min-height: 100%;
     padding: 2.5rem 1.25rem 3rem;
     display: block;
   }
@@ -1684,23 +1721,15 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
   .hero-stack { margin: 0.5rem 0 2rem; }
   .hero-meta { margin-top: 2rem; }
 
-  /* Frame hero (ILI-787) on mobile — hero fills the visible viewport
-     beneath the 80px sticky header so the bottom-anchored frame-block
-     and its top divider rule sit proportionally on every device,
-     instead of cramming into a fixed 540px box and leaving the
-     divider stranded mid-screen on tall phones (ILI-814).
-     Use `height` (not `min-height`): the scan-stack reveals 15+
-     lines at 32px each, so without an upper bound the col-hero
-     would grow taller than the viewport and break the bottom-
-     anchored layout. With a fixed height, frame-viewport's
-     `overflow: hidden` clips old scan lines off the top — same
-     behaviour the desktop grid track gives the column.
-     `svh` excludes the mobile browser's collapsing chrome, so the
-     hero never overflows when address/toolbars retract. */
+  /* Frame hero (ILI-787) on mobile — col-hero already fills the
+     stage box (header→footer) via the pager's inset:0, so no
+     explicit height is needed. The flex column inside (frame-viewport
+     + signal-strip) bottom-anchors via flex-end. */
   .col-hero.has-hero-frame {
     border-right: none;
     border-bottom: 1px solid #000;
-    height: calc(100svh - 80px);
+    display: flex;
+    flex-direction: column;
   }
   .col-hero.has-hero-frame .scan-stack {
     padding: 16px 20px 20px;
@@ -1732,8 +1761,12 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
   /* Desktop back column / button: hide entirely on mobile */
   .back-btn { display: none; }
 
-  /* Post card list: full width, all items expand, standard scroll */
-  .col-list { display: block; }
+  /* Post card list — col-list is the scroll container itself; the
+     inner ul just lays out cards. */
+  .col-list {
+    display: block;
+    background: var(--bg-canvas);
+  }
   .list-label {
     font-size: 11px;
     padding: 1.25rem 1.25rem 0.75rem;
@@ -1766,29 +1799,21 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
   }
   .pagination-arrow { font-size: 14px; }
 
-  /* Article reader on mobile: render inline as a full-flow section,
-     not a fixed overlay. When .stage.open we hide the hero + list and
-     show the reader in their place, so the natural page scroll runs
-     hero/list (closed) OR article + SiteFooter (open). The fixed
-     overlay approach trapped the user in a separate scroll container,
-     which meant the footer never came into view while reading. */
+  /* ILI-817 — article column is one of three pager screens. col-article
+     is its own scroll container (inset: 0 + overflow-y: auto, set above);
+     the back button sticks to the top of the column. */
   .col-article {
-    display: none;
-    position: relative;
+    display: block;
     background: var(--black);
-    overflow: visible;
   }
-  .stage.open .col-article { display: block; }
-  .stage.open .col-hero,
-  .stage.open .col-list { display: none; }
 
+  /* Both back buttons (article→list, list→hero) share the same chrome. */
   .mobile-back {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     position: sticky;
-    top: var(--header-h, 80px);
-    transition: top var(--dur-fast) var(--ease-out);
+    top: 0;
     width: 100%;
     height: 48px;
     padding: 0 1.25rem;
@@ -1804,6 +1829,11 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
     transition: color 0.15s;
   }
   .mobile-back:hover, .mobile-back:active { color: #c8c8c8; }
+  .mobile-back--list {
+    background: var(--bg-canvas);
+    color: var(--mid, #858585);
+    border-bottom: 1px solid var(--rule);
+  }
 
   .article-inner {
     width: 100%;
