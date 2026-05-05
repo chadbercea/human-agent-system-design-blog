@@ -468,13 +468,15 @@ body.has-hero-frame-play .scan-line.is-visible {
 .scan-line .scan-d { color: #888888; }
 
 /* Lockup floats above the scan-stack, centered vertically.
-   background: transparent + backdrop-filter: blur + brightness.
-   Blur softens scan-lines into a frost; brightness(1.5)
-   compensates for the natural dimming of blur on sparse content
-   so the lockup area reads as a LIGHTER frosted region (you
-   can see the blurred scan-lines clearly), not a darker box.
-   Over pure black, brightness*0 = 0 — black stays black, no
-   visible effect. */
+   No background, no backdrop-filter, no border. Pure
+   transparent positioning container. The body has fixed
+   pseudo-element gridlines (chrome.css body::before/::after)
+   that span the entire viewport — any backdrop-filter on
+   this element brightens or blurs those gridlines within
+   the lockup's bounding box, which the user reads as a
+   "bar" or "box." Without any filter, the lockup area is
+   visually identical to the surrounding column except for
+   the message text itself. */
 .frame-block {
   position: absolute;
   top: 50%;
@@ -483,8 +485,6 @@ body.has-hero-frame-play .scan-line.is-visible {
   transform: translateY(-50%);
   z-index: 2;
   background: transparent;
-  backdrop-filter: blur(8px) brightness(1.5);
-  -webkit-backdrop-filter: blur(8px) brightness(1.5);
   padding: 32px 64px;
   display: flex;
   flex-direction: column;

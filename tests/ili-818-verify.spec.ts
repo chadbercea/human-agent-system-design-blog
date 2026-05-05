@@ -45,10 +45,12 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
     const firstScanOpacity = await page.locator('.scan-stack .scan-line').first().evaluate((el) => Number(getComputedStyle(el).opacity));
     expect(firstScanOpacity).toBe(0);
 
-    // Frame-block carries backdrop-filter blur always — over a
-    // black background it's a no-op (blur of black = black).
+    // Frame-block is a pure transparent positioning container.
+    // No backdrop-filter — the body has pseudo-element gridlines
+    // that any filter would visibly affect within the lockup's
+    // bounding box, creating an unwanted bar/box.
     const bf = await page.locator('.frame-block').evaluate((el) => getComputedStyle(el).backdropFilter || (el as any).webkitBackdropFilter || 'none');
-    expect(bf).toContain('blur');
+    expect(bf).toBe('none');
 
     // Frame-line hidden.
     const frameLineOpacity = await page.locator('.frame-block .frame-line').first().evaluate((el) => Number(getComputedStyle(el).opacity));
@@ -111,7 +113,7 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
     expect(state.revealed).toBe(FRAME_LINES_COUNT);
     for (const o of state.opacities) expect(o).toBe(1);
     expect(state.revealing).toBe(true);
-    expect(state.backdrop).toContain('blur');
+    expect(state.backdrop).toBe('none');
 
     // Corners revealed alongside the lockup.
     const cornerOpacities = await page.evaluate(() => {
