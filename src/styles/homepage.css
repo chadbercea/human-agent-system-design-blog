@@ -468,10 +468,10 @@ body.has-hero-frame-play .scan-line.is-visible {
 .scan-line .scan-d { color: #888888; }
 
 /* Lockup floats above the scan-stack, centered vertically.
-   Glassmorphic — pure backdrop blur with a transparent
-   background. No rgba fill, so no "black bar" feeling; the
-   scan-lines behind the lockup are just blurred into a soft
-   frost while the message stays sharp on top. */
+   White-tinted glassmorphism — subtle rgba(255,255,255,0.06)
+   over backdrop blur reads as a slightly LIGHTER frosted area
+   instead of a darker rectangle. Hairline white border for
+   definition without a hard edge. */
 .frame-block {
   position: absolute;
   top: 50%;
@@ -479,29 +479,35 @@ body.has-hero-frame-play .scan-line.is-visible {
   right: 0;
   transform: translateY(-50%);
   z-index: 2;
-  background: transparent;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 32px 64px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   transition:
+    background 400ms ease-out,
     backdrop-filter 400ms ease-out,
-    -webkit-backdrop-filter 400ms ease-out;
+    -webkit-backdrop-filter 400ms ease-out,
+    border-color 400ms ease-out;
 }
-/* During initial load (before the lockup is ready to write
-   in), the glass is invisible — no blur, no fill, just the
-   transparent box with no visual presence. The orchestrator
-   adds .is-revealing when it's ready, transitioning the blur
-   in before the frame-lines start scanning. */
+/* During initial load — before the lockup is ready to write
+   in — every visual property of the glass is removed: no
+   tint, no blur, no border. The box has no visual presence
+   at all. .is-revealing flips the glass back on. */
 body.has-hero-frame-play .frame-block {
+  background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+  border-color: transparent;
 }
 body.has-hero-frame-play .frame-block.is-revealing {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 /* Frame-line wrapper — same reveal as .scan-line, taller

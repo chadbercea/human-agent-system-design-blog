@@ -82,6 +82,18 @@ const SCAN_LINES: [string, string, string][] = [
   ['+02.760', 'OK',   'archive standing by'],
   ['+02.820', 'HRT',  'pulse 60bpm · steady'],
   ['+02.880', 'LOG',  'buffer 0/4096 · flush 5s'],
+  ['+02.940', 'PWR',  'thermal nominal · battery: AC'],
+  ['+03.000', 'GFX',  '60fps · vsync on · paint 4ms'],
+  ['+03.060', 'MEM',  'heap 12mb / 256mb · gc 0'],
+  ['+03.120', 'CRY',  'tls 1.3 · pinned · cert valid 2027.02'],
+  ['+03.180', 'GEO',  'twin falls · MST · alt 1170m'],
+  ['+03.240', 'BIN',  '005 of 005 · all signed'],
+  ['+03.300', 'IO',   'fd 24/1024 · stable'],
+  ['+03.360', 'AGT',  'message queue · drained'],
+  ['+03.420', 'OPS',  'pipeline · idle · ready'],
+  ['+03.480', 'TS',   'clock skew 0.002s · drift compensated'],
+  ['+03.540', 'OBS',  'sweep complete · field stable'],
+  ['+03.600', 'EOL',  'transmission ready · waiting'],
 ];
 
 const rendered = await Promise.all(
@@ -1463,7 +1475,7 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         var REVEAL_TRANSITION = 320;
         var SCAN_BREATH = 200;
         var GLASS_FADE = 400;
-        var SCAN_LINES_COUNT = 28;
+        var SCAN_LINES_COUNT = 40;
         var FRAME_LINES = 5;
         var STAGE_CADENCE = 180;
         var POST_FOOTER_DELAY = 400;
