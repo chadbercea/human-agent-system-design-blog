@@ -452,9 +452,10 @@ body.hero-sequence-play .protocol-chip.is-typed {
 .scan-line .scan-d { color: #888888; }
 
 /* Lockup floats above the scan-stack, centered vertically.
-   Glassmorphic background (semi-transparent + backdrop blur)
-   keeps the message legible against the scrolling scan-lines
-   without forming a hard black bar. */
+   Glassmorphic — pure backdrop blur with a transparent
+   background. No rgba fill, so no "black bar" feeling; the
+   scan-lines behind the lockup are just blurred into a soft
+   frost while the message stays sharp on top. */
 .frame-block {
   position: absolute;
   top: 50%;
@@ -462,32 +463,29 @@ body.hero-sequence-play .protocol-chip.is-typed {
   right: 0;
   transform: translateY(-50%);
   z-index: 2;
-  background: rgba(8, 8, 10, 0.55);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: transparent;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   padding: 32px 64px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   transition:
-    background 400ms ease-out,
     backdrop-filter 400ms ease-out,
     -webkit-backdrop-filter 400ms ease-out;
 }
 /* During initial load (before the lockup is ready to write
-   in), the glass bar is invisible — no background, no blur.
-   The orchestrator adds .is-revealing when it's ready,
-   transitioning the glass into view before the frame-lines
-   start scanning in. */
+   in), the glass is invisible — no blur, no fill, just the
+   transparent box with no visual presence. The orchestrator
+   adds .is-revealing when it's ready, transitioning the blur
+   in before the frame-lines start scanning. */
 body.has-hero-frame-play .frame-block {
-  background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 body.has-hero-frame-play .frame-block.is-revealing {
-  background: rgba(8, 8, 10, 0.55);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 /* Frame-line wrapper — same reveal as .scan-line, taller

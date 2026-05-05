@@ -32,9 +32,9 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
     const lineCount = await page.locator('.scan-stack .scan-line').count();
     expect(lineCount).toBeGreaterThanOrEqual(28);
 
-    // Frame-block has no glass background while booting.
-    const bg = await page.locator('.frame-block').evaluate((el) => getComputedStyle(el).backgroundColor);
-    expect(bg).toMatch(/rgba\(0,\s*0,\s*0,\s*0\)|transparent/);
+    // Frame-block has no glass blur while booting (pure transparent box).
+    const bf = await page.locator('.frame-block').evaluate((el) => getComputedStyle(el).backdropFilter || (el as any).webkitBackdropFilter || 'none');
+    expect(bf).toBe('none');
 
     // Frame-line hidden.
     const frameLineOpacity = await page.locator('.frame-block .frame-line').first().evaluate((el) => Number(getComputedStyle(el).opacity));
@@ -50,20 +50,21 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
 
     const state = await page.evaluate(() => {
       const lines = Array.from(document.querySelectorAll('.frame-block .frame-line'));
+      const fb = document.querySelector('.frame-block') as HTMLElement | null;
       return {
         total: lines.length,
         revealed: lines.filter((l) => l.classList.contains('is-visible')).length,
         opacities: lines.map((l) => Number(getComputedStyle(l).opacity)),
-        revealing: document.querySelector('.frame-block')?.classList.contains('is-revealing') ?? false,
-        bg: getComputedStyle(document.querySelector('.frame-block')!).backgroundColor,
+        revealing: fb?.classList.contains('is-revealing') ?? false,
+        backdrop: fb ? (getComputedStyle(fb).backdropFilter || (fb as any).webkitBackdropFilter || 'none') : 'none',
       };
     });
     expect(state.total).toBe(FRAME_LINES_COUNT);
     expect(state.revealed).toBe(FRAME_LINES_COUNT);
     for (const o of state.opacities) expect(o).toBe(1);
     expect(state.revealing).toBe(true);
-    // Glass background is now visible (rgba with alpha > 0).
-    expect(state.bg).toMatch(/rgba?\(/);
+    // Glass blur is now active.
+    expect(state.backdrop).toContain('blur');
 
     // Wide divider is gone, cursor is on the H1.
     expect(await page.locator('.frame-rule').count()).toBe(0);
@@ -134,8 +135,8 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
     const frameLineOpacity = await page.locator('.frame-block .frame-line').first().evaluate((el) => Number(getComputedStyle(el).opacity));
     expect(frameLineOpacity).toBe(1);
 
-    const bg = await page.locator('.frame-block').evaluate((el) => getComputedStyle(el).backgroundColor);
-    expect(bg).toMatch(/rgba?\(/);
+    const bf = await page.locator('.frame-block').evaluate((el) => getComputedStyle(el).backdropFilter || (el as any).webkitBackdropFilter || 'none');
+    expect(bf).toContain('blur');
 
     await context.close();
   });
