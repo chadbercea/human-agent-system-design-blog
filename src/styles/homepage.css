@@ -1802,15 +1802,37 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
     height: 100svh;
   }
 
-  /* Frame hero on mobile — keep the marquee backdrop but
-     hide the corner brackets (no room on a phone column). */
+  /* Frame hero on mobile — same architecture as desktop:
+     scan-stack backdrop, lockup with feathered glass blur,
+     4 corner brackets at the column corners. Just smaller
+     paddings/typography and a tighter mask fade
+     proportional to the shorter mobile lockup. */
   .col-hero.has-hero-frame {
     border-right: none;
     border-bottom: 1px solid #000;
     display: flex;
     flex-direction: column;
   }
-  .col-hero.has-hero-frame .frame-corner { display: none; }
+  .col-hero.has-hero-frame .frame-corner--tl { top: 16px; left: 32px; }
+  .col-hero.has-hero-frame .frame-corner--tr { top: 16px; right: 16px; }
+  .col-hero.has-hero-frame .frame-corner--bl { bottom: 16px; left: 32px; }
+  .col-hero.has-hero-frame .frame-corner--br { bottom: 16px; right: 16px; }
+  .col-hero.has-hero-frame .frame-block::before {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 48px,
+      #000 calc(100% - 48px),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 48px,
+      #000 calc(100% - 48px),
+      transparent 100%
+    );
+  }
   .col-hero.has-hero-frame .scan-stack {
     padding: 0 20px;
   }

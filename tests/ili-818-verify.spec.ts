@@ -180,6 +180,39 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
     await context.close();
   });
 
+  test('mobile: lockup glass + corners + scan-lines all render at 390px', async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const page = await context.newPage();
+    await page.goto(INDEX);
+    await page.waitForTimeout(HERO_SETTLE + 500);
+
+    const state = await page.evaluate(() => {
+      const fb = document.querySelector('.frame-block') as HTMLElement;
+      const corner = document.querySelector('.frame-corner--tl') as HTMLElement;
+      const scan = document.querySelector('.scan-stack .scan-line') as HTMLElement;
+      const beforeCs = getComputedStyle(fb, '::before');
+      return {
+        cornerOpacity: Number(getComputedStyle(corner).opacity),
+        cornerDisplay: getComputedStyle(corner).display,
+        scanVisible: Number(getComputedStyle(scan).opacity),
+        beforeBackdrop: beforeCs.backdropFilter || (beforeCs as any).webkitBackdropFilter || 'none',
+        beforeMask: beforeCs.maskImage || (beforeCs as any).webkitMaskImage || 'none',
+      };
+    });
+    expect(state.cornerDisplay).not.toBe('none');
+    expect(state.cornerOpacity).toBeCloseTo(0.5, 2);
+    expect(state.scanVisible).toBeCloseTo(0.5, 2);
+    expect(state.beforeBackdrop).toContain('blur');
+    expect(state.beforeMask).toContain('48px');
+
+    await page.screenshot({
+      path: 'verification-screenshots/ili-818-mobile.png',
+      fullPage: false,
+    });
+
+    await context.close();
+  });
+
   test('return visit: lockup visible from first paint, no boot', async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const page = await context.newPage();
