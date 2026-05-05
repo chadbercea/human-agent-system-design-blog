@@ -113,9 +113,9 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
     expect(state.revealed).toBe(FRAME_LINES_COUNT);
     for (const o of state.opacities) expect(o).toBe(1);
     expect(state.revealing).toBe(true);
-    // Subtle backdrop-blur applied — scan-lines stay visible behind
-    // the lockup but soften slightly.
-    expect(state.backdrop).toContain('blur');
+    // Frame-block stays a transparent positioning container; no
+    // backdrop-filter (was tinting the area).
+    expect(state.backdrop).toBe('none');
 
     // Corners revealed alongside the lockup.
     const cornerOpacities = await page.evaluate(() => {

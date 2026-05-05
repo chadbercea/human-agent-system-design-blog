@@ -468,10 +468,9 @@ body.has-hero-frame-play .scan-line.is-visible {
 .scan-line .scan-d { color: #888888; }
 
 /* Lockup floats above the scan-stack, centered vertically.
-   Subtle backdrop-filter blur — small enough that scan-lines
-   stay visible behind, just softened. No background, no
-   border. The blur transitions in alongside the lockup
-   write-in via .is-revealing. */
+   Pure transparent positioning container — no background, no
+   border, no backdrop-filter. Scan-lines flow through and
+   the lockup text renders on top. */
 .frame-block {
   position: absolute;
   top: 50%;
@@ -480,23 +479,10 @@ body.has-hero-frame-play .scan-line.is-visible {
   transform: translateY(-50%);
   z-index: 2;
   background: transparent;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   padding: 32px 64px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  transition:
-    backdrop-filter 400ms ease-out,
-    -webkit-backdrop-filter 400ms ease-out;
-}
-body.has-hero-frame-play .frame-block {
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-body.has-hero-frame-play .frame-block.is-revealing {
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
 }
 
 /* Frame-line wrapper — same reveal as .scan-line, taller
