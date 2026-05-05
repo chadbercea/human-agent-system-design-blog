@@ -468,15 +468,12 @@ body.has-hero-frame-play .scan-line.is-visible {
 .scan-line .scan-d { color: #888888; }
 
 /* Lockup floats above the scan-stack, centered vertically.
-   No background, no backdrop-filter, no border. Pure
-   transparent positioning container. The body has fixed
-   pseudo-element gridlines (chrome.css body::before/::after)
-   that span the entire viewport — any backdrop-filter on
-   this element brightens or blurs those gridlines within
-   the lockup's bounding box, which the user reads as a
-   "bar" or "box." Without any filter, the lockup area is
-   visually identical to the surrounding column except for
-   the message text itself. */
+   css.glass spec — transparent fill, 16px radius, soft drop
+   shadow, 6.1px backdrop blur. Heads-up: chrome.css's body
+   gridlines do interact with backdrop-filter (see memory
+   feedback_body_gridlines_break_backdrop_filter); at 6.1px
+   the effect is subtle but the lockup's bounding box will
+   still be slightly perceptible against the gridline pattern. */
 .frame-block {
   position: absolute;
   top: 50%;
@@ -484,7 +481,11 @@ body.has-hero-frame-play .scan-line.is-visible {
   right: 0;
   transform: translateY(-50%);
   z-index: 2;
-  background: transparent;
+  background: rgba(0, 0, 0, 0);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6.1px);
+  -webkit-backdrop-filter: blur(6.1px);
   padding: 32px 64px;
   display: flex;
   flex-direction: column;
