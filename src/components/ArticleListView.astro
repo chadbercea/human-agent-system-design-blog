@@ -1428,6 +1428,15 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           frameBlock.classList.add('is-revealing');
         }, lockupRevealAt);
 
+        // Corners load in alongside the lockup — staggered at the
+        // canonical 145ms cadence starting with the glass fade.
+        var corners = hero.querySelectorAll('.frame-corner');
+        corners.forEach(function (el, i) {
+          window.setTimeout(function () {
+            el.classList.add('is-visible');
+          }, lockupRevealAt + i * CADENCE);
+        });
+
         var frameLines = frameBlock.querySelectorAll('.frame-line');
         var frameLinesStartAt = lockupRevealAt + GLASS_FADE;
         frameLines.forEach(function (el, i) {

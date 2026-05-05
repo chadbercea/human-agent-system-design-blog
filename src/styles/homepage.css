@@ -468,12 +468,10 @@ body.has-hero-frame-play .scan-line.is-visible {
 .scan-line .scan-d { color: #888888; }
 
 /* Lockup floats above the scan-stack, centered vertically.
-   No background, no border, no backdrop-filter. The block is
-   purely a transparent positioning container — scan-lines
-   flow through it and the lockup text renders on top.
-   That eliminates any "box" effect: the area where the
-   message lives is visually identical to the surrounding
-   column except for the message itself. */
+   Subtle backdrop-filter blur — small enough that scan-lines
+   stay visible behind, just softened. No background, no
+   border. The blur transitions in alongside the lockup
+   write-in via .is-revealing. */
 .frame-block {
   position: absolute;
   top: 50%;
@@ -482,10 +480,23 @@ body.has-hero-frame-play .scan-line.is-visible {
   transform: translateY(-50%);
   z-index: 2;
   background: transparent;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   padding: 32px 64px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  transition:
+    backdrop-filter 400ms ease-out,
+    -webkit-backdrop-filter 400ms ease-out;
+}
+body.has-hero-frame-play .frame-block {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+body.has-hero-frame-play .frame-block.is-revealing {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 /* Frame-line wrapper — same reveal as .scan-line, taller
@@ -646,9 +657,12 @@ body.has-hero-frame-play .scan-line.is-visible {
   display: none;
 }
 
-/* ILI-818 — corner brackets always present at half opacity
-   (left brackets get +20px to clear the page rail). They
-   frame the column independent of the boot sequence. */
+/* ILI-818 — corner brackets default at half opacity. During
+   cold load they start hidden via the body class; the
+   orchestrator adds .is-visible to each one at 145ms cadence
+   alongside the lockup write-in so the corners load in with
+   the rest of the UI. Left brackets get +20px to clear the
+   page rail. */
 .frame-corner {
   position: absolute;
   width: 22px;
@@ -657,11 +671,18 @@ body.has-hero-frame-play .scan-line.is-visible {
   pointer-events: none;
   z-index: 3;
   opacity: 0.5;
+  transition: opacity 320ms ease-out;
 }
 .frame-corner--tl { top: 22px; left: 48px; border-right: none; border-bottom: none; }
 .frame-corner--tr { top: 22px; right: 28px; border-left: none; border-bottom: none; }
 .frame-corner--bl { bottom: 22px; left: 48px; border-right: none; border-top: none; }
 .frame-corner--br { bottom: 22px; right: 28px; border-left: none; border-top: none; }
+body.has-hero-frame-play .frame-corner {
+  opacity: 0;
+}
+body.has-hero-frame-play .frame-corner.is-visible {
+  opacity: 0.5;
+}
 
 /* Frame lines: scan-in via the canonical max-height + opacity
    reveal once the marquee intro finishes. Default visible (so

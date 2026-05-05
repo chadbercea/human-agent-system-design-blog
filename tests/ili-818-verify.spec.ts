@@ -52,6 +52,10 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
     // Frame-line hidden.
     const frameLineOpacity = await page.locator('.frame-block .frame-line').first().evaluate((el) => Number(getComputedStyle(el).opacity));
     expect(frameLineOpacity).toBe(0);
+
+    // Corner brackets hidden — they reveal alongside the lockup.
+    const cornerOpacity = await page.locator('.frame-corner--tl').evaluate((el) => Number(getComputedStyle(el).opacity));
+    expect(cornerOpacity).toBe(0);
   });
 
   test('scan-lines write in one by one before the lockup', async ({ page }) => {
@@ -109,9 +113,17 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
     expect(state.revealed).toBe(FRAME_LINES_COUNT);
     for (const o of state.opacities) expect(o).toBe(1);
     expect(state.revealing).toBe(true);
-    // Frame-block stays a transparent positioning container —
-    // no backdrop-filter at any point. Scan-lines flow through.
-    expect(state.backdrop).toBe('none');
+    // Subtle backdrop-blur applied — scan-lines stay visible behind
+    // the lockup but soften slightly.
+    expect(state.backdrop).toContain('blur');
+
+    // Corners revealed alongside the lockup.
+    const cornerOpacities = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('.frame-corner')).map((el) =>
+        Number(getComputedStyle(el).opacity)
+      );
+    });
+    for (const o of cornerOpacities) expect(o).toBeCloseTo(0.5, 2);
 
     // Wide divider is gone, cursor is on the H1.
     expect(await page.locator('.frame-rule').count()).toBe(0);
