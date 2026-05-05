@@ -236,44 +236,75 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           <span class="signal-sep">&middot;</span>
           <span class="signal-item">SIGNAL ██████████ 100%</span>
         </div>
-        {/* ILI-818 — ambient HUD telemetry. Hidden during boot.
-            Fades in at low opacity as the strip-down lands so the
-            stripped resting state has faint scan-line-style data
-            framing the centered message. Same .scan-line grid
-            (timestamp · code · description) so the system reads
-            as continuing to operate, not gone quiet. */}
+        {/* ILI-818 — ambient HUD chrome for the resting state.
+            Hidden during boot (the loud scan log + frame print own
+            the stage). At strip-down, a mini-boot prints these in
+            line by line at low opacity so the post-strip column has
+            its own intro pass — corner brackets draw in, telemetry
+            rows stagger-reveal, T+ counter ticks live, signal bar
+            fluctuates. Reads as: system landed, mission control
+            is operational. */}
+        <div class="hud-frame-bracket hud-frame-bracket--tl" aria-hidden="true"></div>
+        <div class="hud-frame-bracket hud-frame-bracket--tr" aria-hidden="true"></div>
+        <div class="hud-frame-bracket hud-frame-bracket--bl" aria-hidden="true"></div>
+        <div class="hud-frame-bracket hud-frame-bracket--br" aria-hidden="true"></div>
         <div class="hud-ambient hud-ambient--top" aria-hidden="true">
           <div class="hud-ambient-line">
-            <span class="hud-ambient-t">T+00:02:14</span>
+            <span class="hud-ambient-t" data-hud-tick>T+00:02:14</span>
             <span class="hud-ambient-c">OBS</span>
             <span class="hud-ambient-d">42.56&deg;N &middot; 114.46&deg;W &middot; TWIN FALLS / IDAHO</span>
           </div>
           <div class="hud-ambient-line">
-            <span class="hud-ambient-t">T+00:02:14</span>
+            <span class="hud-ambient-t" data-hud-tick>T+00:02:14</span>
             <span class="hud-ambient-c">IDX</span>
             <span class="hud-ambient-d">003 ENTRIES &middot; UPD 2026.04.30 &middot; CH 01 DISPATCH</span>
           </div>
           <div class="hud-ambient-line">
-            <span class="hud-ambient-t">T+00:02:14</span>
+            <span class="hud-ambient-t" data-hud-tick>T+00:02:14</span>
             <span class="hud-ambient-c">LNK</span>
             <span class="hud-ambient-d">AGENT-01 ONLINE &middot; OPERATOR LINKED &middot; HANDSHAKE OK</span>
+          </div>
+          <div class="hud-ambient-line">
+            <span class="hud-ambient-t" data-hud-tick>T+00:02:14</span>
+            <span class="hud-ambient-c">OBJ</span>
+            <span class="hud-ambient-d">HUMAN &middot; AGENT &middot; SYSTEM &middot; THREE DESIGN OBJECTS</span>
+          </div>
+          <div class="hud-ambient-line">
+            <span class="hud-ambient-t" data-hud-tick>T+00:02:14</span>
+            <span class="hud-ambient-c">FRM</span>
+            <span class="hud-ambient-d">V1.0 PUBLISHED &middot; TRIAD VERIFIED &middot; LOCK</span>
           </div>
         </div>
         <div class="hud-ambient hud-ambient--bot" aria-hidden="true">
           <div class="hud-ambient-line">
-            <span class="hud-ambient-t">T+00:02:14</span>
-            <span class="hud-ambient-c">FRM</span>
-            <span class="hud-ambient-d">V1.0 &middot; TRIAD VERIFIED &middot; 3 DESIGN OBJECTS</span>
+            <span class="hud-ambient-t" data-hud-tick>T+00:02:14</span>
+            <span class="hud-ambient-c">CHN</span>
+            <span class="hud-ambient-d">// DISPATCH &middot; CH 01 &middot; UPLINK NOMINAL</span>
           </div>
           <div class="hud-ambient-line">
-            <span class="hud-ambient-t">T+00:02:14</span>
+            <span class="hud-ambient-t" data-hud-tick>T+00:02:14</span>
             <span class="hud-ambient-c">BLD</span>
             <span class="hud-ambient-d">REV 01.00 &middot; HASH 9F2A-8C1D &middot; GAMMA sRGB</span>
           </div>
           <div class="hud-ambient-line">
-            <span class="hud-ambient-t">T+00:02:14</span>
+            <span class="hud-ambient-t" data-hud-tick>T+00:02:14</span>
+            <span class="hud-ambient-c">SYS</span>
+            <span class="hud-ambient-d">CPU 12% &middot; MEM 248MB &middot; DRIFT &plusmn;0.0001</span>
+          </div>
+          <div class="hud-ambient-line">
+            <span class="hud-ambient-t" data-hud-tick>T+00:02:14</span>
             <span class="hud-ambient-c">SIG</span>
-            <span class="hud-ambient-d">██████████ 100% &middot; ARCHIVE STANDING BY</span>
+            <span class="hud-ambient-d">
+              <span data-hud-bar>██████████</span>
+              <span>&nbsp;</span>
+              <span data-hud-pct>100</span>%
+              &middot; NOMINAL &middot; ARCHIVE STANDING BY
+            </span>
+          </div>
+          <div class="hud-ambient-line">
+            <span class="hud-ambient-t" data-hud-tick>T+00:02:14</span>
+            <span class="hud-ambient-c">ARC</span>
+            <span class="hud-ambient-d">003 / UNL ENTRIES &middot; SAFE &middot; STREAM ACTIVE <span class="hud-ambient-cursor">&#9646;</span></span>
           </div>
         </div>
         <button class="back-btn" id="back-btn" aria-label="Back to articles">
@@ -1527,6 +1558,137 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         }
 
         window.setTimeout(startStrip, stripAt);
+      })();
+    </script>
+
+    <script is:inline data-astro-rerun>
+      /* ILI-818 — HUD chrome reveal + live telemetry.
+         The CSS transitions handle corner brackets and the
+         .hud-ambient container fade. This script handles:
+         - per-line stagger reveal (.is-visible class added to
+           each .hud-ambient-line at 80ms cadence so the
+           readouts print in like terminal output, mini-boot)
+         - live T+ counter tick (1Hz, all data-hud-tick spans)
+         - signal-bar fluctuation (block characters + percent)
+         Cold load: per-line reveal kicks in alongside the
+         strip animation (300ms after stripAt). Return visits
+         and reduced-motion: pre-paint gate already set
+         body.hero-stripped, so lines reveal synchronously at
+         script run with no stagger — first paint = full state.
+         Window flag guards against view-transition re-runs
+         spawning duplicate intervals/RAF chains. */
+      (function () {
+        if (window.__ili818HudMounted) return;
+        var hero = document.querySelector('.col-hero.has-hero-frame');
+        if (!hero) return;
+        var lines = hero.querySelectorAll('.hud-ambient-line');
+        if (!lines.length) return;
+        window.__ili818HudMounted = true;
+
+        var LINE_STAGGER = 80;
+        var REVEAL_AFTER_STRIP_START = 300;
+
+        // Boot constants mirror ILI-789 + ILI-818 strip math so the
+        // reveal lines up with the strip animation on cold load.
+        var INITIAL_DELAY = 280;
+        var CADENCE = 145;
+        var HANDOFF_PAUSE = 280;
+        var FRAME_BREATH = 200;
+        var SCAN_LINES = 13;
+        var FRAME_LINES = 6;
+        var REVEAL_TRANSITION = 320;
+        var STAGE_CADENCE = 180;
+        var STAGES = 4;
+        var STRIP_HOLD = 600;
+        var lastScanAt = INITIAL_DELAY + (SCAN_LINES - 1) * CADENCE;
+        var frameStart = lastScanAt + HANDOFF_PAUSE + FRAME_BREATH;
+        var lastFrameAt = frameStart + Math.max(0, FRAME_LINES - 1) * CADENCE;
+        var heroSettleAt = lastFrameAt + REVEAL_TRANSITION;
+        var footerSettleAt = heroSettleAt + (STAGES - 1) * STAGE_CADENCE + REVEAL_TRANSITION;
+        var stripAt = footerSettleAt + STRIP_HOLD;
+
+        function revealStaggered(startDelay) {
+          lines.forEach(function (line, i) {
+            window.setTimeout(function () {
+              line.classList.add('is-visible');
+            }, startDelay + i * LINE_STAGGER);
+          });
+        }
+        function revealInstant() {
+          lines.forEach(function (line) { line.classList.add('is-visible'); });
+        }
+
+        if (document.body.classList.contains('is-index-booting')) {
+          // Cold load: wait for strip start + small offset.
+          revealStaggered(stripAt + REVEAL_AFTER_STRIP_START);
+        } else {
+          // Return visit or reduced motion — full HUD on first paint.
+          revealInstant();
+        }
+
+        // ── Live T+ tick ────────────────────────────────
+        // All data-hud-tick spans share one master clock. Seed at
+        // 134s so the live counter continues from the static value
+        // in the DOM (T+00:02:14) instead of jumping to 0.
+        var tickEls = hero.querySelectorAll('[data-hud-tick]');
+        var SEED_SECONDS = 134;
+        var startTime = performance.now();
+        function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+        function fmtT(seconds) {
+          var h = Math.floor(seconds / 3600);
+          var m = Math.floor((seconds % 3600) / 60);
+          var s = Math.floor(seconds % 60);
+          return 'T+' + pad2(h) + ':' + pad2(m) + ':' + pad2(s);
+        }
+        function tick() {
+          var totalS = SEED_SECONDS + (performance.now() - startTime) / 1000;
+          var formatted = fmtT(totalS);
+          for (var i = 0; i < tickEls.length; i++) {
+            tickEls[i].textContent = formatted;
+          }
+        }
+        tick();
+        window.setInterval(tick, 1000);
+
+        // ── Signal bar fluctuation ─────────────────────
+        var barEl = hero.querySelector('[data-hud-bar]');
+        var pctEl = hero.querySelector('[data-hud-pct]');
+        if (barEl && pctEl) {
+          var reduced = window.matchMedia
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (!reduced) {
+            var currentSignal = 100;
+            function renderSignal(v) {
+              var pct = Math.round(v);
+              var blocks = Math.max(0, Math.min(10, Math.round((v / 100) * 10)));
+              var bar = '';
+              for (var i = 0; i < 10; i++) bar += i < blocks ? '█' : '░';
+              barEl.textContent = bar;
+              pctEl.textContent = String(pct);
+            }
+            function fluctuate() {
+              // 88% chance nominal (94–100), 12% mild dip (84–92).
+              var roll = Math.random();
+              var target = roll < 0.12
+                ? 84 + Math.random() * 8
+                : 94 + Math.random() * 6;
+              var startVal = currentSignal;
+              var t0 = performance.now();
+              var dur = 520;
+              function step() {
+                var t = (performance.now() - t0) / dur;
+                if (t > 1) t = 1;
+                var eased = 1 - Math.pow(1 - t, 3);
+                currentSignal = startVal + (target - startVal) * eased;
+                renderSignal(currentSignal);
+                if (t < 1) requestAnimationFrame(step);
+              }
+              requestAnimationFrame(step);
+              window.setTimeout(fluctuate, 900 + Math.random() * 1300);
+            }
+            window.setTimeout(fluctuate, 1000);
+          }
+        }
       })();
     </script>
   </Fragment>

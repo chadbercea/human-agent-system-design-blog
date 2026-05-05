@@ -886,17 +886,23 @@ body.hero-stripped .has-hero-frame .frame-block {
   }
 }
 
-/* ───────────── ILI-818: AMBIENT HUD TELEMETRY ─────────────
-   Two stacks of faint scan-line-style readouts that frame the
-   centered message in the resting state. Hidden during boot
-   (so the loud scan log + frame print pass owns the stage),
-   fade in at low opacity (~0.32) as the strip-down lands —
-   same easing window as the chrome fade so the column
-   transforms from "loud chrome bottom-anchored" to "faint
-   chrome top + bottom" as a single move. Absolutely
-   positioned so they don't disrupt the strip-down recenter
-   math (frame-block keeps centering against the full column
-   height it already measured). */
+/* ───────────── ILI-818: AMBIENT HUD CHROME ─────────────
+   Resting-state mission-control chrome: 4 corner brackets
+   draw in, two stacks of scan-line-style telemetry print
+   in line by line (mini-boot, 80ms cadence), T+ counter
+   ticks live, signal bar fluctuates, terminal cursor blinks
+   on the last line. All at low opacity (0.36 base on the
+   stack) so the centered message stays the focal point.
+
+   Hidden during boot (the loud scan log owns the stage).
+   When body.hero-stripping is added: corner brackets
+   reveal as the chrome fades, then the JS orchestrator
+   adds .is-visible to each .hud-ambient-line at 80ms
+   stagger so the readouts print in like terminal output.
+   Pre-paint gate path (return visits, reduced-motion)
+   adds .is-visible to every line synchronously so the
+   resting state lands fully assembled, no animation. */
+
 .hud-ambient {
   position: absolute;
   left: 0;
@@ -904,6 +910,7 @@ body.hero-stripped .has-hero-frame .frame-block {
   padding: 24px 64px;
   display: flex;
   flex-direction: column;
+  gap: 2px;
   pointer-events: none;
   opacity: 0;
   z-index: 2;
@@ -913,55 +920,111 @@ body.hero-stripped .has-hero-frame .frame-block {
 
 .hud-ambient-line {
   display: grid;
-  grid-template-columns: 96px 56px 1fr;
-  gap: 16px;
+  grid-template-columns: 104px 48px 1fr;
+  gap: 18px;
   align-items: center;
   font-family: var(--font-mono);
   font-weight: 500;
   font-size: 11px;
-  line-height: 26px;
-  letter-spacing: 0.04em;
+  line-height: 22px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #ffffff;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* Per-row reveal (mini-boot for the resting state). Stagger
+     is applied via .is-visible classes added by the JS
+     orchestrator at 80ms cadence after the strip animation. */
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 280ms var(--ease-out),
+    transform 280ms var(--ease-out);
+}
+.hud-ambient-line.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 .hud-ambient-line .hud-ambient-t { opacity: 0.55; }
 .hud-ambient-line .hud-ambient-c { font-weight: 700; }
-.hud-ambient-line .hud-ambient-d { overflow: hidden; text-overflow: ellipsis; }
+.hud-ambient-line .hud-ambient-d {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hud-ambient-cursor {
+  display: inline-block;
+  margin-left: 4px;
+  animation: hud-cursor-blink 1s steps(1, end) infinite;
+}
+@keyframes hud-cursor-blink {
+  0%, 50%      { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
 
-/* Reveal: faint, framing the centered message. The transition
-   fires when body.hero-stripping is added (cold load) so the
-   fade-in lands inside the same animation window as the
-   chrome fade-out and the block recenter. The pre-paint gate
-   for return visits / reduced-motion sets body.hero-stripped
-   directly and the cascade resolves to opacity 0.32 at first
-   paint — no transition fires. */
+/* Corner brackets — 4 L-shapes anchored to col-hero corners.
+   Hidden during boot, draw in (scale-from-0) when the strip
+   lands. Pure CSS borders, no extra DOM. */
+.hud-frame-bracket {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 1px solid #ffffff;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity 360ms var(--ease-out),
+    transform 360ms var(--ease-out);
+}
+.hud-frame-bracket--tl { top: 22px; left: 28px; border-right: none; border-bottom: none; transform-origin: top left; }
+.hud-frame-bracket--tr { top: 22px; right: 28px; border-left: none; border-bottom: none; transform-origin: top right; }
+.hud-frame-bracket--bl { bottom: 22px; left: 28px; border-right: none; border-top: none; transform-origin: bottom left; }
+.hud-frame-bracket--br { bottom: 22px; right: 28px; border-left: none; border-top: none; transform-origin: bottom right; }
+
+/* Reveal — both .hud-ambient containers and .hud-frame-bracket
+   come in together when stripping starts. Lines inside .hud-ambient
+   stay at opacity:0 until the JS orchestrator adds .is-visible
+   to each one at 80ms cadence. */
 body.hero-stripping .has-hero-frame .hud-ambient,
 body.hero-stripped .has-hero-frame .hud-ambient {
-  opacity: 0.32;
+  opacity: 0.36;
 }
 body.hero-stripping .has-hero-frame .hud-ambient {
-  transition: opacity 700ms var(--ease-out) 100ms;
+  transition: opacity 500ms var(--ease-out) 200ms;
+}
+body.hero-stripping .has-hero-frame .hud-frame-bracket,
+body.hero-stripped .has-hero-frame .hud-frame-bracket {
+  opacity: 0.42;
+  transform: scale(1);
+}
+body.hero-stripping .has-hero-frame .hud-frame-bracket {
+  transition:
+    opacity 360ms var(--ease-out) 200ms,
+    transform 360ms var(--ease-out) 200ms;
 }
 
-/* Article-open hides the hero column visuals; hide hud-ambient
-   too so it doesn't bleed past the stage.open back-button strip. */
-.stage.open .col-hero.has-hero-frame .hud-ambient {
+/* Article-open hides hero visuals; hide HUD chrome too so it
+   doesn't bleed past the stage.open back-button strip. */
+.stage.open .col-hero.has-hero-frame .hud-ambient,
+.stage.open .col-hero.has-hero-frame .hud-frame-bracket {
   display: none;
 }
 
 @media (max-width: 900px) {
-  /* Mobile: hide entirely. The shorter column doesn't have room
-     for telemetry above + below the message without crowding
-     out the kept content. */
-  .hud-ambient { display: none; }
+  /* Mobile: shorter column has no room for HUD chrome above
+     and below the message; hide entirely. */
+  .hud-ambient,
+  .hud-frame-bracket { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body.hero-stripping .has-hero-frame .hud-ambient {
+  .hud-ambient-line,
+  .hud-frame-bracket,
+  .hud-ambient-cursor,
+  body.hero-stripping .has-hero-frame .hud-ambient,
+  body.hero-stripping .has-hero-frame .hud-frame-bracket {
     transition: none !important;
+    animation: none !important;
   }
 }
 
