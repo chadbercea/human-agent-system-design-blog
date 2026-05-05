@@ -60,9 +60,10 @@ test.describe('ILI-789 — index boot sequence', () => {
     await page.goto(INDEX);
     await page.waitForLoadState('domcontentloaded');
 
-    // ILI-818 — boot now includes top + bottom scan stacks + corners,
-    // so hero settles at ~6.5s. Panels start revealing then.
-    await page.waitForTimeout(6600);
+    // ILI-818 — boot reformat: marquee intro (6s) + 5 frame
+    // lines × 145ms + 320ms transition ≈ 7s hero settle. Panels
+    // start revealing then.
+    await page.waitForTimeout(7100);
     const afterHeader = await page.evaluate(() => {
       return {
         header: Number(getComputedStyle(document.querySelector('.site-header')!).opacity),
@@ -112,9 +113,10 @@ test.describe('ILI-789 — index boot sequence', () => {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const page = await context.newPage();
 
-    // First visit — let it run. ILI-818 — full boot is ~7.8s.
+    // First visit — let it run. ILI-818 — full boot is ~9s
+    // (7s hero settle + ~1.3s panel reveals + 400ms tail).
     await page.goto(INDEX);
-    await page.waitForTimeout(8500);
+    await page.waitForTimeout(9500);
     expect(await page.evaluate(() => sessionStorage.getItem('has_index_booted'))).toBe('1');
 
     // Second visit (reload) — should skip the boot entirely.

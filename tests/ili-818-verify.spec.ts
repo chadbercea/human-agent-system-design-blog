@@ -4,86 +4,66 @@ const PORT = process.env.PORT || 4322;
 const INDEX = `http://localhost:${PORT}/`;
 const ABOUT = `http://localhost:${PORT}/about`;
 
-/* ILI-818 — boot prints two scan stacks, the frame-block lockup,
-   and 4 corner brackets, all via the canonical .scan-line reveal
-   (max-height + opacity, 145ms cadence). No strip-down, no fade,
-   no hud-ambient. Resting state has scan lines above + below the
-   centered lockup with corner brackets on each corner. */
+/* ILI-818 — scan-marquee backdrop scrolls bottom-to-top
+   continuously. On cold load, an intro keyframe pushes the track
+   from below the column up to filling it (~6s); the moment the
+   intro finishes the frame-block lockup scans in via the canonical
+   max-height + opacity reveal. The H1 carries a blinking terminal
+   cursor. The wide divider (.frame-rule) is gone. */
 
-test.describe('ILI-818 — hero boot reveal', () => {
-  test('cold load: top scan, frame-block, bottom scan, corners hidden initially', async ({ page }) => {
+const INTRO_DURATION = 6000;
+const HERO_SETTLE = INTRO_DURATION + 5 * 145 + 320; // 5 frame lines + transition
+
+test.describe('ILI-818 — scan-marquee + lockup', () => {
+  test('cold load: marquee + corners visible, frame-block hidden until intro completes', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(INDEX);
     await page.waitForLoadState('domcontentloaded');
 
-    // Body is in boot mode pre-paint; scan-lines, frame-lines, corners hidden.
+    // Boot classes set pre-paint.
     expect(await page.evaluate(() => document.body.classList.contains('is-index-booting'))).toBe(true);
+    expect(await page.evaluate(() => document.body.classList.contains('has-hero-frame-play'))).toBe(true);
 
-    // Hidden initially via max-height:0 / opacity:0.
-    const opacities = await page.evaluate(() => {
-      const top = document.querySelector('.scan-stack--top .scan-line');
-      const bot = document.querySelector('.scan-stack--bot .scan-line');
-      const frame = document.querySelector('.frame-block .frame-line');
-      const corner = document.querySelector('.frame-corner');
-      return {
-        top: top ? Number(getComputedStyle(top).opacity) : -1,
-        bot: bot ? Number(getComputedStyle(bot).opacity) : -1,
-        frame: frame ? Number(getComputedStyle(frame).opacity) : -1,
-        corner: corner ? Number(getComputedStyle(corner).opacity) : -1,
-      };
-    });
-    expect(opacities.top).toBe(0);
-    expect(opacities.bot).toBe(0);
-    expect(opacities.frame).toBe(0);
-    expect(opacities.corner).toBe(0);
+    // Marquee is present and animating.
+    const marqueeAnim = await page.locator('.scan-marquee-track').evaluate((el) => getComputedStyle(el).animationName);
+    expect(marqueeAnim).toContain('scan-intro');
+
+    // Corners always visible (not part of boot reveal).
+    const cornerOpacity = await page.locator('.frame-corner--tl').evaluate((el) => Number(getComputedStyle(el).opacity));
+    expect(cornerOpacity).toBeCloseTo(0.5, 2);
+
+    // Frame-line hidden during boot (max-height: 0 + opacity: 0).
+    const frameLineOpacity = await page.locator('.frame-block .frame-line').first().evaluate((el) => Number(getComputedStyle(el).opacity));
+    expect(frameLineOpacity).toBe(0);
   });
 
-  test('boot reveal completes: top + bottom scan + frame + corners all visible', async ({ page }) => {
+  test('frame-block scans in after intro: 5 lines reveal at 145ms cadence', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(INDEX);
     await page.waitForLoadState('domcontentloaded');
 
-    // Boot timing: 280 + (13-1)*145 + 280 + 145 + (6-1)*145 + 280 + 145 + (13-1)*145
-    //   + 280 + 145 + (4-1)*145 + 320 transition ≈ 6700ms hero settle.
-    // Wait until well past that.
-    await page.waitForTimeout(8500);
+    // Wait until well past hero-settle.
+    await page.waitForTimeout(HERO_SETTLE + 500);
 
-    const counts = await page.evaluate(() => ({
-      topVisible: document.querySelectorAll('.scan-stack--top .scan-line.is-visible').length,
-      topTotal: document.querySelectorAll('.scan-stack--top .scan-line').length,
-      botVisible: document.querySelectorAll('.scan-stack--bot .scan-line.is-visible').length,
-      botTotal: document.querySelectorAll('.scan-stack--bot .scan-line').length,
-      frameVisible: document.querySelectorAll('.frame-block .frame-line.is-visible').length,
-      frameTotal: document.querySelectorAll('.frame-block .frame-line').length,
-      cornerVisible: document.querySelectorAll('.frame-corner.is-visible').length,
-      cornerTotal: document.querySelectorAll('.frame-corner').length,
-    }));
-    expect(counts.topVisible).toBe(counts.topTotal);
-    expect(counts.botVisible).toBe(counts.botTotal);
-    expect(counts.frameVisible).toBe(counts.frameTotal);
-    expect(counts.cornerVisible).toBe(counts.cornerTotal);
-    expect(counts.topTotal).toBeGreaterThanOrEqual(13);
-    expect(counts.botTotal).toBeGreaterThanOrEqual(13);
-    expect(counts.cornerTotal).toBe(4);
+    const frameLineState = await page.evaluate(() => {
+      const lines = Array.from(document.querySelectorAll('.frame-block .frame-line'));
+      return {
+        total: lines.length,
+        revealed: lines.filter((l) => l.classList.contains('is-visible')).length,
+        opacities: lines.map((l) => Number(getComputedStyle(l).opacity)),
+      };
+    });
+    expect(frameLineState.total).toBe(5);
+    expect(frameLineState.revealed).toBe(5);
+    for (const o of frameLineState.opacities) expect(o).toBe(1);
 
-    // Frame-viewport is grid 1fr auto 1fr — lockup centers
-    // vertically, scan stacks fill row 1 and row 3.
-    const layout = await page.locator('.frame-viewport').evaluate((el) => ({
-      display: getComputedStyle(el).display,
-      rows: getComputedStyle(el).gridTemplateRows,
-    }));
-    expect(layout.display).toBe('grid');
-    expect(layout.rows).toMatch(/[\d.]+px [\d.]+px [\d.]+px/);
+    // The wide divider is gone.
+    const ruleCount = await page.locator('.frame-rule').count();
+    expect(ruleCount).toBe(0);
 
-    // Post-boot fade: scan lines settle at opacity 0.5, corners at 0.25.
-    // Wait past the 600ms fade duration after boot end (~7.8s).
-    await page.waitForTimeout(1200);
-    const dimmed = await page.evaluate(() => ({
-      scan: Number(getComputedStyle(document.querySelector('.scan-line.is-visible')!).opacity),
-      corner: Number(getComputedStyle(document.querySelector('.frame-corner.is-visible')!).opacity),
-    }));
-    expect(dimmed.scan).toBeCloseTo(0.5, 2);
-    expect(dimmed.corner).toBeCloseTo(0.25, 2);
+    // Cursor is present on the H1.
+    const cursorCount = await page.locator('.frame-h1 .frame-cursor').count();
+    expect(cursorCount).toBe(1);
 
     await page.screenshot({
       path: 'verification-screenshots/ili-818-boot-end.png',
@@ -91,7 +71,21 @@ test.describe('ILI-818 — hero boot reveal', () => {
     });
   });
 
-  test('reduced motion: all elements visible at first paint', async ({ browser }) => {
+  test('marquee transitions from intro to infinite loop without breaking', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(INDEX);
+    await page.waitForLoadState('domcontentloaded');
+
+    // Wait into the loop phase (after intro + a few seconds).
+    await page.waitForTimeout(INTRO_DURATION + 2000);
+
+    const animName = await page.locator('.scan-marquee-track').evaluate((el) => getComputedStyle(el).animationName);
+    // Two-stage chain: scan-intro then scan-loop. After intro
+    // completes, scan-loop is the active animation.
+    expect(animName).toMatch(/scan-loop|scan-intro,\s*scan-loop/);
+  });
+
+  test('reduced motion: lockup visible, marquee static', async ({ browser }) => {
     const context = await browser.newContext({
       reducedMotion: 'reduce',
       viewport: { width: 1440, height: 900 },
@@ -100,21 +94,10 @@ test.describe('ILI-818 — hero boot reveal', () => {
     await page.goto(INDEX);
     await page.waitForLoadState('domcontentloaded');
 
-    // No boot class on reduced-motion path.
     expect(await page.evaluate(() => document.body.classList.contains('is-index-booting'))).toBe(false);
 
-    // No boot class → resting state from first paint:
-    // scan lines at 0.5, lockup at 1, corners at 0.25.
-    const opacities = await page.evaluate(() => ({
-      top: Number(getComputedStyle(document.querySelector('.scan-stack--top .scan-line')!).opacity),
-      bot: Number(getComputedStyle(document.querySelector('.scan-stack--bot .scan-line')!).opacity),
-      frame: Number(getComputedStyle(document.querySelector('.frame-block .frame-line')!).opacity),
-      corner: Number(getComputedStyle(document.querySelector('.frame-corner')!).opacity),
-    }));
-    expect(opacities.top).toBeCloseTo(0.5, 2);
-    expect(opacities.bot).toBeCloseTo(0.5, 2);
-    expect(opacities.frame).toBe(1);
-    expect(opacities.corner).toBeCloseTo(0.25, 2);
+    const frameLineOpacity = await page.locator('.frame-block .frame-line').first().evaluate((el) => Number(getComputedStyle(el).opacity));
+    expect(frameLineOpacity).toBe(1);
 
     await page.screenshot({
       path: 'verification-screenshots/ili-818-reduced-motion.png',
@@ -124,35 +107,25 @@ test.describe('ILI-818 — hero boot reveal', () => {
     await context.close();
   });
 
-  test('return visit (reload): all elements visible at first paint, no boot', async ({ browser }) => {
+  test('return visit (reload): lockup visible from first paint', async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const page = await context.newPage();
 
-    // First visit — let boot run.
     await page.goto(INDEX);
-    await page.waitForTimeout(8500);
+    await page.waitForTimeout(HERO_SETTLE + 1500);
     expect(await page.evaluate(() => sessionStorage.getItem('has_index_booted'))).toBe('1');
 
-    // Reload — should land directly on the assembled state.
     await page.reload();
     await page.waitForLoadState('domcontentloaded');
     expect(await page.evaluate(() => document.body.classList.contains('is-index-booting'))).toBe(false);
 
-    const opacities = await page.evaluate(() => ({
-      top: Number(getComputedStyle(document.querySelector('.scan-stack--top .scan-line')!).opacity),
-      bot: Number(getComputedStyle(document.querySelector('.scan-stack--bot .scan-line')!).opacity),
-      frame: Number(getComputedStyle(document.querySelector('.frame-block .frame-line')!).opacity),
-      corner: Number(getComputedStyle(document.querySelector('.frame-corner')!).opacity),
-    }));
-    expect(opacities.top).toBeCloseTo(0.5, 2);
-    expect(opacities.bot).toBeCloseTo(0.5, 2);
-    expect(opacities.frame).toBe(1);
-    expect(opacities.corner).toBeCloseTo(0.25, 2);
+    const frameLineOpacity = await page.locator('.frame-block .frame-line').first().evaluate((el) => Number(getComputedStyle(el).opacity));
+    expect(frameLineOpacity).toBe(1);
 
     await context.close();
   });
 
-  test('internal navigation /about → /: lands directly on assembled state', async ({ browser }) => {
+  test('internal navigation /about → /: lockup visible from first paint', async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const page = await context.newPage();
 
@@ -164,13 +137,8 @@ test.describe('ILI-818 — hero boot reveal', () => {
     await page.waitForTimeout(400);
 
     expect(await page.evaluate(() => document.body.classList.contains('is-index-booting'))).toBe(false);
-
-    const opacities = await page.evaluate(() => ({
-      top: Number(getComputedStyle(document.querySelector('.scan-stack--top .scan-line')!).opacity),
-      bot: Number(getComputedStyle(document.querySelector('.scan-stack--bot .scan-line')!).opacity),
-    }));
-    expect(opacities.top).toBeCloseTo(0.5, 2);
-    expect(opacities.bot).toBeCloseTo(0.5, 2);
+    const frameLineOpacity = await page.locator('.frame-block .frame-line').first().evaluate((el) => Number(getComputedStyle(el).opacity));
+    expect(frameLineOpacity).toBe(1);
 
     await context.close();
   });

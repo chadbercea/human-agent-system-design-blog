@@ -45,14 +45,14 @@ const totalEntries = allArticles.length;
 const entryCount = String(totalEntries).padStart(3, '0');
 const lastUpdated = totalEntries > 0 ? formatDate(allArticles[0].data.date) : '—';
 
-/* ILI-818 — top + bottom scan stacks, pre-rendered as static markup
-   so return visits and reduced-motion paint the resting state without
-   waiting on JS. Top stack tells the boot story (sweep → triad lock
-   → publish). Bottom stack is ongoing operational telemetry. Each
-   line uses the canonical .scan-line reveal — same as the existing
-   boot — at 145ms cadence. The 4 corner brackets reveal at the end
-   of the same sequence to cap the HUD frame. */
-const TOP_SCAN_LINES: [string, string, string][] = [
+/* ILI-818 — single scan-marquee backdrop. Always-on, scrolls
+   bottom-to-top continuously. Two identical copies of these 28
+   lines are stacked in the track so the loop is seamless: a
+   translateY(0) → translateY(-50%) cycle moves the track up by
+   exactly one copy, leaving copy 2 in copy 1's prior visual
+   position. Pre-rendered as static markup so return visits and
+   reduced-motion paint the resting backdrop with no JS. */
+const SCAN_LINES: [string, string, string][] = [
   ['+00.001', 'PING', 'sweep envelope · radius ∞'],
   ['+00.034', 'CAL',  'calibrating actor classifier'],
   ['+00.124', 'HIT',  'actor.01 · classification HUMAN'],
@@ -66,8 +66,6 @@ const TOP_SCAN_LINES: [string, string, string][] = [
   ['+01.488', 'HIT',  'actor.03 · classification SYSTEM'],
   ['+01.604', 'LOCK', 'triad established · 3 design objects'],
   ['+01.660', 'RDY',  'publishing frame · v1.0'],
-];
-const BOT_SCAN_LINES: [string, string, string][] = [
   ['+02.040', 'BLD',  'rev 01.00 · hash 9F2A-8C1D · gamma sRGB'],
   ['+02.100', 'OBS',  'twin falls / idaho · 42.56°N · 114.46°W'],
   ['+02.160', 'IDX',  '003 entries · upd 2026.04.30 · ch 01'],
@@ -81,6 +79,8 @@ const BOT_SCAN_LINES: [string, string, string][] = [
   ['+02.640', 'CAL',  'drift compensated · ±0.0001'],
   ['+02.700', 'STAT', 'system nominal · all green'],
   ['+02.760', 'OK',   'archive standing by'],
+  ['+02.820', 'HRT',  'pulse 60bpm · steady'],
+  ['+02.880', 'LOG',  'buffer 0/4096 · flush 5s'],
 ];
 
 const rendered = await Promise.all(
@@ -247,34 +247,33 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
     {heroVariant === 'frame' ? (
       <div class="col col-hero has-hero-frame">
         <div class="frame-viewport" id="frame-viewport">
-          <div class="scan-stack scan-stack--top" id="scan-stack" aria-hidden="true">
-            {TOP_SCAN_LINES.map(([t, c, d]) => (
-              <div class="scan-line">
-                <span class="scan-t">{t}</span>
-                <span class="scan-c">{c}</span>
-                <span class="scan-d">{d}</span>
-              </div>
-            ))}
+          <div class="scan-marquee" aria-hidden="true">
+            <div class="scan-marquee-track" id="scan-marquee-track">
+              {SCAN_LINES.map(([t, c, d]) => (
+                <div class="scan-line">
+                  <span class="scan-t">{t}</span>
+                  <span class="scan-c">{c}</span>
+                  <span class="scan-d">{d}</span>
+                </div>
+              ))}
+              {SCAN_LINES.map(([t, c, d]) => (
+                <div class="scan-line" aria-hidden="true">
+                  <span class="scan-t">{t}</span>
+                  <span class="scan-c">{c}</span>
+                  <span class="scan-d">{d}</span>
+                </div>
+              ))}
+            </div>
           </div>
           <div class="frame-block" id="frame-block">
-            <div class="frame-line"><div class="frame-rule" aria-hidden="true"></div></div>
             <div class="frame-line"><div class="frame-eyebrow">// FRAME &middot; V1.0 &middot; TRIAD VERIFIED</div></div>
-            <div class="frame-line"><h1 class="frame-h1">Human Agent System Design</h1></div>
+            <div class="frame-line"><h1 class="frame-h1">Human Agent System Design<span class="frame-cursor" aria-hidden="true">&#9646;</span></h1></div>
             <div class="frame-line"><p class="frame-dek">Humans, agents, and the system they share. Three actors. Three design objects. One framework.</p></div>
             <div class="frame-line"><div class="frame-audience">&gt; FOR THE PEOPLE SHIPPING THEM</div></div>
             <div class="frame-line"><a class="frame-cta" href="/blog">
               <span class="frame-cta-label">Begin transmission</span>
               <span class="frame-cta-arrow" aria-hidden="true">&rarr;</span>
             </a></div>
-          </div>
-          <div class="scan-stack scan-stack--bot" aria-hidden="true">
-            {BOT_SCAN_LINES.map(([t, c, d]) => (
-              <div class="scan-line">
-                <span class="scan-t">{t}</span>
-                <span class="scan-c">{c}</span>
-                <span class="scan-d">{d}</span>
-              </div>
-            ))}
           </div>
         </div>
         <div class="frame-corner frame-corner--tl" aria-hidden="true"></div>
@@ -1319,59 +1318,43 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
     </script>
 
     <script is:inline data-astro-rerun>
-      /* ILI-788 + ILI-818 — frame-hero boot sequence.
-         One continuous terminal print pass: top scan stack
-         (13 lines, the boot story), then frame-block (6 lines,
-         the lockup), then bottom scan stack (13 lines, ongoing
-         telemetry), then 4 corner brackets. Same canonical
-         .scan-line reveal at 145ms cadence the whole way.
-         Scan stacks are pre-rendered as static markup; this
-         script just walks the DOM and adds .is-visible at the
-         cadence. Lockup centers via the .frame-viewport's grid
-         layout (1fr auto 1fr) — no recenter animation, no
-         strip-down, no fade-out. */
+      /* ILI-818 — frame-hero boot. Scan-marquee scrolls
+         continuously via CSS animation (chained intro then
+         infinite loop). Once the intro brings scan content from
+         below the column up to filling it (INTRO_DURATION ms),
+         frame-block lines reveal at the canonical 145ms cadence.
+         No scan-line reveal in JS — they're always-on, scrolling
+         in the background.
+
+         Sets --frame-viewport-h on the viewport so the intro
+         keyframe knows how far to translate from. Re-set on
+         resize. */
       (function () {
-        if (!document.body.classList.contains('has-hero-frame-play')) return;
         var hero = document.querySelector('.col-hero.has-hero-frame');
         if (!hero) return;
-        var topStack = hero.querySelector('.scan-stack--top');
+        var viewport = hero.querySelector('.frame-viewport');
         var frameBlock = hero.querySelector('.frame-block');
-        var botStack = hero.querySelector('.scan-stack--bot');
-        if (!topStack || !frameBlock || !botStack) return;
+        if (!viewport || !frameBlock) return;
 
-        var INITIAL_DELAY = 280;
-        var CADENCE = 145;
-        var PHASE_PAUSE = 280;
-
-        // Build the reveal sequence in one flat array so timing is
-        // simple and the cadence stays uniform across phase
-        // boundaries (with a 280ms breath between phases).
-        var sequence = [];
-        function addPhase(elements, withPause) {
-          if (withPause && sequence.length > 0) sequence.push(null);
-          for (var i = 0; i < elements.length; i++) sequence.push(elements[i]);
+        function setViewportH() {
+          viewport.style.setProperty('--frame-viewport-h', viewport.offsetHeight + 'px');
         }
-        addPhase(topStack.querySelectorAll('.scan-line'), false);
-        addPhase(frameBlock.querySelectorAll('.frame-line'), true);
-        addPhase(botStack.querySelectorAll('.scan-line'), true);
-        addPhase(hero.querySelectorAll('.frame-corner'), true);
+        setViewportH();
+        window.addEventListener('resize', setViewportH);
 
-        // Walk: each entry is either an element (reveal) or null
-        // (phase-break, adds PHASE_PAUSE before the next reveal).
-        var t = INITIAL_DELAY;
-        sequence.forEach(function (el) {
-          if (el === null) {
-            t += PHASE_PAUSE;
-            return;
-          }
-          var fireAt = t;
-          window.setTimeout(function () { el.classList.add('is-visible'); }, fireAt);
-          t += CADENCE;
+        if (!document.body.classList.contains('has-hero-frame-play')) return;
+
+        var INTRO_DURATION = 6000;
+        var CADENCE = 145;
+
+        var frameLines = frameBlock.querySelectorAll('.frame-line');
+        frameLines.forEach(function (el, i) {
+          window.setTimeout(function () {
+            el.classList.add('is-visible');
+          }, INTRO_DURATION + i * CADENCE);
         });
 
-        // Tail: drop the play class so view-transition re-entries
-        // see the post-boot end state with no transitions queued.
-        var totalDuration = t + 400;
+        var totalDuration = INTRO_DURATION + frameLines.length * CADENCE + 400;
         window.setTimeout(function () {
           try { sessionStorage.setItem('has_hero_played', '1'); } catch (e) {}
           document.body.classList.remove('has-hero-frame-play');
@@ -1395,31 +1378,18 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
       (function () {
         if (!document.body.classList.contains('is-index-booting')) return;
 
-        /* Mirror the hero orchestrator's sequence to compute when the
-           hero settles. One flat sequence: 13 top scan + (phase pause)
-           + 6 frame + (phase pause) + 13 bot scan + (phase pause) +
-           4 corners. Each reveal slot = CADENCE; each phase pause
-           between groups = PHASE_PAUSE. */
-        var INITIAL_DELAY = 280;
+        /* Mirrors the frame-hero orchestrator: marquee intro takes
+           INTRO_DURATION, then frame-lines reveal at CADENCE each.
+           Hero settles when the last frame-line reveal completes. */
+        var INTRO_DURATION = 6000;
         var CADENCE = 145;
-        var PHASE_PAUSE = 280;
+        var FRAME_LINES = 5;
         var REVEAL_TRANSITION = 320;
         var STAGE_CADENCE = 180;
         var POST_FOOTER_DELAY = 400;
-        var TOP_SCAN = 13;
-        var FRAME_LINES = 6;
-        var BOT_SCAN = 13;
-        var CORNERS = 4;
 
-        var lastRevealAt = INITIAL_DELAY
-          + (TOP_SCAN - 1) * CADENCE
-          + PHASE_PAUSE + CADENCE
-          + (FRAME_LINES - 1) * CADENCE
-          + PHASE_PAUSE + CADENCE
-          + (BOT_SCAN - 1) * CADENCE
-          + PHASE_PAUSE + CADENCE
-          + (CORNERS - 1) * CADENCE;
-        var heroSettleAt = lastRevealAt + REVEAL_TRANSITION;
+        var lastFrameLineAt = INTRO_DURATION + (FRAME_LINES - 1) * CADENCE;
+        var heroSettleAt = lastFrameLineAt + REVEAL_TRANSITION;
 
         var stages = ['boot-stage-header', 'boot-stage-rail', 'boot-stage-list', 'boot-stage-footer'];
         stages.forEach(function (cls, i) {

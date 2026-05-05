@@ -398,41 +398,55 @@ body.hero-sequence-play .protocol-chip.is-typed {
   position: relative;
 }
 
-/* ILI-818 — three-row grid: lockup vertically centered in
-   row 2 (auto), top scan in row 1 (1fr), bot scan in row 3
-   (1fr). Each scan stack is taller than its row, so it
-   overflows clip-side and visually fills the row from edge
-   to edge. Top stack flex-end so the latest reveal sits
-   just above the lockup (oldest clip at column top). Bot
-   stack flex-start so the first telemetry line sits just
-   below the lockup (latest clip at column bottom). */
+/* ILI-818 — scan-marquee backdrop. Always-on, scrolls
+   bottom-to-top continuously. Two stacked copies of the same
+   scan-line list so a translateY(0) → translateY(-50%) loop
+   is seamless (copy 2 ends at copy 1's prior visual position).
+   On cold load, an intro keyframe pushes the track from below
+   the column up to filling it (INTRO_DURATION) — the moment
+   the intro completes is when the frame-block reveals. */
 .frame-viewport {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  display: grid;
-  grid-template-rows: 1fr auto 1fr;
+  /* Set by JS to the live frame-viewport height — drives the
+     scan-intro keyframe so the track starts exactly one column
+     below and animates up to fill it. */
+  --frame-viewport-h: 740px;
 }
 
-.scan-stack {
+.scan-marquee {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+.scan-marquee-track {
   display: flex;
   flex-direction: column;
-  padding: 0 40px;
-  pointer-events: none;
-  overflow: hidden;
-  min-height: 0;
+  animation: scan-loop 8s linear infinite;
+  will-change: transform;
 }
-.scan-stack--top { grid-row: 1; justify-content: flex-end; }
-.scan-stack--bot { grid-row: 3; justify-content: flex-start; }
+body.has-hero-frame-play .scan-marquee-track {
+  animation:
+    scan-intro 6s linear forwards,
+    scan-loop 8s linear 6s infinite;
+}
+@keyframes scan-intro {
+  from { transform: translateY(var(--frame-viewport-h, 740px)); }
+  to   { transform: translateY(0); }
+}
+@keyframes scan-loop {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
 
-/* Canonical reveal — scan-line and frame-line use the same
-   max-height + opacity transition. Default state is VISIBLE
-   so return visits and reduced-motion paint the resting state
-   from first paint without running the animation. The
-   .is-index-booting body class flips them to hidden during
-   cold load; the boot orchestrator then walks the DOM and adds
-   .is-visible at 145ms cadence. */
+/* Scan lines: dim ambient by default. No boot-time full
+   opacity — the marquee carries the same dim aesthetic the
+   whole time. Color #888 at 0.5 multiplier gives roughly
+   #444 effective on black. */
 .scan-line {
   display: grid;
   grid-template-columns: 96px 64px 1fr;
@@ -446,33 +460,25 @@ body.hero-sequence-play .protocol-chip.is-typed {
   text-transform: uppercase;
   color: #888888;
   white-space: nowrap;
-  max-height: 28px;
-  /* Resting opacity is half — once the boot finishes
-     (body.is-index-booting removed), the cascade falls back
-     here and the 600ms transition fades from 1 → 0.5. */
+  flex: 0 0 auto;
   opacity: 0.5;
-  transition: opacity 600ms ease-out;
-}
-body.is-index-booting .scan-line {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition:
-    max-height 0.32s cubic-bezier(.4, .1, .2, 1),
-    opacity 0.18s linear 0.08s;
-}
-body.is-index-booting .scan-line.is-visible {
-  max-height: 28px;
-  opacity: 1;
 }
 .scan-line .scan-t { color: #888888; opacity: 0.7; }
 .scan-line .scan-c { color: #888888; font-weight: 700; }
 .scan-line .scan-d { color: #888888; }
 
+/* Lockup floats above the marquee, centered vertically.
+   Black background occludes the scrolling scan-lines behind
+   the message so the lockup stays legible. */
 .frame-block {
-  grid-row: 2;
-  background: transparent;
-  padding: 24px 64px;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 2;
+  background: #000000;
+  padding: 32px 64px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -484,13 +490,6 @@ body.is-index-booting .scan-line.is-visible {
    end-state composition is identical to a static frame. */
 .frame-line {
   width: 100%;
-}
-
-.frame-rule {
-  width: 100%;
-  height: 1px;
-  background: #888888;
-  margin-bottom: 32px;
 }
 
 .frame-eyebrow {
@@ -512,6 +511,21 @@ body.is-index-booting .scan-line.is-visible {
   color: #ffffff;
   margin-bottom: 24px;
   hyphens: none;
+}
+/* ILI-818 — terminal cursor next to the H1, blinks 1Hz. */
+.frame-cursor {
+  display: inline-block;
+  margin-left: 0.18em;
+  vertical-align: baseline;
+  color: #ffffff;
+  animation: frame-cursor-blink 1s steps(1, end) infinite;
+}
+@keyframes frame-cursor-blink {
+  0%, 50%      { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .frame-cursor { animation: none; }
 }
 
 .frame-dek {
@@ -628,10 +642,9 @@ body.is-index-booting .scan-line.is-visible {
   display: none;
 }
 
-/* ILI-818 — corner brackets at the col-hero corners. Default
-   visible; hidden during boot until the orchestrator adds
-   .is-visible at the canonical 145ms cadence (same opacity
-   transition as a scan-line). */
+/* ILI-818 — corner brackets always present at half opacity
+   (left brackets get +20px to clear the page rail). They
+   frame the column independent of the boot sequence. */
 .frame-corner {
   position: absolute;
   width: 22px;
@@ -639,35 +652,24 @@ body.is-index-booting .scan-line.is-visible {
   border: 1px solid #ffffff;
   pointer-events: none;
   z-index: 3;
-  /* Resting opacity is half of the boot-time 0.5 reveal —
-     fades 0.5 → 0.25 over 600ms when the boot ends, same
-     direction as the scan lines. */
-  opacity: 0.25;
-  transition: opacity 600ms ease-out;
+  opacity: 0.5;
 }
-/* Left brackets get +20px to clear the page rail; the col-hero
-   left edge sits flush against the rail so 28px isn't enough. */
 .frame-corner--tl { top: 22px; left: 48px; border-right: none; border-bottom: none; }
 .frame-corner--tr { top: 22px; right: 28px; border-left: none; border-bottom: none; }
 .frame-corner--bl { bottom: 22px; left: 48px; border-right: none; border-top: none; }
 .frame-corner--br { bottom: 22px; right: 28px; border-left: none; border-top: none; }
-body.is-index-booting .frame-corner {
-  opacity: 0;
-  transition: opacity 0.18s linear 0.08s;
-}
-body.is-index-booting .frame-corner.is-visible {
-  opacity: 0.5;
-}
 
-/* Frame lines: same canonical reveal as scan-line (max-height +
-   opacity at 145ms cadence). Default visible; hidden only during
-   boot until the orchestrator adds .is-visible. */
+/* Frame lines: scan-in via the canonical max-height + opacity
+   reveal once the marquee intro finishes. Default visible (so
+   return visits and reduced-motion paint the lockup from first
+   paint without animation); body.has-hero-frame-play flips
+   them hidden + ready-to-transition during cold load. */
 .frame-line {
   width: 100%;
   max-height: none;
   opacity: 1;
 }
-body.is-index-booting .frame-line {
+body.has-hero-frame-play .frame-line {
   max-height: 0;
   opacity: 0;
   overflow: hidden;
@@ -675,7 +677,7 @@ body.is-index-booting .frame-line {
     max-height 0.32s cubic-bezier(.4, .1, .2, 1),
     opacity 0.18s linear 0.08s;
 }
-body.is-index-booting .frame-line.is-visible {
+body.has-hero-frame-play .frame-line.is-visible {
   max-height: 320px;
   opacity: 1;
 }
@@ -683,7 +685,7 @@ body.is-index-booting .frame-line.is-visible {
 @media (prefers-reduced-motion: reduce) {
   .scan-line,
   .frame-line,
-  .frame-corner {
+  .scan-marquee-track {
     transition: none !important;
     animation: none !important;
   }
@@ -1760,32 +1762,25 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
     height: 100svh;
   }
 
-  /* Frame hero on mobile — col-hero fills the pager's stage box.
-     Mobile keeps the simpler bottom-anchored layout (no top scan
-     stack, no corners) — the message + bottom telemetry is plenty
-     of density for a phone. */
+  /* Frame hero on mobile — keep the marquee backdrop but
+     hide the corner brackets (no room on a phone column). */
   .col-hero.has-hero-frame {
     border-right: none;
     border-bottom: 1px solid #000;
     display: flex;
     flex-direction: column;
   }
-  .col-hero.has-hero-frame .frame-viewport {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-  }
-  .col-hero.has-hero-frame .scan-stack--top { display: none; }
   .col-hero.has-hero-frame .frame-corner { display: none; }
-  .col-hero.has-hero-frame .scan-stack {
-    padding: 16px 20px 20px;
+  .col-hero.has-hero-frame .scan-marquee {
+    padding: 0 20px;
   }
   .col-hero.has-hero-frame .scan-line {
     grid-template-columns: 76px 56px 1fr;
     gap: 12px;
+    padding: 0;
   }
   .col-hero.has-hero-frame .frame-block {
-    padding: 56px 24px 40px;
+    padding: 28px 24px;
   }
   .col-hero.has-hero-frame .frame-h1 {
     font-size: 64px;
