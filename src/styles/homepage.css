@@ -468,12 +468,10 @@ body.has-hero-frame-play .scan-line.is-visible {
 .scan-line .scan-d { color: #888888; }
 
 /* Lockup floats above the scan-stack, centered vertically.
-   css.glass spec — transparent fill, 16px radius, soft drop
-   shadow, 6.1px backdrop blur. Heads-up: chrome.css's body
-   gridlines do interact with backdrop-filter (see memory
-   feedback_body_gridlines_break_backdrop_filter); at 6.1px
-   the effect is subtle but the lockup's bounding box will
-   still be slightly perceptible against the gridline pattern. */
+   The block itself is a transparent positioning container —
+   the glass effect lives on the ::before layer behind the
+   text, so the mask gradient that feathers the blur at the
+   top and bottom edges doesn't also fade the message. */
 .frame-block {
   position: absolute;
   top: 50%;
@@ -482,14 +480,39 @@ body.has-hero-frame-play .scan-line.is-visible {
   transform: translateY(-50%);
   z-index: 2;
   background: rgba(0, 0, 0, 0);
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(6.1px);
-  -webkit-backdrop-filter: blur(6.1px);
   padding: 32px 64px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  isolation: isolate;
+}
+/* Backdrop-blur layer with edge feathering. blur(2px) is
+   subtle enough that the body gridlines barely register;
+   the 80px mask gradient on top and bottom dissolves the
+   blur into the surrounding sharp content so the lockup has
+   no hard rectangle boundary. */
+.frame-block::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 80px,
+    #000 calc(100% - 80px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 80px,
+    #000 calc(100% - 80px),
+    transparent 100%
+  );
 }
 
 /* Frame-line wrapper — same reveal as .scan-line, taller

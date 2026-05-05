@@ -45,10 +45,12 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
     const firstScanOpacity = await page.locator('.scan-stack .scan-line').first().evaluate((el) => Number(getComputedStyle(el).opacity));
     expect(firstScanOpacity).toBe(0);
 
-    // Frame-block carries the css.glass spec — backdrop-filter
-    // blur with rounded corners and a soft drop shadow. Always
-    // applied (no conditional gating).
-    const bf = await page.locator('.frame-block').evaluate((el) => getComputedStyle(el).backdropFilter || (el as any).webkitBackdropFilter || 'none');
+    // The blur layer lives on .frame-block::before so the mask
+    // gradient can feather the blur edges without fading the text.
+    const bf = await page.locator('.frame-block').evaluate((el) => {
+      const cs = getComputedStyle(el, '::before');
+      return cs.backdropFilter || (cs as any).webkitBackdropFilter || 'none';
+    });
     expect(bf).toContain('blur');
 
     // Frame-line hidden.
@@ -100,19 +102,20 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
     const state = await page.evaluate(() => {
       const lines = Array.from(document.querySelectorAll('.frame-block .frame-line'));
       const fb = document.querySelector('.frame-block') as HTMLElement | null;
+      const beforeCs = fb ? getComputedStyle(fb, '::before') : null;
       return {
         total: lines.length,
         revealed: lines.filter((l) => l.classList.contains('is-visible')).length,
         opacities: lines.map((l) => Number(getComputedStyle(l).opacity)),
         revealing: fb?.classList.contains('is-revealing') ?? false,
-        backdrop: fb ? (getComputedStyle(fb).backdropFilter || (fb as any).webkitBackdropFilter || 'none') : 'none',
+        beforeBackdrop: beforeCs ? (beforeCs.backdropFilter || (beforeCs as any).webkitBackdropFilter || 'none') : 'none',
       };
     });
     expect(state.total).toBe(FRAME_LINES_COUNT);
     expect(state.revealed).toBe(FRAME_LINES_COUNT);
     for (const o of state.opacities) expect(o).toBe(1);
     expect(state.revealing).toBe(true);
-    expect(state.backdrop).toContain('blur');
+    expect(state.beforeBackdrop).toContain('blur');
 
     // Corners revealed alongside the lockup.
     const cornerOpacities = await page.evaluate(() => {
