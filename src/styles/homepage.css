@@ -392,7 +392,9 @@ body.hero-sequence-play .protocol-chip.is-typed {
   color: #ffffff;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #1c1c1c;
+  /* border-right inherited from base .col rule (#1c1c1c). During
+     the index boot the divider is masked to transparent and fades
+     in with the col-list panel — see boot-stage-list rule below. */
   /* ILI-818 — anchor for the 4 absolutely-positioned
      .frame-corner brackets that frame the column. */
   position: relative;
@@ -775,6 +777,15 @@ body.is-index-booting .site-footer {
     transform 0.32s cubic-bezier(.4, .1, .2, 1);
 }
 
+/* The hero/list divider is the col-hero's border-right, so it
+   paints alongside the hero from first frame. Mask it to
+   transparent during boot and bring it in with the list panel
+   so it reads as part of the list reveal. */
+body.is-index-booting .col-hero {
+  border-right-color: transparent;
+  transition: border-right-color 0.32s cubic-bezier(.4, .1, .2, 1);
+}
+
 html:has(body.is-index-booting.boot-stage-header),
 body.is-index-booting.boot-stage-header {
   background-color: var(--bg-canvas);
@@ -797,6 +808,9 @@ body.is-index-booting.boot-stage-list .col-list {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+}
+body.is-index-booting.boot-stage-list .col-hero {
+  border-right-color: #1c1c1c;
 }
 
 body.is-index-booting.boot-stage-footer .site-footer {
@@ -821,6 +835,10 @@ body.is-index-booting.boot-stage-footer .site-footer {
     opacity: 1 !important;
     visibility: visible !important;
     transform: none !important;
+    transition: none !important;
+  }
+  body.is-index-booting .col-hero {
+    border-right-color: #1c1c1c !important;
     transition: none !important;
   }
 }
