@@ -393,36 +393,35 @@ body.hero-sequence-play .protocol-chip.is-typed {
   display: flex;
   flex-direction: column;
   border-right: 1px solid #000;
+  /* ILI-818 — anchor for the 4 absolutely-positioned
+     .frame-corner brackets that frame the column. */
+  position: relative;
 }
 
-/* Single bottom-anchored print column. scan-stack and frame-block
-   are siblings stacked vertically; both are pushed to the bottom of
-   the viewport via flex-end. Each new revealed line (scan or frame)
-   appears at the bottom and lifts the entire stack up — the scan log
-   stays visible the whole time, and the frame content prints in
-   below it as one continuous pass. overflow:hidden clips any content
-   that pushes past the top of the viewport. */
+/* ILI-818 — scan-line backdrop. Pre-rendered set fills the
+   column at default 0.5 opacity. JS appends a new line at the
+   bottom on a varied interval; the new line scans in (max-height
+   + opacity) and pushes the existing stack up by 28px, sending
+   the oldest past the top edge into overflow:hidden. */
 .frame-viewport {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
 }
 
 .scan-stack {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   padding: 0 40px;
   pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
 }
 
-/* Shared reveal mechanism — scan lines and frame lines use
-   the same max-height + opacity transition so the cadence
-   reads as a single continuous print pass. */
 .scan-line {
   display: grid;
   grid-template-columns: 96px 64px 1fr;
@@ -431,33 +430,89 @@ body.hero-sequence-play .protocol-chip.is-typed {
   font-family: var(--font-mono);
   font-weight: 500;
   font-size: 12px;
-  line-height: 32px;
+  line-height: 28px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #888888;
   white-space: nowrap;
-  max-height: 0;
-  opacity: 0;
+  flex: 0 0 auto;
+  /* Default visible — return visits and reduced-motion paint
+     the column already filled. */
+  max-height: 28px;
+  opacity: 0.5;
   overflow: hidden;
   transition:
     max-height 0.32s cubic-bezier(.4, .1, .2, 1),
     opacity 0.18s linear 0.08s;
 }
-.scan-line.is-visible {
-  max-height: 32px;
-  opacity: 1;
+/* Cold load: pre-rendered lines start hidden, then the boot
+   orchestrator adds .is-visible at 145ms cadence to write
+   them in one by one (canonical boot reveal). */
+body.has-hero-frame-play .scan-line {
+  max-height: 0;
+  opacity: 0;
+}
+body.has-hero-frame-play .scan-line.is-visible {
+  max-height: 28px;
+  opacity: 0.5;
+}
+/* The loop appends new lines marked .is-hidden so they start
+   collapsed; removing the class transitions them in to the
+   default visible state. */
+.scan-line.is-hidden {
+  max-height: 0;
+  opacity: 0;
 }
 .scan-line .scan-t { color: #888888; opacity: 0.7; }
 .scan-line .scan-c { color: #888888; font-weight: 700; }
 .scan-line .scan-d { color: #888888; }
 
+/* Lockup floats above the scan-stack, centered vertically.
+   The block itself is a transparent positioning container —
+   the glass effect lives on the ::before layer behind the
+   text, so the mask gradient that feathers the blur at the
+   top and bottom edges doesn't also fade the message. */
 .frame-block {
-  background: transparent;
-  padding: 24px 64px 56px;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 2;
+  background: rgba(0, 0, 0, 0);
+  padding: 32px 64px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: flex-end;
+  isolation: isolate;
+}
+/* Backdrop-blur layer with edge feathering. blur(2px) is
+   subtle enough that the body gridlines barely register;
+   the 80px mask gradient on top and bottom dissolves the
+   blur into the surrounding sharp content so the lockup has
+   no hard rectangle boundary. */
+.frame-block::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 80px,
+    #000 calc(100% - 80px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 80px,
+    #000 calc(100% - 80px),
+    transparent 100%
+  );
 }
 
 /* Frame-line wrapper — same reveal as .scan-line, taller
@@ -466,13 +521,6 @@ body.hero-sequence-play .protocol-chip.is-typed {
    end-state composition is identical to a static frame. */
 .frame-line {
   width: 100%;
-}
-
-.frame-rule {
-  width: 100%;
-  height: 1px;
-  background: #888888;
-  margin-bottom: 32px;
 }
 
 .frame-eyebrow {
@@ -494,6 +542,21 @@ body.hero-sequence-play .protocol-chip.is-typed {
   color: #ffffff;
   margin-bottom: 24px;
   hyphens: none;
+}
+/* ILI-818 — terminal cursor next to the H1, blinks 1Hz. */
+.frame-cursor {
+  display: inline-block;
+  margin-left: 0.18em;
+  vertical-align: baseline;
+  color: #ffffff;
+  animation: frame-cursor-blink 1s steps(1, end) infinite;
+}
+@keyframes frame-cursor-blink {
+  0%, 50%      { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .frame-cursor { animation: none; }
 }
 
 .frame-dek {
@@ -599,57 +662,55 @@ body.hero-sequence-play .protocol-chip.is-typed {
   }
 }
 
-.signal-strip {
-  flex: 0 0 auto;
-  border-top: 1px solid #888888;
-  padding: 14px 40px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  background: #000000;
-  color: #888888;
-}
-.signal-strip .signal-sep { opacity: 0.6; }
-.signal-strip .signal-cursor {
-  display: inline-block;
-  margin-left: 2px;
-  color: #888888;
-  animation: signal-cursor-blink 1s steps(1, end) infinite;
-}
-@keyframes signal-cursor-blink {
-  0%, 50%      { opacity: 1; }
-  50.01%, 100% { opacity: 0; }
-}
-
-/* Article-open state — when an article reader is open the
-   hero column collapses to an 80px back-button strip. Hero
-   is already black, so we just hide the frame visuals and
-   let the back-btn take over. */
+/* Article-open state — hide everything inside the hero column
+   when the article reader is open; just leave the back-btn. */
 .stage.open .col-hero.has-hero-frame {
   background: var(--black);
   border-right: 1px solid #1c1c1c;
 }
 .stage.open .col-hero.has-hero-frame .frame-viewport,
-.stage.open .col-hero.has-hero-frame .signal-strip {
+.stage.open .col-hero.has-hero-frame .frame-corner {
   display: none;
 }
 
-/* ── Play-state overrides — only active while the boot
-      sequence is running. Containers stay visible the whole
-      time; the individual lines (scan-line and frame-line)
-      handle their own reveal via max-height + opacity. ── */
+/* ILI-818 — corner brackets default at half opacity. During
+   cold load they start hidden via the body class; the
+   orchestrator adds .is-visible to each one at 145ms cadence
+   alongside the lockup write-in so the corners load in with
+   the rest of the UI. Left brackets get +20px to clear the
+   page rail. */
+.frame-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 1px solid #ffffff;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.5;
+  transition: opacity 320ms ease-out;
+}
+.frame-corner--tl { top: 22px; left: 48px; border-right: none; border-bottom: none; }
+.frame-corner--tr { top: 22px; right: 28px; border-left: none; border-bottom: none; }
+.frame-corner--bl { bottom: 22px; left: 48px; border-right: none; border-top: none; }
+.frame-corner--br { bottom: 22px; right: 28px; border-left: none; border-top: none; }
+body.has-hero-frame-play .frame-corner {
+  opacity: 0;
+}
+body.has-hero-frame-play .frame-corner.is-visible {
+  opacity: 0.5;
+}
 
-/* Frame lines hide until JS adds .is-visible at the cadence —
-   identical reveal mechanism to .scan-line above. No translateY,
-   no per-element delays; the orchestrator schedules each
-   .is-visible flip 145ms apart. */
-body.has-hero-frame-play .has-hero-frame .frame-line {
+/* Frame lines: scan-in via the canonical max-height + opacity
+   reveal once the marquee intro finishes. Default visible (so
+   return visits and reduced-motion paint the lockup from first
+   paint without animation); body.has-hero-frame-play flips
+   them hidden + ready-to-transition during cold load. */
+.frame-line {
+  width: 100%;
+  max-height: none;
+  opacity: 1;
+}
+body.has-hero-frame-play .frame-line {
   max-height: 0;
   opacity: 0;
   overflow: hidden;
@@ -657,34 +718,16 @@ body.has-hero-frame-play .has-hero-frame .frame-line {
     max-height 0.32s cubic-bezier(.4, .1, .2, 1),
     opacity 0.18s linear 0.08s;
 }
-body.has-hero-frame-play .has-hero-frame .frame-line.is-visible {
+body.has-hero-frame-play .frame-line.is-visible {
   max-height: 320px;
   opacity: 1;
 }
 
-/* Reduced motion safety net — even if the JS gate failed and
-   the play class was added in error, drop every transition
-   so the user lands on end-state instantly. */
 @media (prefers-reduced-motion: reduce) {
   .scan-line,
-  .scan-stack,
-  .frame-block,
-  .frame-line,
-  .frame-rule,
-  .frame-eyebrow,
-  .frame-h1,
-  .frame-dek,
-  .frame-audience,
-  .frame-cta {
+  .frame-line {
     transition: none !important;
     animation: none !important;
-  }
-  body.has-hero-frame-play .has-hero-frame .scan-stack { display: none; }
-  body.has-hero-frame-play .has-hero-frame .frame-block,
-  body.has-hero-frame-play .has-hero-frame .frame-line {
-    opacity: 1;
-    max-height: none;
-    overflow: visible;
   }
 }
 
@@ -1759,25 +1802,46 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
     height: 100svh;
   }
 
-  /* Frame hero (ILI-787) on mobile — col-hero already fills the
-     stage box (header→footer) via the pager's inset:0, so no
-     explicit height is needed. The flex column inside (frame-viewport
-     + signal-strip) bottom-anchors via flex-end. */
+  /* Frame hero on mobile — same architecture as desktop:
+     scan-stack backdrop, lockup with feathered glass blur,
+     4 corner brackets at the column corners. Just smaller
+     paddings/typography and a tighter mask fade
+     proportional to the shorter mobile lockup. */
   .col-hero.has-hero-frame {
     border-right: none;
     border-bottom: 1px solid #000;
     display: flex;
     flex-direction: column;
   }
+  .col-hero.has-hero-frame .frame-corner--tl { top: 16px; left: 32px; }
+  .col-hero.has-hero-frame .frame-corner--tr { top: 16px; right: 16px; }
+  .col-hero.has-hero-frame .frame-corner--bl { bottom: 16px; left: 32px; }
+  .col-hero.has-hero-frame .frame-corner--br { bottom: 16px; right: 16px; }
+  .col-hero.has-hero-frame .frame-block::before {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 48px,
+      #000 calc(100% - 48px),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 48px,
+      #000 calc(100% - 48px),
+      transparent 100%
+    );
+  }
   .col-hero.has-hero-frame .scan-stack {
-    padding: 16px 20px 20px;
+    padding: 0 20px;
   }
   .col-hero.has-hero-frame .scan-line {
     grid-template-columns: 76px 56px 1fr;
     gap: 12px;
   }
   .col-hero.has-hero-frame .frame-block {
-    padding: 56px 24px 40px;
+    padding: 28px 24px;
   }
   .col-hero.has-hero-frame .frame-h1 {
     font-size: 64px;
@@ -1788,12 +1852,6 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
   .col-hero.has-hero-frame .frame-dek {
     font-size: 16px;
     line-height: 1.5;
-  }
-  .col-hero.has-hero-frame .signal-strip {
-    padding: 12px 20px;
-    font-size: 10px;
-    letter-spacing: 0.10em;
-    gap: 8px;
   }
 
   /* Desktop back column / button: hide entirely on mobile */

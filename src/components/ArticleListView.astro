@@ -45,6 +45,57 @@ const totalEntries = allArticles.length;
 const entryCount = String(totalEntries).padStart(3, '0');
 const lastUpdated = totalEntries > 0 ? formatDate(allArticles[0].data.date) : '—';
 
+/* ILI-818 — scan-line backdrop. Pre-rendered set fills the
+   column at default 0.5 opacity. A JS loop on a varied
+   interval (400–2000ms) appends a new scan-line at the bottom
+   of the stack; the new line scans in (max-height + opacity)
+   and pushes the existing stack up by 28px, sending the
+   oldest line past the top edge into overflow:hidden. DOM
+   trimmed to ~50 entries to keep memory bounded over long
+   sessions. The full source list cycles via modulo. */
+const SCAN_LINES: [string, string, string][] = [
+  ['+00.001', 'PING', 'sweep envelope · radius ∞'],
+  ['+00.034', 'CAL',  'calibrating actor classifier'],
+  ['+00.124', 'HIT',  'actor.01 · classification HUMAN'],
+  ['+00.298', 'HIT',  'actor.02 · classification AGENT'],
+  ['+00.412', 'PING', 'third-actor sweep · expanded radius'],
+  ['+00.620', 'PING', 'sweep · negative'],
+  ['+00.840', 'NULL', 'no signal · system not located'],
+  ['+01.020', 'WARN', 'triad incomplete · reclassifying'],
+  ['+01.180', 'NOTE', 'environment is not substrate'],
+  ['+01.340', 'RECL', 'classifier · revising'],
+  ['+01.488', 'HIT',  'actor.03 · classification SYSTEM'],
+  ['+01.604', 'LOCK', 'triad established · 3 design objects'],
+  ['+01.660', 'RDY',  'publishing frame · v1.0'],
+  ['+02.040', 'BLD',  'rev 01.00 · hash 9F2A-8C1D · gamma sRGB'],
+  ['+02.100', 'OBS',  'twin falls / idaho · 42.56°N · 114.46°W'],
+  ['+02.160', 'IDX',  '003 entries · upd 2026.04.30 · ch 01'],
+  ['+02.220', 'LNK',  'agent-01 online · operator linked'],
+  ['+02.280', 'OBJ',  'human · agent · system'],
+  ['+02.340', 'CHN',  '// dispatch · ch 01 · uplink nominal'],
+  ['+02.400', 'SYS',  'cpu 12% · mem 248mb · drift ±0.0001'],
+  ['+02.460', 'SIG',  '██████████ 100% · stream active'],
+  ['+02.520', 'NET',  'rtt 18ms · jitter 0.4ms · loss 0%'],
+  ['+02.580', 'ARC',  '003 / unl entries · safe · backup ok'],
+  ['+02.640', 'CAL',  'drift compensated · ±0.0001'],
+  ['+02.700', 'STAT', 'system nominal · all green'],
+  ['+02.760', 'OK',   'archive standing by'],
+  ['+02.820', 'HRT',  'pulse 60bpm · steady'],
+  ['+02.880', 'LOG',  'buffer 0/4096 · flush 5s'],
+  ['+02.940', 'PWR',  'thermal nominal · battery: AC'],
+  ['+03.000', 'GFX',  '60fps · vsync on · paint 4ms'],
+  ['+03.060', 'MEM',  'heap 12mb / 256mb · gc 0'],
+  ['+03.120', 'CRY',  'tls 1.3 · pinned · cert valid 2027.02'],
+  ['+03.180', 'GEO',  'twin falls · MST · alt 1170m'],
+  ['+03.240', 'BIN',  '005 of 005 · all signed'],
+  ['+03.300', 'IO',   'fd 24/1024 · stable'],
+  ['+03.360', 'AGT',  'message queue · drained'],
+  ['+03.420', 'OPS',  'pipeline · idle · ready'],
+  ['+03.480', 'TS',   'clock skew 0.002s · drift compensated'],
+  ['+03.540', 'OBS',  'sweep complete · field stable'],
+  ['+03.600', 'EOL',  'transmission ready · waiting'],
+];
+
 const rendered = await Promise.all(
   pageArticles.map(async (a) => {
     const { Content } = await a.render();
@@ -209,11 +260,24 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
     {heroVariant === 'frame' ? (
       <div class="col col-hero has-hero-frame">
         <div class="frame-viewport" id="frame-viewport">
-          <div class="scan-stack" id="scan-stack" aria-hidden="true"></div>
+          <div class="scan-stack" id="scan-stack" aria-hidden="true">
+            {SCAN_LINES.map(([t, c, d]) => (
+              <div class="scan-line">
+                <span class="scan-t">{t}</span>
+                <span class="scan-c">{c}</span>
+                <span class="scan-d">{d}</span>
+              </div>
+            ))}
+          </div>
+          <script
+            id="scan-lines-data"
+            type="application/json"
+            is:inline
+            set:html={JSON.stringify(SCAN_LINES)}
+          />
           <div class="frame-block" id="frame-block">
-            <div class="frame-line"><div class="frame-rule" aria-hidden="true"></div></div>
             <div class="frame-line"><div class="frame-eyebrow">// FRAME &middot; V1.0 &middot; TRIAD VERIFIED</div></div>
-            <div class="frame-line"><h1 class="frame-h1">Human Agent System Design</h1></div>
+            <div class="frame-line"><h1 class="frame-h1">Human Agent System Design<span class="frame-cursor" aria-hidden="true">&#9646;</span></h1></div>
             <div class="frame-line"><p class="frame-dek">Humans, agents, and the system they share. Three actors. Three design objects. One framework.</p></div>
             <div class="frame-line"><div class="frame-audience">&gt; FOR THE PEOPLE SHIPPING THEM</div></div>
             <div class="frame-line"><a class="frame-cta" href="/blog">
@@ -222,15 +286,10 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
             </a></div>
           </div>
         </div>
-        <div class="signal-strip" aria-hidden="true">
-          <span class="signal-item">VISITOR ACQUIRED</span>
-          <span class="signal-sep">&middot;</span>
-          <span class="signal-item">TELEMETRY NOMINAL</span>
-          <span class="signal-sep">&middot;</span>
-          <span class="signal-item">ARCHIVE STANDING BY <span class="signal-cursor">&#9646;</span></span>
-          <span class="signal-sep">&middot;</span>
-          <span class="signal-item">SIGNAL ██████████ 100%</span>
-        </div>
+        <div class="frame-corner frame-corner--tl" aria-hidden="true"></div>
+        <div class="frame-corner frame-corner--tr" aria-hidden="true"></div>
+        <div class="frame-corner frame-corner--bl" aria-hidden="true"></div>
+        <div class="frame-corner frame-corner--br" aria-hidden="true"></div>
         <button class="back-btn" id="back-btn" aria-label="Back to articles">
           <span class="back-content">
             <span class="back-arrow">&larr;</span>
@@ -1269,48 +1328,40 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
     </script>
 
     <script is:inline data-astro-rerun>
-      /* ILI-788 — frame-hero boot sequence orchestrator.
-         One continuous terminal print pass at a single rhythm:
-         13 scan lines at 145ms cadence after a 280ms initial
-         delay, then a 280ms hand-off pause, scan-stack fades
-         out as frame-block becomes visible, then a 200ms breath
-         before frame lines (rule, eyebrow, h1, dek, audience,
-         cta) print at the same 145ms cadence using the same
-         max-height + opacity reveal as scan lines. Set
-         sessionStorage so within-session repeat visits skip
-         straight to end-state via the pre-paint gate. */
+      /* ILI-818 — frame-hero backdrop + lockup orchestrator.
+
+         Cold load (body.has-hero-frame-play set pre-paint):
+         pre-rendered scan-lines start hidden via the body class.
+         JS reveals them one by one at 145ms cadence — the
+         canonical boot reveal — filling the column from the
+         bottom up. After the last scan-line settles + a short
+         breath, the lockup writes in: glass blur fades on,
+         then the 5 frame-lines reveal at the same 145ms
+         cadence. Once everything has loaded in, the one-in/
+         one-out varied-interval loop starts and runs forever.
+
+         Return visit / reduced-motion: pre-rendered lines are
+         visible from first paint, lockup is visible from first
+         paint, loop starts immediately on script run (skipped
+         entirely under reduced-motion). */
       (function () {
-        if (!document.body.classList.contains('has-hero-frame-play')) return;
+        if (window.__ili818LoopMounted) return;
         var hero = document.querySelector('.col-hero.has-hero-frame');
         if (!hero) return;
-        var scanStack = hero.querySelector('.scan-stack');
+        var stack = hero.querySelector('.scan-stack');
         var frameBlock = hero.querySelector('.frame-block');
-        if (!scanStack || !frameBlock) return;
+        var dataEl = hero.querySelector('#scan-lines-data');
+        if (!stack || !frameBlock || !dataEl) return;
+        window.__ili818LoopMounted = true;
 
-        var lines = [
-          ['+00.001', 'PING', 'sweep envelope · radius ∞'],
-          ['+00.034', 'CAL',  'calibrating actor classifier'],
-          ['+00.124', 'HIT',  'actor.01 · classification HUMAN'],
-          ['+00.298', 'HIT',  'actor.02 · classification AGENT'],
-          ['+00.412', 'PING', 'third-actor sweep · expanded radius'],
-          ['+00.620', 'PING', 'sweep · negative'],
-          ['+00.840', 'NULL', 'no signal · system not located'],
-          ['+01.020', 'WARN', 'triad incomplete · reclassifying'],
-          ['+01.180', 'NOTE', 'environment is not substrate'],
-          ['+01.340', 'RECL', 'classifier · revising'],
-          ['+01.488', 'HIT',  'actor.03 · classification SYSTEM'],
-          ['+01.604', 'LOCK', 'triad established · 3 design objects'],
-          ['+01.660', 'RDY',  'publishing frame · v1.0']
-        ];
-
-        var INITIAL_DELAY = 280;
-        var CADENCE = 145;
-        var HANDOFF_PAUSE = 280;
-        var FRAME_BREATH = 200;
+        var SCAN_LINES = [];
+        try { SCAN_LINES = JSON.parse(dataEl.textContent || '[]'); } catch (e) {}
+        if (!SCAN_LINES.length) return;
+        var scanIdx = SCAN_LINES.length;
 
         function makeLine(parts) {
           var el = document.createElement('div');
-          el.className = 'scan-line';
+          el.className = 'scan-line is-hidden';
           var t = document.createElement('span'); t.className = 'scan-t'; t.textContent = parts[0];
           var c = document.createElement('span'); c.className = 'scan-c'; c.textContent = parts[1];
           var d = document.createElement('span'); d.className = 'scan-d'; d.textContent = parts[2];
@@ -1318,44 +1369,92 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           return el;
         }
 
-        // Pre-build the scan-line elements so layout doesn't shift
-        // mid-sequence; reveal each via a class flip.
-        var nodes = lines.map(function (parts) {
-          var n = makeLine(parts);
-          scanStack.appendChild(n);
-          return n;
-        });
+        var MAX_DOM_LINES = 50;
+        function cycleAdd() {
+          var next = SCAN_LINES[scanIdx % SCAN_LINES.length];
+          scanIdx++;
+          var el = makeLine(next);
+          stack.appendChild(el);
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              el.classList.remove('is-hidden');
+            });
+          });
+          var all = stack.querySelectorAll('.scan-line');
+          if (all.length > MAX_DOM_LINES) all[0].remove();
+        }
 
-        nodes.forEach(function (el, i) {
+        var reduced = window.matchMedia
+          && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function startLoop() {
+          if (reduced) return;
+          (function tick() {
+            var delay = 400 + Math.random() * 1600;
+            window.setTimeout(function () {
+              cycleAdd();
+              tick();
+            }, delay);
+          })();
+        }
+
+        if (!document.body.classList.contains('has-hero-frame-play')) {
+          // Return visit / reduced-motion: everything already
+          // visible from CSS defaults. Just kick off the loop.
+          startLoop();
+          return;
+        }
+
+        // Cold load — orchestrate the canonical reveal sequence.
+        var INITIAL_DELAY = 280;
+        var CADENCE = 145;
+        var REVEAL_TRANSITION = 320;
+        var SCAN_BREATH = 200;
+        var GLASS_FADE = 400;
+        var POST_LOCKUP_BREATH = 400;
+
+        var preLines = stack.querySelectorAll('.scan-line');
+        preLines.forEach(function (el, i) {
           window.setTimeout(function () {
             el.classList.add('is-visible');
           }, INITIAL_DELAY + i * CADENCE);
         });
 
-        // Frame phase: 280ms hand-off pause + 200ms breath after
-        // the last scan line, then each .frame-line prints at the
-        // same 145ms cadence. Same reveal mechanism as scan lines
-        // (max-height + opacity, no translateY) so the entire pass
-        // reads as one rhythm. The scan log stays visible — frame
-        // lines print below it and the whole stack lifts together.
-        var totalLinesTime = INITIAL_DELAY + (nodes.length - 1) * CADENCE;
-        var frameStart = totalLinesTime + HANDOFF_PAUSE + FRAME_BREATH;
+        var lastScanAt = INITIAL_DELAY + Math.max(0, preLines.length - 1) * CADENCE;
+        var scanSettleAt = lastScanAt + REVEAL_TRANSITION;
+        var lockupRevealAt = scanSettleAt + SCAN_BREATH;
+
+        window.setTimeout(function () {
+          frameBlock.classList.add('is-revealing');
+        }, lockupRevealAt);
+
+        // Corners load in alongside the lockup — staggered at the
+        // canonical 145ms cadence starting with the glass fade.
+        var corners = hero.querySelectorAll('.frame-corner');
+        corners.forEach(function (el, i) {
+          window.setTimeout(function () {
+            el.classList.add('is-visible');
+          }, lockupRevealAt + i * CADENCE);
+        });
+
         var frameLines = frameBlock.querySelectorAll('.frame-line');
+        var frameLinesStartAt = lockupRevealAt + GLASS_FADE;
         frameLines.forEach(function (el, i) {
           window.setTimeout(function () {
             el.classList.add('is-visible');
-          }, frameStart + i * CADENCE);
+          }, frameLinesStartAt + i * CADENCE);
         });
 
-        // Post-completion: set the session flag and drop the play
-        // class so any re-entry from a view transition lands on
-        // end-state rules (no transitions re-running).
-        var lastFrameAt = frameStart + Math.max(0, frameLines.length - 1) * CADENCE;
-        var totalDuration = lastFrameAt + 400;
+        var lastFrameAt = frameLinesStartAt + Math.max(0, frameLines.length - 1) * CADENCE;
+        var lockupSettleAt = lastFrameAt + REVEAL_TRANSITION;
+        var loopStartAt = lockupSettleAt + POST_LOCKUP_BREATH;
+        var bootEndAt = loopStartAt;
+
         window.setTimeout(function () {
           try { sessionStorage.setItem('has_hero_played', '1'); } catch (e) {}
           document.body.classList.remove('has-hero-frame-play');
-        }, totalDuration);
+          startLoop();
+        }, bootEndAt);
       })();
     </script>
 
@@ -1375,19 +1474,25 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
       (function () {
         if (!document.body.classList.contains('is-index-booting')) return;
 
+        /* Mirrors the frame-hero orchestrator: 28 scan-lines
+           reveal at 145ms cadence, then a 200ms breath, then
+           the lockup writes in (glass fade + 5 frame-lines).
+           Hero settles when the last frame-line reveal completes. */
         var INITIAL_DELAY = 280;
         var CADENCE = 145;
-        var HANDOFF_PAUSE = 280;
-        var FRAME_BREATH = 200;
-        var SCAN_LINES = 13;
-        var FRAME_LINES = 6;
         var REVEAL_TRANSITION = 320;
+        var SCAN_BREATH = 200;
+        var GLASS_FADE = 400;
+        var SCAN_LINES_COUNT = 40;
+        var FRAME_LINES = 5;
         var STAGE_CADENCE = 180;
         var POST_FOOTER_DELAY = 400;
 
-        var lastScanAt = INITIAL_DELAY + (SCAN_LINES - 1) * CADENCE;
-        var frameStart = lastScanAt + HANDOFF_PAUSE + FRAME_BREATH;
-        var lastFrameAt = frameStart + Math.max(0, FRAME_LINES - 1) * CADENCE;
+        var lastScanAt = INITIAL_DELAY + (SCAN_LINES_COUNT - 1) * CADENCE;
+        var scanSettleAt = lastScanAt + REVEAL_TRANSITION;
+        var lockupRevealAt = scanSettleAt + SCAN_BREATH;
+        var frameLinesStartAt = lockupRevealAt + GLASS_FADE;
+        var lastFrameAt = frameLinesStartAt + (FRAME_LINES - 1) * CADENCE;
         var heroSettleAt = lastFrameAt + REVEAL_TRANSITION;
 
         var stages = ['boot-stage-header', 'boot-stage-rail', 'boot-stage-list', 'boot-stage-footer'];
@@ -1406,5 +1511,6 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         }, endAt);
       })();
     </script>
+
   </Fragment>
 </HomepageLayout>
