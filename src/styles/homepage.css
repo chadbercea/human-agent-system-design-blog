@@ -398,55 +398,30 @@ body.hero-sequence-play .protocol-chip.is-typed {
   position: relative;
 }
 
-/* ILI-818 — scan-marquee backdrop. Always-on, scrolls
-   bottom-to-top continuously. Two stacked copies of the same
-   scan-line list so a translateY(0) → translateY(-50%) loop
-   is seamless (copy 2 ends at copy 1's prior visual position).
-   On cold load, an intro keyframe pushes the track from below
-   the column up to filling it (INTRO_DURATION) — the moment
-   the intro completes is when the frame-block reveals. */
+/* ILI-818 — scan-line backdrop. Pre-rendered set fills the
+   column at default 0.5 opacity. JS appends a new line at the
+   bottom on a varied interval; the new line scans in (max-height
+   + opacity) and pushes the existing stack up by 28px, sending
+   the oldest past the top edge into overflow:hidden. */
 .frame-viewport {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  /* Set by JS to the live frame-viewport height — drives the
-     scan-intro keyframe so the track starts exactly one column
-     below and animates up to fill it. */
-  --frame-viewport-h: 740px;
 }
 
-.scan-marquee {
+.scan-stack {
   position: absolute;
   inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 1;
-}
-.scan-marquee-track {
   display: flex;
   flex-direction: column;
-  animation: scan-loop 8s linear infinite;
-  will-change: transform;
-}
-body.has-hero-frame-play .scan-marquee-track {
-  animation:
-    scan-intro 6s linear forwards,
-    scan-loop 8s linear 6s infinite;
-}
-@keyframes scan-intro {
-  from { transform: translateY(var(--frame-viewport-h, 740px)); }
-  to   { transform: translateY(0); }
-}
-@keyframes scan-loop {
-  from { transform: translateY(0); }
-  to   { transform: translateY(-50%); }
+  justify-content: flex-end;
+  padding: 0 40px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
 }
 
-/* Scan lines: dim ambient by default. No boot-time full
-   opacity — the marquee carries the same dim aesthetic the
-   whole time. Color #888 at 0.5 multiplier gives roughly
-   #444 effective on black. */
 .scan-line {
   display: grid;
   grid-template-columns: 96px 64px 1fr;
@@ -461,15 +436,25 @@ body.has-hero-frame-play .scan-marquee-track {
   color: #888888;
   white-space: nowrap;
   flex: 0 0 auto;
+  max-height: 28px;
   opacity: 0.5;
+  overflow: hidden;
+  transition:
+    max-height 0.32s cubic-bezier(.4, .1, .2, 1),
+    opacity 0.18s linear 0.08s;
+}
+.scan-line.is-hidden {
+  max-height: 0;
+  opacity: 0;
 }
 .scan-line .scan-t { color: #888888; opacity: 0.7; }
 .scan-line .scan-c { color: #888888; font-weight: 700; }
 .scan-line .scan-d { color: #888888; }
 
-/* Lockup floats above the marquee, centered vertically.
-   Black background occludes the scrolling scan-lines behind
-   the message so the lockup stays legible. */
+/* Lockup floats above the scan-stack, centered vertically.
+   Glassmorphic background (semi-transparent + backdrop blur)
+   keeps the message legible against the scrolling scan-lines
+   without forming a hard black bar. */
 .frame-block {
   position: absolute;
   top: 50%;
@@ -477,11 +462,32 @@ body.has-hero-frame-play .scan-marquee-track {
   right: 0;
   transform: translateY(-50%);
   z-index: 2;
-  background: #000000;
+  background: rgba(8, 8, 10, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 32px 64px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  transition:
+    background 400ms ease-out,
+    backdrop-filter 400ms ease-out,
+    -webkit-backdrop-filter 400ms ease-out;
+}
+/* During initial load (before the lockup is ready to write
+   in), the glass bar is invisible — no background, no blur.
+   The orchestrator adds .is-revealing when it's ready,
+   transitioning the glass into view before the frame-lines
+   start scanning in. */
+body.has-hero-frame-play .frame-block {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+body.has-hero-frame-play .frame-block.is-revealing {
+  background: rgba(8, 8, 10, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 /* Frame-line wrapper — same reveal as .scan-line, taller
@@ -684,8 +690,7 @@ body.has-hero-frame-play .frame-line.is-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .scan-line,
-  .frame-line,
-  .scan-marquee-track {
+  .frame-line {
     transition: none !important;
     animation: none !important;
   }
@@ -1771,13 +1776,12 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
     flex-direction: column;
   }
   .col-hero.has-hero-frame .frame-corner { display: none; }
-  .col-hero.has-hero-frame .scan-marquee {
+  .col-hero.has-hero-frame .scan-stack {
     padding: 0 20px;
   }
   .col-hero.has-hero-frame .scan-line {
     grid-template-columns: 76px 56px 1fr;
     gap: 12px;
-    padding: 0;
   }
   .col-hero.has-hero-frame .frame-block {
     padding: 28px 24px;

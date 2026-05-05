@@ -45,13 +45,14 @@ const totalEntries = allArticles.length;
 const entryCount = String(totalEntries).padStart(3, '0');
 const lastUpdated = totalEntries > 0 ? formatDate(allArticles[0].data.date) : '—';
 
-/* ILI-818 — single scan-marquee backdrop. Always-on, scrolls
-   bottom-to-top continuously. Two identical copies of these 28
-   lines are stacked in the track so the loop is seamless: a
-   translateY(0) → translateY(-50%) cycle moves the track up by
-   exactly one copy, leaving copy 2 in copy 1's prior visual
-   position. Pre-rendered as static markup so return visits and
-   reduced-motion paint the resting backdrop with no JS. */
+/* ILI-818 — scan-line backdrop. Pre-rendered set fills the
+   column at default 0.5 opacity. A JS loop on a varied
+   interval (400–2000ms) appends a new scan-line at the bottom
+   of the stack; the new line scans in (max-height + opacity)
+   and pushes the existing stack up by 28px, sending the
+   oldest line past the top edge into overflow:hidden. DOM
+   trimmed to ~50 entries to keep memory bounded over long
+   sessions. The full source list cycles via modulo. */
 const SCAN_LINES: [string, string, string][] = [
   ['+00.001', 'PING', 'sweep envelope · radius ∞'],
   ['+00.034', 'CAL',  'calibrating actor classifier'],
@@ -247,24 +248,22 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
     {heroVariant === 'frame' ? (
       <div class="col col-hero has-hero-frame">
         <div class="frame-viewport" id="frame-viewport">
-          <div class="scan-marquee" aria-hidden="true">
-            <div class="scan-marquee-track" id="scan-marquee-track">
-              {SCAN_LINES.map(([t, c, d]) => (
-                <div class="scan-line">
-                  <span class="scan-t">{t}</span>
-                  <span class="scan-c">{c}</span>
-                  <span class="scan-d">{d}</span>
-                </div>
-              ))}
-              {SCAN_LINES.map(([t, c, d]) => (
-                <div class="scan-line" aria-hidden="true">
-                  <span class="scan-t">{t}</span>
-                  <span class="scan-c">{c}</span>
-                  <span class="scan-d">{d}</span>
-                </div>
-              ))}
-            </div>
+          <div class="scan-stack" id="scan-stack" aria-hidden="true">
+            {SCAN_LINES.map(([t, c, d]) => (
+              <div class="scan-line">
+                <span class="scan-t">{t}</span>
+                <span class="scan-c">{c}</span>
+                <span class="scan-d">{d}</span>
+              </div>
+            ))}
           </div>
+          <script
+            id="scan-lines-data"
+            type="application/json"
+            is:inline
+            set:html={JSON.stringify(SCAN_LINES)}
+          />
+        </div>
           <div class="frame-block" id="frame-block">
             <div class="frame-line"><div class="frame-eyebrow">// FRAME &middot; V1.0 &middot; TRIAD VERIFIED</div></div>
             <div class="frame-line"><h1 class="frame-h1">Human Agent System Design<span class="frame-cursor" aria-hidden="true">&#9646;</span></h1></div>
@@ -1318,43 +1317,96 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
     </script>
 
     <script is:inline data-astro-rerun>
-      /* ILI-818 — frame-hero boot. Scan-marquee scrolls
-         continuously via CSS animation (chained intro then
-         infinite loop). Once the intro brings scan content from
-         below the column up to filling it (INTRO_DURATION ms),
-         frame-block lines reveal at the canonical 145ms cadence.
-         No scan-line reveal in JS — they're always-on, scrolling
-         in the background.
+      /* ILI-818 — frame-hero backdrop + lockup orchestrator.
 
-         Sets --frame-viewport-h on the viewport so the intro
-         keyframe knows how far to translate from. Re-set on
-         resize. */
+         Scan loop (always on, every visit, unless reduced-motion):
+         every 400–2000ms (varied), append a new .scan-line at the
+         bottom of #scan-stack. The line starts collapsed, grows
+         to 28px via max-height transition; the rest of the stack
+         pushes up by 28px and the oldest line scrolls past the
+         top edge (clipped by overflow:hidden on .scan-stack). DOM
+         is trimmed when it exceeds 50 entries.
+
+         Lockup reveal (cold load only):
+         body.has-hero-frame-play is set pre-paint; the .frame-block
+         is transparent during this state. After REVEAL_DELAY (4s),
+         add .is-revealing — glass background fades in (400ms),
+         then frame-lines scan in at the canonical 145ms cadence. */
       (function () {
+        if (window.__ili818LoopMounted) return;
         var hero = document.querySelector('.col-hero.has-hero-frame');
         if (!hero) return;
-        var viewport = hero.querySelector('.frame-viewport');
+        var stack = hero.querySelector('.scan-stack');
         var frameBlock = hero.querySelector('.frame-block');
-        if (!viewport || !frameBlock) return;
+        var dataEl = hero.querySelector('#scan-lines-data');
+        if (!stack || !frameBlock || !dataEl) return;
+        window.__ili818LoopMounted = true;
 
-        function setViewportH() {
-          viewport.style.setProperty('--frame-viewport-h', viewport.offsetHeight + 'px');
+        var SCAN_LINES = [];
+        try { SCAN_LINES = JSON.parse(dataEl.textContent || '[]'); } catch (e) {}
+        if (!SCAN_LINES.length) return;
+        var scanIdx = SCAN_LINES.length; // pre-rendered set occupies slots 0..N-1
+
+        function makeLine(parts) {
+          var el = document.createElement('div');
+          el.className = 'scan-line is-hidden';
+          var t = document.createElement('span'); t.className = 'scan-t'; t.textContent = parts[0];
+          var c = document.createElement('span'); c.className = 'scan-c'; c.textContent = parts[1];
+          var d = document.createElement('span'); d.className = 'scan-d'; d.textContent = parts[2];
+          el.appendChild(t); el.appendChild(c); el.appendChild(d);
+          return el;
         }
-        setViewportH();
-        window.addEventListener('resize', setViewportH);
 
+        var MAX_DOM_LINES = 50;
+        function cycleAdd() {
+          var next = SCAN_LINES[scanIdx % SCAN_LINES.length];
+          scanIdx++;
+          var el = makeLine(next);
+          stack.appendChild(el);
+          // Two RAFs ensure the browser has applied is-hidden's
+          // collapsed state before we remove it — without this the
+          // transition can be skipped and the line snaps in.
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              el.classList.remove('is-hidden');
+            });
+          });
+          var all = stack.querySelectorAll('.scan-line');
+          if (all.length > MAX_DOM_LINES) all[0].remove();
+        }
+
+        var reduced = window.matchMedia
+          && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function loop() {
+          var delay = 400 + Math.random() * 1600;
+          window.setTimeout(function () {
+            cycleAdd();
+            loop();
+          }, delay);
+        }
+        if (!reduced) loop();
+
+        // Lockup reveal — cold load only.
         if (!document.body.classList.contains('has-hero-frame-play')) return;
 
-        var INTRO_DURATION = 6000;
+        var REVEAL_DELAY = 4000;
+        var GLASS_FADE = 400;
         var CADENCE = 145;
-
         var frameLines = frameBlock.querySelectorAll('.frame-line');
-        frameLines.forEach(function (el, i) {
-          window.setTimeout(function () {
-            el.classList.add('is-visible');
-          }, INTRO_DURATION + i * CADENCE);
-        });
 
-        var totalDuration = INTRO_DURATION + frameLines.length * CADENCE + 400;
+        window.setTimeout(function () {
+          frameBlock.classList.add('is-revealing');
+          window.setTimeout(function () {
+            frameLines.forEach(function (el, i) {
+              window.setTimeout(function () {
+                el.classList.add('is-visible');
+              }, i * CADENCE);
+            });
+          }, GLASS_FADE);
+        }, REVEAL_DELAY);
+
+        var totalDuration = REVEAL_DELAY + GLASS_FADE + frameLines.length * CADENCE + 400;
         window.setTimeout(function () {
           try { sessionStorage.setItem('has_hero_played', '1'); } catch (e) {}
           document.body.classList.remove('has-hero-frame-play');
@@ -1378,17 +1430,19 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
       (function () {
         if (!document.body.classList.contains('is-index-booting')) return;
 
-        /* Mirrors the frame-hero orchestrator: marquee intro takes
-           INTRO_DURATION, then frame-lines reveal at CADENCE each.
-           Hero settles when the last frame-line reveal completes. */
-        var INTRO_DURATION = 6000;
+        /* Mirrors the frame-hero orchestrator: REVEAL_DELAY hold,
+           then the glass background fades in (GLASS_FADE), then
+           5 frame-lines scan in at CADENCE each. Hero settles
+           when the last frame-line reveal completes. */
+        var REVEAL_DELAY = 4000;
+        var GLASS_FADE = 400;
         var CADENCE = 145;
         var FRAME_LINES = 5;
         var REVEAL_TRANSITION = 320;
         var STAGE_CADENCE = 180;
         var POST_FOOTER_DELAY = 400;
 
-        var lastFrameLineAt = INTRO_DURATION + (FRAME_LINES - 1) * CADENCE;
+        var lastFrameLineAt = REVEAL_DELAY + GLASS_FADE + (FRAME_LINES - 1) * CADENCE;
         var heroSettleAt = lastFrameLineAt + REVEAL_TRANSITION;
 
         var stages = ['boot-stage-header', 'boot-stage-rail', 'boot-stage-list', 'boot-stage-footer'];
