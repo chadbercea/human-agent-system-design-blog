@@ -468,9 +468,11 @@ body.has-hero-frame-play .scan-line.is-visible {
 .scan-line .scan-d { color: #888888; }
 
 /* Lockup floats above the scan-stack, centered vertically.
-   Pure transparent positioning container — no background, no
-   border, no backdrop-filter. Scan-lines flow through and
-   the lockup text renders on top. */
+   background: transparent + backdrop-filter: blur. No color
+   fill — over black areas the blur of black is just black
+   (invisible), over scan-lines the blur softens them into
+   frost. Always on; no conditional gating, since "no content
+   behind" already produces "no visible effect" naturally. */
 .frame-block {
   position: absolute;
   top: 50%;
@@ -479,6 +481,8 @@ body.has-hero-frame-play .scan-line.is-visible {
   transform: translateY(-50%);
   z-index: 2;
   background: transparent;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding: 32px 64px;
   display: flex;
   flex-direction: column;
