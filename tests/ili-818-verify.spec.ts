@@ -66,10 +66,17 @@ test.describe('ILI-818 — hero boot reveal', () => {
     expect(counts.botTotal).toBeGreaterThanOrEqual(13);
     expect(counts.cornerTotal).toBe(4);
 
-    // Lockup centered via grid: frame-block sits in row 2 of a
-    // 1fr auto 1fr grid, so the kept content is vertically centered.
-    const gridRows = await page.locator('.frame-viewport').evaluate((el) => getComputedStyle(el).gridTemplateRows);
-    expect(gridRows).toMatch(/[\d.]+px (auto|[\d.]+px) [\d.]+px/);
+    // Bottom-anchored stack: frame-viewport is flex column with
+    // justify-content: flex-end, so all 3 children push up from
+    // the bottom of the viewport as each line reveals.
+    const flow = await page.locator('.frame-viewport').evaluate((el) => ({
+      display: getComputedStyle(el).display,
+      direction: getComputedStyle(el).flexDirection,
+      justify: getComputedStyle(el).justifyContent,
+    }));
+    expect(flow.display).toBe('flex');
+    expect(flow.direction).toBe('column');
+    expect(flow.justify).toBe('flex-end');
 
     await page.screenshot({
       path: 'verification-screenshots/ili-818-boot-end.png',
