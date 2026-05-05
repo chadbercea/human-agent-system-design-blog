@@ -109,8 +109,9 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
     expect(state.revealed).toBe(FRAME_LINES_COUNT);
     for (const o of state.opacities) expect(o).toBe(1);
     expect(state.revealing).toBe(true);
-    // Glass blur is now active.
-    expect(state.backdrop).toContain('blur');
+    // Frame-block stays a transparent positioning container —
+    // no backdrop-filter at any point. Scan-lines flow through.
+    expect(state.backdrop).toBe('none');
 
     // Wide divider is gone, cursor is on the H1.
     expect(await page.locator('.frame-rule').count()).toBe(0);
@@ -167,7 +168,7 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
     await context.close();
   });
 
-  test('return visit: lockup visible from first paint, glass background applied', async ({ browser }) => {
+  test('return visit: lockup visible from first paint, no boot', async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const page = await context.newPage();
 
@@ -181,9 +182,6 @@ test.describe('ILI-818 — scan cycle + glass lockup', () => {
 
     const frameLineOpacity = await page.locator('.frame-block .frame-line').first().evaluate((el) => Number(getComputedStyle(el).opacity));
     expect(frameLineOpacity).toBe(1);
-
-    const bf = await page.locator('.frame-block').evaluate((el) => getComputedStyle(el).backdropFilter || (el as any).webkitBackdropFilter || 'none');
-    expect(bf).toContain('blur');
 
     await context.close();
   });
