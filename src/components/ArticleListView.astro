@@ -1585,7 +1585,10 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         if (!lines.length) return;
         window.__ili818HudMounted = true;
 
-        var LINE_STAGGER = 80;
+        /* Cadence matches boot CADENCE (145ms) — same reveal as
+           the boot scan-line is the canonical pattern; corner
+           brackets and HUD readouts stagger in at the same rhythm. */
+        var STAGGER = 145;
         var REVEAL_AFTER_STRIP_START = 300;
 
         // Boot constants mirror ILI-789 + ILI-818 strip math so the
@@ -1607,15 +1610,26 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         var footerSettleAt = heroSettleAt + (STAGES - 1) * STAGE_CADENCE + REVEAL_TRANSITION;
         var stripAt = footerSettleAt + STRIP_HOLD;
 
+        /* Reveal order: top-row lines (top-down) → bottom-row lines
+           (bottom-up, so the cursor line lands last) → corner
+           brackets pair-wise. Single sequence at 145ms cadence. */
+        var topLines = hero.querySelectorAll('.hud-ambient--top .hud-ambient-line');
+        var botLines = hero.querySelectorAll('.hud-ambient--bot .hud-ambient-line');
+        var brackets = hero.querySelectorAll('.hud-frame-bracket');
+        var sequence = [];
+        for (var i = 0; i < topLines.length; i++) sequence.push(topLines[i]);
+        for (var j = botLines.length - 1; j >= 0; j--) sequence.push(botLines[j]);
+        for (var k = 0; k < brackets.length; k++) sequence.push(brackets[k]);
+
         function revealStaggered(startDelay) {
-          lines.forEach(function (line, i) {
+          sequence.forEach(function (el, i) {
             window.setTimeout(function () {
-              line.classList.add('is-visible');
-            }, startDelay + i * LINE_STAGGER);
+              el.classList.add('is-visible');
+            }, startDelay + i * STAGGER);
           });
         }
         function revealInstant() {
-          lines.forEach(function (line) { line.classList.add('is-visible'); });
+          sequence.forEach(function (el) { el.classList.add('is-visible'); });
         }
 
         if (document.body.classList.contains('is-index-booting')) {

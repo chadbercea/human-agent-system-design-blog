@@ -5,11 +5,14 @@ const INDEX = `http://localhost:${PORT}/`;
 const ABOUT = `http://localhost:${PORT}/about`;
 
 // ILI-818 timing: boot ends ~4.4s after load (footer reveal complete);
-// strip-down hold = 600ms; fade duration = 500ms. So:
-//   strip starts at ~5.0s
-//   strip completes at ~5.5s
+// strip-down hold = 600ms; fade duration = 500ms. HUD chrome reveals
+// at 145ms cadence over 14 elements (10 lines + 4 brackets) starting
+// 300ms after strip start, so the resting state fully settles around
+// 7.7s. Give the post-strip test a wider window so the screenshot
+// captures the assembled state, not a half-revealed pass.
 const STRIP_START_AT = 5000;
 const STRIP_END_AT = 5600;
+const HUD_REVEAL_END_AT = 8000;
 
 test.describe('ILI-818 — hero strip-down', () => {
   test('cold load: chrome visible immediately after boot, before strip', async ({ page }) => {
@@ -45,8 +48,9 @@ test.describe('ILI-818 — hero strip-down', () => {
       fullPage: false,
     });
 
-    // Wait past strip end: stripped class is on, chrome gone.
-    await page.waitForTimeout(STRIP_END_AT - (STRIP_START_AT + 100) + 200);
+    // Wait past strip end + full HUD chrome reveal: stripped class is
+    // on, chrome gone, all 10 telemetry rows + 4 corner brackets visible.
+    await page.waitForTimeout(HUD_REVEAL_END_AT - (STRIP_START_AT + 100));
 
     expect(await page.evaluate(() => document.body.classList.contains('hero-stripped'))).toBe(true);
     expect(await page.evaluate(() => document.body.classList.contains('hero-stripping'))).toBe(false);

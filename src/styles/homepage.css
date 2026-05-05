@@ -931,18 +931,20 @@ body.hero-stripped .has-hero-frame .frame-block {
   text-transform: uppercase;
   color: #ffffff;
   white-space: nowrap;
-  /* Per-row reveal (mini-boot for the resting state). Stagger
-     is applied via .is-visible classes added by the JS
-     orchestrator at 80ms cadence after the strip animation. */
+  /* Reveal mirrors the boot .scan-line exactly — max-height +
+     opacity, same cubic-bezier on max-height, same delayed
+     linear opacity. JS adds .is-visible at 145ms cadence
+     (matching boot). One canonical reveal, no others. */
+  max-height: 0;
   opacity: 0;
-  transform: translateY(6px);
+  overflow: hidden;
   transition:
-    opacity 280ms var(--ease-out),
-    transform 280ms var(--ease-out);
+    max-height 0.32s cubic-bezier(.4, .1, .2, 1),
+    opacity 0.18s linear 0.08s;
 }
 .hud-ambient-line.is-visible {
+  max-height: 22px;
   opacity: 1;
-  transform: translateY(0);
 }
 .hud-ambient-line .hud-ambient-t { opacity: 0.55; }
 .hud-ambient-line .hud-ambient-c { font-weight: 700; }
@@ -961,8 +963,9 @@ body.hero-stripped .has-hero-frame .frame-block {
 }
 
 /* Corner brackets — 4 L-shapes anchored to col-hero corners.
-   Hidden during boot, draw in (scale-from-0) when the strip
-   lands. Pure CSS borders, no extra DOM. */
+   Hidden during boot, fade in via the same opacity timing the
+   scan-line uses (no scale, no translate — opacity-only since
+   max-height doesn't apply to a fixed-size border box). */
 .hud-frame-bracket {
   position: absolute;
   width: 22px;
@@ -971,36 +974,25 @@ body.hero-stripped .has-hero-frame .frame-block {
   pointer-events: none;
   z-index: 3;
   opacity: 0;
-  transform: scale(0.4);
-  transition:
-    opacity 360ms var(--ease-out),
-    transform 360ms var(--ease-out);
+  transition: opacity 0.18s linear 0.08s;
 }
-.hud-frame-bracket--tl { top: 22px; left: 28px; border-right: none; border-bottom: none; transform-origin: top left; }
-.hud-frame-bracket--tr { top: 22px; right: 28px; border-left: none; border-bottom: none; transform-origin: top right; }
-.hud-frame-bracket--bl { bottom: 22px; left: 28px; border-right: none; border-top: none; transform-origin: bottom left; }
-.hud-frame-bracket--br { bottom: 22px; right: 28px; border-left: none; border-top: none; transform-origin: bottom right; }
+.hud-frame-bracket--tl { top: 22px; left: 28px; border-right: none; border-bottom: none; }
+.hud-frame-bracket--tr { top: 22px; right: 28px; border-left: none; border-bottom: none; }
+.hud-frame-bracket--bl { bottom: 22px; left: 28px; border-right: none; border-top: none; }
+.hud-frame-bracket--br { bottom: 22px; right: 28px; border-left: none; border-top: none; }
 
-/* Reveal — both .hud-ambient containers and .hud-frame-bracket
-   come in together when stripping starts. Lines inside .hud-ambient
-   stay at opacity:0 until the JS orchestrator adds .is-visible
-   to each one at 80ms cadence. */
+/* Container goes to its target opacity instantly; nothing visible
+   inside until lines reveal one by one via .is-visible. The
+   container's 0.36 acts as a faint multiplier on its children. */
 body.hero-stripping .has-hero-frame .hud-ambient,
 body.hero-stripped .has-hero-frame .hud-ambient {
   opacity: 0.36;
 }
-body.hero-stripping .has-hero-frame .hud-ambient {
-  transition: opacity 500ms var(--ease-out) 200ms;
-}
-body.hero-stripping .has-hero-frame .hud-frame-bracket,
-body.hero-stripped .has-hero-frame .hud-frame-bracket {
+/* Brackets share the scan-line opacity timing — added via
+   .is-visible by the JS orchestrator at the same 145ms cadence,
+   so the corners draw on alongside the readouts. */
+.hud-frame-bracket.is-visible {
   opacity: 0.42;
-  transform: scale(1);
-}
-body.hero-stripping .has-hero-frame .hud-frame-bracket {
-  transition:
-    opacity 360ms var(--ease-out) 200ms,
-    transform 360ms var(--ease-out) 200ms;
 }
 
 /* Article-open hides hero visuals; hide HUD chrome too so it
@@ -1020,9 +1012,7 @@ body.hero-stripping .has-hero-frame .hud-frame-bracket {
 @media (prefers-reduced-motion: reduce) {
   .hud-ambient-line,
   .hud-frame-bracket,
-  .hud-ambient-cursor,
-  body.hero-stripping .has-hero-frame .hud-ambient,
-  body.hero-stripping .has-hero-frame .hud-frame-bracket {
+  .hud-ambient-cursor {
     transition: none !important;
     animation: none !important;
   }
