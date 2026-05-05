@@ -398,28 +398,33 @@ body.hero-sequence-play .protocol-chip.is-typed {
   position: relative;
 }
 
-/* ILI-818 — single bottom-anchored flex column. Top scan,
-   frame-block, and bottom scan stack as siblings; all push
-   up from the bottom of the viewport as each line reveals.
-   overflow:hidden lets the oldest top-scan lines clip past
-   the top edge terminal-style. */
+/* ILI-818 — three-row grid: lockup vertically centered in
+   row 2 (auto), top scan in row 1 (1fr), bot scan in row 3
+   (1fr). Each scan stack is taller than its row, so it
+   overflows clip-side and visually fills the row from edge
+   to edge. Top stack flex-end so the latest reveal sits
+   just above the lockup (oldest clip at column top). Bot
+   stack flex-start so the first telemetry line sits just
+   below the lockup (latest clip at column bottom). */
 .frame-viewport {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
 }
 
 .scan-stack {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   padding: 0 40px;
   pointer-events: none;
+  overflow: hidden;
+  min-height: 0;
 }
+.scan-stack--top { grid-row: 1; justify-content: flex-end; }
+.scan-stack--bot { grid-row: 3; justify-content: flex-start; }
 
 /* Canonical reveal — scan-line and frame-line use the same
    max-height + opacity transition. Default state is VISIBLE
@@ -442,7 +447,11 @@ body.hero-sequence-play .protocol-chip.is-typed {
   color: #888888;
   white-space: nowrap;
   max-height: 28px;
-  opacity: 1;
+  /* Resting opacity is half — once the boot finishes
+     (body.is-index-booting removed), the cascade falls back
+     here and the 600ms transition fades from 1 → 0.5. */
+  opacity: 0.5;
+  transition: opacity 600ms ease-out;
 }
 body.is-index-booting .scan-line {
   max-height: 0;
@@ -461,6 +470,7 @@ body.is-index-booting .scan-line.is-visible {
 .scan-line .scan-d { color: #888888; }
 
 .frame-block {
+  grid-row: 2;
   background: transparent;
   padding: 24px 64px;
   display: flex;
@@ -629,7 +639,11 @@ body.is-index-booting .scan-line.is-visible {
   border: 1px solid #ffffff;
   pointer-events: none;
   z-index: 3;
-  opacity: 0.5;
+  /* Resting opacity is half of the boot-time 0.5 reveal —
+     fades 0.5 → 0.25 over 600ms when the boot ends, same
+     direction as the scan lines. */
+  opacity: 0.25;
+  transition: opacity 600ms ease-out;
 }
 /* Left brackets get +20px to clear the page rail; the col-hero
    left edge sits flush against the rail so 28px isn't enough. */

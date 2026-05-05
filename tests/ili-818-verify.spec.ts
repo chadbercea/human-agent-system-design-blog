@@ -66,17 +66,24 @@ test.describe('ILI-818 — hero boot reveal', () => {
     expect(counts.botTotal).toBeGreaterThanOrEqual(13);
     expect(counts.cornerTotal).toBe(4);
 
-    // Bottom-anchored stack: frame-viewport is flex column with
-    // justify-content: flex-end, so all 3 children push up from
-    // the bottom of the viewport as each line reveals.
-    const flow = await page.locator('.frame-viewport').evaluate((el) => ({
+    // Frame-viewport is grid 1fr auto 1fr — lockup centers
+    // vertically, scan stacks fill row 1 and row 3.
+    const layout = await page.locator('.frame-viewport').evaluate((el) => ({
       display: getComputedStyle(el).display,
-      direction: getComputedStyle(el).flexDirection,
-      justify: getComputedStyle(el).justifyContent,
+      rows: getComputedStyle(el).gridTemplateRows,
     }));
-    expect(flow.display).toBe('flex');
-    expect(flow.direction).toBe('column');
-    expect(flow.justify).toBe('flex-end');
+    expect(layout.display).toBe('grid');
+    expect(layout.rows).toMatch(/[\d.]+px [\d.]+px [\d.]+px/);
+
+    // Post-boot fade: scan lines settle at opacity 0.5, corners at 0.25.
+    // Wait past the 600ms fade duration after boot end (~7.8s).
+    await page.waitForTimeout(1200);
+    const dimmed = await page.evaluate(() => ({
+      scan: Number(getComputedStyle(document.querySelector('.scan-line.is-visible')!).opacity),
+      corner: Number(getComputedStyle(document.querySelector('.frame-corner.is-visible')!).opacity),
+    }));
+    expect(dimmed.scan).toBeCloseTo(0.5, 2);
+    expect(dimmed.corner).toBeCloseTo(0.25, 2);
 
     await page.screenshot({
       path: 'verification-screenshots/ili-818-boot-end.png',
@@ -96,18 +103,18 @@ test.describe('ILI-818 — hero boot reveal', () => {
     // No boot class on reduced-motion path.
     expect(await page.evaluate(() => document.body.classList.contains('is-index-booting'))).toBe(false);
 
-    // Scan-lines / frame-lines / corners visible by default (no body.is-index-booting,
-    // so the default visible state from CSS applies).
+    // No boot class → resting state from first paint:
+    // scan lines at 0.5, lockup at 1, corners at 0.25.
     const opacities = await page.evaluate(() => ({
       top: Number(getComputedStyle(document.querySelector('.scan-stack--top .scan-line')!).opacity),
       bot: Number(getComputedStyle(document.querySelector('.scan-stack--bot .scan-line')!).opacity),
       frame: Number(getComputedStyle(document.querySelector('.frame-block .frame-line')!).opacity),
       corner: Number(getComputedStyle(document.querySelector('.frame-corner')!).opacity),
     }));
-    expect(opacities.top).toBe(1);
-    expect(opacities.bot).toBe(1);
+    expect(opacities.top).toBeCloseTo(0.5, 2);
+    expect(opacities.bot).toBeCloseTo(0.5, 2);
     expect(opacities.frame).toBe(1);
-    expect(opacities.corner).toBeGreaterThan(0);
+    expect(opacities.corner).toBeCloseTo(0.25, 2);
 
     await page.screenshot({
       path: 'verification-screenshots/ili-818-reduced-motion.png',
@@ -137,10 +144,10 @@ test.describe('ILI-818 — hero boot reveal', () => {
       frame: Number(getComputedStyle(document.querySelector('.frame-block .frame-line')!).opacity),
       corner: Number(getComputedStyle(document.querySelector('.frame-corner')!).opacity),
     }));
-    expect(opacities.top).toBe(1);
-    expect(opacities.bot).toBe(1);
+    expect(opacities.top).toBeCloseTo(0.5, 2);
+    expect(opacities.bot).toBeCloseTo(0.5, 2);
     expect(opacities.frame).toBe(1);
-    expect(opacities.corner).toBeGreaterThan(0);
+    expect(opacities.corner).toBeCloseTo(0.25, 2);
 
     await context.close();
   });
@@ -162,8 +169,8 @@ test.describe('ILI-818 — hero boot reveal', () => {
       top: Number(getComputedStyle(document.querySelector('.scan-stack--top .scan-line')!).opacity),
       bot: Number(getComputedStyle(document.querySelector('.scan-stack--bot .scan-line')!).opacity),
     }));
-    expect(opacities.top).toBe(1);
-    expect(opacities.bot).toBe(1);
+    expect(opacities.top).toBeCloseTo(0.5, 2);
+    expect(opacities.bot).toBeCloseTo(0.5, 2);
 
     await context.close();
   });
