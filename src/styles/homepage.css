@@ -436,6 +436,8 @@ body.hero-sequence-play .protocol-chip.is-typed {
   color: #888888;
   white-space: nowrap;
   flex: 0 0 auto;
+  /* Default visible — return visits and reduced-motion paint
+     the column already filled. */
   max-height: 28px;
   opacity: 0.5;
   overflow: hidden;
@@ -443,6 +445,20 @@ body.hero-sequence-play .protocol-chip.is-typed {
     max-height 0.32s cubic-bezier(.4, .1, .2, 1),
     opacity 0.18s linear 0.08s;
 }
+/* Cold load: pre-rendered lines start hidden, then the boot
+   orchestrator adds .is-visible at 145ms cadence to write
+   them in one by one (canonical boot reveal). */
+body.has-hero-frame-play .scan-line {
+  max-height: 0;
+  opacity: 0;
+}
+body.has-hero-frame-play .scan-line.is-visible {
+  max-height: 28px;
+  opacity: 0.5;
+}
+/* The loop appends new lines marked .is-hidden so they start
+   collapsed; removing the class transitions them in to the
+   default visible state. */
 .scan-line.is-hidden {
   max-height: 0;
   opacity: 0;

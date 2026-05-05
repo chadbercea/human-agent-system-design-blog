@@ -1319,19 +1319,20 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
     <script is:inline data-astro-rerun>
       /* ILI-818 — frame-hero backdrop + lockup orchestrator.
 
-         Scan loop (always on, every visit, unless reduced-motion):
-         every 400–2000ms (varied), append a new .scan-line at the
-         bottom of #scan-stack. The line starts collapsed, grows
-         to 28px via max-height transition; the rest of the stack
-         pushes up by 28px and the oldest line scrolls past the
-         top edge (clipped by overflow:hidden on .scan-stack). DOM
-         is trimmed when it exceeds 50 entries.
+         Cold load (body.has-hero-frame-play set pre-paint):
+         pre-rendered scan-lines start hidden via the body class.
+         JS reveals them one by one at 145ms cadence — the
+         canonical boot reveal — filling the column from the
+         bottom up. After the last scan-line settles + a short
+         breath, the lockup writes in: glass blur fades on,
+         then the 5 frame-lines reveal at the same 145ms
+         cadence. Once everything has loaded in, the one-in/
+         one-out varied-interval loop starts and runs forever.
 
-         Lockup reveal (cold load only):
-         body.has-hero-frame-play is set pre-paint; the .frame-block
-         is transparent during this state. After REVEAL_DELAY (4s),
-         add .is-revealing — glass background fades in (400ms),
-         then frame-lines scan in at the canonical 145ms cadence. */
+         Return visit / reduced-motion: pre-rendered lines are
+         visible from first paint, lockup is visible from first
+         paint, loop starts immediately on script run (skipped
+         entirely under reduced-motion). */
       (function () {
         if (window.__ili818LoopMounted) return;
         var hero = document.querySelector('.col-hero.has-hero-frame');
@@ -1345,7 +1346,7 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         var SCAN_LINES = [];
         try { SCAN_LINES = JSON.parse(dataEl.textContent || '[]'); } catch (e) {}
         if (!SCAN_LINES.length) return;
-        var scanIdx = SCAN_LINES.length; // pre-rendered set occupies slots 0..N-1
+        var scanIdx = SCAN_LINES.length;
 
         function makeLine(parts) {
           var el = document.createElement('div');
@@ -1363,9 +1364,6 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           scanIdx++;
           var el = makeLine(next);
           stack.appendChild(el);
-          // Two RAFs ensure the browser has applied is-hidden's
-          // collapsed state before we remove it — without this the
-          // transition can be skipped and the line snaps in.
           requestAnimationFrame(function () {
             requestAnimationFrame(function () {
               el.classList.remove('is-hidden');
@@ -1378,39 +1376,65 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         var reduced = window.matchMedia
           && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        function loop() {
-          var delay = 400 + Math.random() * 1600;
-          window.setTimeout(function () {
-            cycleAdd();
-            loop();
-          }, delay);
+        function startLoop() {
+          if (reduced) return;
+          (function tick() {
+            var delay = 400 + Math.random() * 1600;
+            window.setTimeout(function () {
+              cycleAdd();
+              tick();
+            }, delay);
+          })();
         }
-        if (!reduced) loop();
 
-        // Lockup reveal — cold load only.
-        if (!document.body.classList.contains('has-hero-frame-play')) return;
+        if (!document.body.classList.contains('has-hero-frame-play')) {
+          // Return visit / reduced-motion: everything already
+          // visible from CSS defaults. Just kick off the loop.
+          startLoop();
+          return;
+        }
 
-        var REVEAL_DELAY = 4000;
-        var GLASS_FADE = 400;
+        // Cold load — orchestrate the canonical reveal sequence.
+        var INITIAL_DELAY = 280;
         var CADENCE = 145;
-        var frameLines = frameBlock.querySelectorAll('.frame-line');
+        var REVEAL_TRANSITION = 320;
+        var SCAN_BREATH = 200;
+        var GLASS_FADE = 400;
+        var POST_LOCKUP_BREATH = 400;
+
+        var preLines = stack.querySelectorAll('.scan-line');
+        preLines.forEach(function (el, i) {
+          window.setTimeout(function () {
+            el.classList.add('is-visible');
+          }, INITIAL_DELAY + i * CADENCE);
+        });
+
+        var lastScanAt = INITIAL_DELAY + Math.max(0, preLines.length - 1) * CADENCE;
+        var scanSettleAt = lastScanAt + REVEAL_TRANSITION;
+        var lockupRevealAt = scanSettleAt + SCAN_BREATH;
 
         window.setTimeout(function () {
           frameBlock.classList.add('is-revealing');
-          window.setTimeout(function () {
-            frameLines.forEach(function (el, i) {
-              window.setTimeout(function () {
-                el.classList.add('is-visible');
-              }, i * CADENCE);
-            });
-          }, GLASS_FADE);
-        }, REVEAL_DELAY);
+        }, lockupRevealAt);
 
-        var totalDuration = REVEAL_DELAY + GLASS_FADE + frameLines.length * CADENCE + 400;
+        var frameLines = frameBlock.querySelectorAll('.frame-line');
+        var frameLinesStartAt = lockupRevealAt + GLASS_FADE;
+        frameLines.forEach(function (el, i) {
+          window.setTimeout(function () {
+            el.classList.add('is-visible');
+          }, frameLinesStartAt + i * CADENCE);
+        });
+
+        var lastFrameAt = frameLinesStartAt + Math.max(0, frameLines.length - 1) * CADENCE;
+        var lockupSettleAt = lastFrameAt + REVEAL_TRANSITION;
+        var loopStartAt = lockupSettleAt + POST_LOCKUP_BREATH;
+        var bootEndAt = loopStartAt;
+
         window.setTimeout(function () {
           try { sessionStorage.setItem('has_hero_played', '1'); } catch (e) {}
           document.body.classList.remove('has-hero-frame-play');
-        }, totalDuration);
+          startLoop();
+        }, bootEndAt);
       })();
     </script>
 
@@ -1430,20 +1454,26 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
       (function () {
         if (!document.body.classList.contains('is-index-booting')) return;
 
-        /* Mirrors the frame-hero orchestrator: REVEAL_DELAY hold,
-           then the glass background fades in (GLASS_FADE), then
-           5 frame-lines scan in at CADENCE each. Hero settles
-           when the last frame-line reveal completes. */
-        var REVEAL_DELAY = 4000;
-        var GLASS_FADE = 400;
+        /* Mirrors the frame-hero orchestrator: 28 scan-lines
+           reveal at 145ms cadence, then a 200ms breath, then
+           the lockup writes in (glass fade + 5 frame-lines).
+           Hero settles when the last frame-line reveal completes. */
+        var INITIAL_DELAY = 280;
         var CADENCE = 145;
-        var FRAME_LINES = 5;
         var REVEAL_TRANSITION = 320;
+        var SCAN_BREATH = 200;
+        var GLASS_FADE = 400;
+        var SCAN_LINES_COUNT = 28;
+        var FRAME_LINES = 5;
         var STAGE_CADENCE = 180;
         var POST_FOOTER_DELAY = 400;
 
-        var lastFrameLineAt = REVEAL_DELAY + GLASS_FADE + (FRAME_LINES - 1) * CADENCE;
-        var heroSettleAt = lastFrameLineAt + REVEAL_TRANSITION;
+        var lastScanAt = INITIAL_DELAY + (SCAN_LINES_COUNT - 1) * CADENCE;
+        var scanSettleAt = lastScanAt + REVEAL_TRANSITION;
+        var lockupRevealAt = scanSettleAt + SCAN_BREATH;
+        var frameLinesStartAt = lockupRevealAt + GLASS_FADE;
+        var lastFrameAt = frameLinesStartAt + (FRAME_LINES - 1) * CADENCE;
+        var heroSettleAt = lastFrameAt + REVEAL_TRANSITION;
 
         var stages = ['boot-stage-header', 'boot-stage-rail', 'boot-stage-list', 'boot-stage-footer'];
         stages.forEach(function (cls, i) {
