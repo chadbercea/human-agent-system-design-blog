@@ -393,39 +393,43 @@ body.hero-sequence-play .protocol-chip.is-typed {
   display: flex;
   flex-direction: column;
   border-right: 1px solid #000;
-  /* ILI-818 — anchor for absolutely-positioned .hud-ambient
-     telemetry rows that fade in at low opacity post-strip. */
+  /* ILI-818 — anchor for the 4 absolutely-positioned
+     .frame-corner brackets that frame the column. */
   position: relative;
 }
 
-/* Single bottom-anchored print column. scan-stack and frame-block
-   are siblings stacked vertically; both are pushed to the bottom of
-   the viewport via flex-end. Each new revealed line (scan or frame)
-   appears at the bottom and lifts the entire stack up — the scan log
-   stays visible the whole time, and the frame content prints in
-   below it as one continuous pass. overflow:hidden clips any content
-   that pushes past the top of the viewport. */
+/* ILI-818 — three-row grid lays out the lockup centered with
+   scan stacks above and below. Top stack bottom-anchors against
+   the frame-block (newest line nearest the message), bottom
+   stack top-anchors. overflow:hidden so excess scan lines
+   clip terminal-style. */
 .frame-viewport {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
 }
 
 .scan-stack {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   padding: 0 40px;
   pointer-events: none;
+  overflow: hidden;
+  min-height: 0;
 }
+.scan-stack--top { grid-row: 1; justify-content: flex-end; }
+.scan-stack--bot { grid-row: 3; justify-content: flex-start; }
 
-/* Shared reveal mechanism — scan lines and frame lines use
-   the same max-height + opacity transition so the cadence
-   reads as a single continuous print pass. */
+/* Canonical reveal — scan-line and frame-line use the same
+   max-height + opacity transition. Default state is VISIBLE
+   so return visits and reduced-motion paint the resting state
+   from first paint without running the animation. The
+   .is-index-booting body class flips them to hidden during
+   cold load; the boot orchestrator then walks the DOM and adds
+   .is-visible at 145ms cadence. */
 .scan-line {
   display: grid;
   grid-template-columns: 96px 64px 1fr;
@@ -434,11 +438,15 @@ body.hero-sequence-play .protocol-chip.is-typed {
   font-family: var(--font-mono);
   font-weight: 500;
   font-size: 12px;
-  line-height: 32px;
+  line-height: 28px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #888888;
   white-space: nowrap;
+  max-height: 28px;
+  opacity: 1;
+}
+body.is-index-booting .scan-line {
   max-height: 0;
   opacity: 0;
   overflow: hidden;
@@ -446,8 +454,8 @@ body.hero-sequence-play .protocol-chip.is-typed {
     max-height 0.32s cubic-bezier(.4, .1, .2, 1),
     opacity 0.18s linear 0.08s;
 }
-.scan-line.is-visible {
-  max-height: 32px;
+body.is-index-booting .scan-line.is-visible {
+  max-height: 28px;
   opacity: 1;
 }
 .scan-line .scan-t { color: #888888; opacity: 0.7; }
@@ -455,12 +463,12 @@ body.hero-sequence-play .protocol-chip.is-typed {
 .scan-line .scan-d { color: #888888; }
 
 .frame-block {
+  grid-row: 2;
   background: transparent;
-  padding: 24px 64px 56px;
+  padding: 24px 64px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: flex-end;
 }
 
 /* Frame-line wrapper — same reveal as .scan-line, taller
@@ -602,57 +610,51 @@ body.hero-sequence-play .protocol-chip.is-typed {
   }
 }
 
-.signal-strip {
-  flex: 0 0 auto;
-  border-top: 1px solid #888888;
-  padding: 14px 40px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  background: #000000;
-  color: #888888;
-}
-.signal-strip .signal-sep { opacity: 0.6; }
-.signal-strip .signal-cursor {
-  display: inline-block;
-  margin-left: 2px;
-  color: #888888;
-  animation: signal-cursor-blink 1s steps(1, end) infinite;
-}
-@keyframes signal-cursor-blink {
-  0%, 50%      { opacity: 1; }
-  50.01%, 100% { opacity: 0; }
-}
-
-/* Article-open state — when an article reader is open the
-   hero column collapses to an 80px back-button strip. Hero
-   is already black, so we just hide the frame visuals and
-   let the back-btn take over. */
+/* Article-open state — hide everything inside the hero column
+   when the article reader is open; just leave the back-btn. */
 .stage.open .col-hero.has-hero-frame {
   background: var(--black);
   border-right: 1px solid #1c1c1c;
 }
 .stage.open .col-hero.has-hero-frame .frame-viewport,
-.stage.open .col-hero.has-hero-frame .signal-strip {
+.stage.open .col-hero.has-hero-frame .frame-corner {
   display: none;
 }
 
-/* ── Play-state overrides — only active while the boot
-      sequence is running. Containers stay visible the whole
-      time; the individual lines (scan-line and frame-line)
-      handle their own reveal via max-height + opacity. ── */
+/* ILI-818 — corner brackets at the col-hero corners. Default
+   visible; hidden during boot until the orchestrator adds
+   .is-visible at the canonical 145ms cadence (same opacity
+   transition as a scan-line). */
+.frame-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 1px solid #ffffff;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.5;
+}
+.frame-corner--tl { top: 22px; left: 28px; border-right: none; border-bottom: none; }
+.frame-corner--tr { top: 22px; right: 28px; border-left: none; border-bottom: none; }
+.frame-corner--bl { bottom: 22px; left: 28px; border-right: none; border-top: none; }
+.frame-corner--br { bottom: 22px; right: 28px; border-left: none; border-top: none; }
+body.is-index-booting .frame-corner {
+  opacity: 0;
+  transition: opacity 0.18s linear 0.08s;
+}
+body.is-index-booting .frame-corner.is-visible {
+  opacity: 0.5;
+}
 
-/* Frame lines hide until JS adds .is-visible at the cadence —
-   identical reveal mechanism to .scan-line above. No translateY,
-   no per-element delays; the orchestrator schedules each
-   .is-visible flip 145ms apart. */
-body.has-hero-frame-play .has-hero-frame .frame-line {
+/* Frame lines: same canonical reveal as scan-line (max-height +
+   opacity at 145ms cadence). Default visible; hidden only during
+   boot until the orchestrator adds .is-visible. */
+.frame-line {
+  width: 100%;
+  max-height: none;
+  opacity: 1;
+}
+body.is-index-booting .frame-line {
   max-height: 0;
   opacity: 0;
   overflow: hidden;
@@ -660,34 +662,17 @@ body.has-hero-frame-play .has-hero-frame .frame-line {
     max-height 0.32s cubic-bezier(.4, .1, .2, 1),
     opacity 0.18s linear 0.08s;
 }
-body.has-hero-frame-play .has-hero-frame .frame-line.is-visible {
+body.is-index-booting .frame-line.is-visible {
   max-height: 320px;
   opacity: 1;
 }
 
-/* Reduced motion safety net — even if the JS gate failed and
-   the play class was added in error, drop every transition
-   so the user lands on end-state instantly. */
 @media (prefers-reduced-motion: reduce) {
   .scan-line,
-  .scan-stack,
-  .frame-block,
   .frame-line,
-  .frame-rule,
-  .frame-eyebrow,
-  .frame-h1,
-  .frame-dek,
-  .frame-audience,
-  .frame-cta {
+  .frame-corner {
     transition: none !important;
     animation: none !important;
-  }
-  body.has-hero-frame-play .has-hero-frame .scan-stack { display: none; }
-  body.has-hero-frame-play .has-hero-frame .frame-block,
-  body.has-hero-frame-play .has-hero-frame .frame-line {
-    opacity: 1;
-    max-height: none;
-    overflow: visible;
   }
 }
 
@@ -782,239 +767,6 @@ body.is-index-booting.boot-stage-footer .site-footer {
     visibility: visible !important;
     transform: none !important;
     transition: none !important;
-  }
-}
-
-/* ───────────── ILI-818: HERO STRIP-DOWN ─────────────
-   Cold load: after the ILI-789 boot finishes (header → rail
-   → list → footer panels) plus a 600ms hold, the hero strips
-   itself down to just the message — H1, dek, audience, CTA —
-   recentered in the now-empty column. Chrome that fades on
-   desktop: .scan-stack, the .frame-rule hairline, the
-   .frame-eyebrow line, and the .signal-strip (which carries
-   the second hairline + the VISITOR ACQUIRED · TELEMETRY ·
-   ARCHIVE · SIGNAL telemetry row).
-
-   Two classes drive the lifecycle:
-   - body.hero-stripping: transient, runs the 500ms animated
-     transition. Chrome collapses (opacity + max-height on
-     scan/eyebrow/rule lines; opacity-only on signal-strip so
-     it stays in flow during the animation) while .frame-block
-     translates from bottom-anchored to centered using
-     --strip-y measured at trigger time.
-   - body.hero-stripped: final resting state. Chrome
-     display:none; frame-viewport justify-content:center.
-     Pre-paint gate sets this directly on return visits and
-     reduced-motion so first paint = resting state. The cold-
-     load orchestrator swaps stripping → stripped at 500ms;
-     the swap is visually seamless because --strip-y was
-     computed against the col-hero column height (signal-strip
-     space included), matching the post-swap centered layout.
-   ───────────────────────────────────────────────────── */
-body.hero-stripping .has-hero-frame .scan-stack,
-body.hero-stripping .has-hero-frame .frame-line:has(.frame-rule),
-body.hero-stripping .has-hero-frame .frame-line:has(.frame-eyebrow) {
-  opacity: 0;
-  max-height: 0;
-  margin: 0;
-  pointer-events: none;
-  overflow: hidden;
-  transition:
-    opacity 500ms var(--ease-out),
-    max-height 500ms var(--ease-out),
-    margin 500ms var(--ease-out);
-}
-/* Signal-strip stays in layout during the animation (no
-   max-height collapse) so frame-viewport keeps its size and
-   the JS-measured --strip-y stays accurate. Display:none
-   in the stripped state drops it from layout post-swap. */
-body.hero-stripping .has-hero-frame .signal-strip {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 500ms var(--ease-out);
-}
-body.hero-stripping .has-hero-frame .frame-block {
-  transform: translateY(var(--strip-y, 0));
-  transition: transform 500ms var(--ease-out);
-  will-change: transform;
-}
-
-body.hero-stripped .has-hero-frame .frame-viewport {
-  justify-content: center;
-}
-body.hero-stripped .has-hero-frame .scan-stack,
-body.hero-stripped .has-hero-frame .frame-line:has(.frame-rule),
-body.hero-stripped .has-hero-frame .frame-line:has(.frame-eyebrow),
-body.hero-stripped .has-hero-frame .signal-strip {
-  display: none;
-}
-body.hero-stripped .has-hero-frame .frame-block {
-  transform: none;
-}
-
-@media (max-width: 900px) {
-  /* Strip-down is a desktop refinement. Mobile keeps the
-     bottom-anchored layout AND the signal-strip (its smaller
-     mobile chrome reads as part of the hero, not desktop
-     theatre); only the eyebrow/rule/scan log get cleaned up
-     by the existing mobile rules. */
-  body.hero-stripping .has-hero-frame .signal-strip,
-  body.hero-stripped .has-hero-frame .signal-strip {
-    opacity: 1;
-    pointer-events: auto;
-    display: flex;
-  }
-  body.hero-stripping .has-hero-frame .frame-block {
-    transform: none;
-    transition: none;
-  }
-  body.hero-stripped .has-hero-frame .frame-viewport {
-    justify-content: flex-end;
-  }
-  body.hero-stripped .has-hero-frame .frame-block {
-    transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body.hero-stripping .has-hero-frame .scan-stack,
-  body.hero-stripping .has-hero-frame .frame-line:has(.frame-rule),
-  body.hero-stripping .has-hero-frame .frame-line:has(.frame-eyebrow),
-  body.hero-stripping .has-hero-frame .signal-strip,
-  body.hero-stripping .has-hero-frame .frame-block {
-    transition: none !important;
-  }
-}
-
-/* ───────────── ILI-818: AMBIENT HUD CHROME ─────────────
-   Resting-state mission-control chrome: 4 corner brackets
-   draw in, two stacks of scan-line-style telemetry print
-   in line by line (mini-boot, 80ms cadence), T+ counter
-   ticks live, signal bar fluctuates, terminal cursor blinks
-   on the last line. All at low opacity (0.36 base on the
-   stack) so the centered message stays the focal point.
-
-   Hidden during boot (the loud scan log owns the stage).
-   When body.hero-stripping is added: corner brackets
-   reveal as the chrome fades, then the JS orchestrator
-   adds .is-visible to each .hud-ambient-line at 80ms
-   stagger so the readouts print in like terminal output.
-   Pre-paint gate path (return visits, reduced-motion)
-   adds .is-visible to every line synchronously so the
-   resting state lands fully assembled, no animation. */
-
-.hud-ambient {
-  position: absolute;
-  left: 0;
-  right: 0;
-  padding: 24px 64px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  pointer-events: none;
-  opacity: 0;
-  z-index: 2;
-}
-.hud-ambient--top { top: 0; }
-.hud-ambient--bot { bottom: 0; }
-
-.hud-ambient-line {
-  display: grid;
-  grid-template-columns: 104px 48px 1fr;
-  gap: 18px;
-  align-items: center;
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-size: 11px;
-  line-height: 22px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #ffffff;
-  white-space: nowrap;
-  /* Reveal mirrors the boot .scan-line exactly — max-height +
-     opacity, same cubic-bezier on max-height, same delayed
-     linear opacity. JS adds .is-visible at 145ms cadence
-     (matching boot). One canonical reveal, no others. */
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition:
-    max-height 0.32s cubic-bezier(.4, .1, .2, 1),
-    opacity 0.18s linear 0.08s;
-}
-.hud-ambient-line.is-visible {
-  max-height: 22px;
-  opacity: 1;
-}
-.hud-ambient-line .hud-ambient-t { opacity: 0.55; }
-.hud-ambient-line .hud-ambient-c { font-weight: 700; }
-.hud-ambient-line .hud-ambient-d {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.hud-ambient-cursor {
-  display: inline-block;
-  margin-left: 4px;
-  animation: hud-cursor-blink 1s steps(1, end) infinite;
-}
-@keyframes hud-cursor-blink {
-  0%, 50%      { opacity: 1; }
-  50.01%, 100% { opacity: 0; }
-}
-
-/* Corner brackets — 4 L-shapes anchored to col-hero corners.
-   Hidden during boot, fade in via the same opacity timing the
-   scan-line uses (no scale, no translate — opacity-only since
-   max-height doesn't apply to a fixed-size border box). */
-.hud-frame-bracket {
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  border: 1px solid #ffffff;
-  pointer-events: none;
-  z-index: 3;
-  opacity: 0;
-  transition: opacity 0.18s linear 0.08s;
-}
-.hud-frame-bracket--tl { top: 22px; left: 28px; border-right: none; border-bottom: none; }
-.hud-frame-bracket--tr { top: 22px; right: 28px; border-left: none; border-bottom: none; }
-.hud-frame-bracket--bl { bottom: 22px; left: 28px; border-right: none; border-top: none; }
-.hud-frame-bracket--br { bottom: 22px; right: 28px; border-left: none; border-top: none; }
-
-/* Container goes to its target opacity instantly; nothing visible
-   inside until lines reveal one by one via .is-visible. The
-   container's 0.36 acts as a faint multiplier on its children. */
-body.hero-stripping .has-hero-frame .hud-ambient,
-body.hero-stripped .has-hero-frame .hud-ambient {
-  opacity: 0.36;
-}
-/* Brackets share the scan-line opacity timing — added via
-   .is-visible by the JS orchestrator at the same 145ms cadence,
-   so the corners draw on alongside the readouts. */
-.hud-frame-bracket.is-visible {
-  opacity: 0.42;
-}
-
-/* Article-open hides hero visuals; hide HUD chrome too so it
-   doesn't bleed past the stage.open back-button strip. */
-.stage.open .col-hero.has-hero-frame .hud-ambient,
-.stage.open .col-hero.has-hero-frame .hud-frame-bracket {
-  display: none;
-}
-
-@media (max-width: 900px) {
-  /* Mobile: shorter column has no room for HUD chrome above
-     and below the message; hide entirely. */
-  .hud-ambient,
-  .hud-frame-bracket { display: none; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hud-ambient-line,
-  .hud-frame-bracket,
-  .hud-ambient-cursor {
-    transition: none !important;
-    animation: none !important;
   }
 }
 
@@ -1995,16 +1747,23 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
     height: 100svh;
   }
 
-  /* Frame hero (ILI-787) on mobile — col-hero already fills the
-     stage box (header→footer) via the pager's inset:0, so no
-     explicit height is needed. The flex column inside (frame-viewport
-     + signal-strip) bottom-anchors via flex-end. */
+  /* Frame hero on mobile — col-hero fills the pager's stage box.
+     Mobile keeps the simpler bottom-anchored layout (no top scan
+     stack, no corners) — the message + bottom telemetry is plenty
+     of density for a phone. */
   .col-hero.has-hero-frame {
     border-right: none;
     border-bottom: 1px solid #000;
     display: flex;
     flex-direction: column;
   }
+  .col-hero.has-hero-frame .frame-viewport {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .col-hero.has-hero-frame .scan-stack--top { display: none; }
+  .col-hero.has-hero-frame .frame-corner { display: none; }
   .col-hero.has-hero-frame .scan-stack {
     padding: 16px 20px 20px;
   }
@@ -2024,12 +1783,6 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
   .col-hero.has-hero-frame .frame-dek {
     font-size: 16px;
     line-height: 1.5;
-  }
-  .col-hero.has-hero-frame .signal-strip {
-    padding: 12px 20px;
-    font-size: 10px;
-    letter-spacing: 0.10em;
-    gap: 8px;
   }
 
   /* Desktop back column / button: hide entirely on mobile */
