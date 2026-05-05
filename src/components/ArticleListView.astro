@@ -236,6 +236,46 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           <span class="signal-sep">&middot;</span>
           <span class="signal-item">SIGNAL ██████████ 100%</span>
         </div>
+        {/* ILI-818 — ambient HUD telemetry. Hidden during boot.
+            Fades in at low opacity as the strip-down lands so the
+            stripped resting state has faint scan-line-style data
+            framing the centered message. Same .scan-line grid
+            (timestamp · code · description) so the system reads
+            as continuing to operate, not gone quiet. */}
+        <div class="hud-ambient hud-ambient--top" aria-hidden="true">
+          <div class="hud-ambient-line">
+            <span class="hud-ambient-t">T+00:02:14</span>
+            <span class="hud-ambient-c">OBS</span>
+            <span class="hud-ambient-d">42.56&deg;N &middot; 114.46&deg;W &middot; TWIN FALLS / IDAHO</span>
+          </div>
+          <div class="hud-ambient-line">
+            <span class="hud-ambient-t">T+00:02:14</span>
+            <span class="hud-ambient-c">IDX</span>
+            <span class="hud-ambient-d">003 ENTRIES &middot; UPD 2026.04.30 &middot; CH 01 DISPATCH</span>
+          </div>
+          <div class="hud-ambient-line">
+            <span class="hud-ambient-t">T+00:02:14</span>
+            <span class="hud-ambient-c">LNK</span>
+            <span class="hud-ambient-d">AGENT-01 ONLINE &middot; OPERATOR LINKED &middot; HANDSHAKE OK</span>
+          </div>
+        </div>
+        <div class="hud-ambient hud-ambient--bot" aria-hidden="true">
+          <div class="hud-ambient-line">
+            <span class="hud-ambient-t">T+00:02:14</span>
+            <span class="hud-ambient-c">FRM</span>
+            <span class="hud-ambient-d">V1.0 &middot; TRIAD VERIFIED &middot; 3 DESIGN OBJECTS</span>
+          </div>
+          <div class="hud-ambient-line">
+            <span class="hud-ambient-t">T+00:02:14</span>
+            <span class="hud-ambient-c">BLD</span>
+            <span class="hud-ambient-d">REV 01.00 &middot; HASH 9F2A-8C1D &middot; GAMMA sRGB</span>
+          </div>
+          <div class="hud-ambient-line">
+            <span class="hud-ambient-t">T+00:02:14</span>
+            <span class="hud-ambient-c">SIG</span>
+            <span class="hud-ambient-d">██████████ 100% &middot; ARCHIVE STANDING BY</span>
+          </div>
+        </div>
         <button class="back-btn" id="back-btn" aria-label="Back to articles">
           <span class="back-content">
             <span class="back-arrow">&larr;</span>
