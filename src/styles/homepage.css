@@ -392,7 +392,7 @@ body.hero-sequence-play .protocol-chip.is-typed {
   color: #ffffff;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #000;
+  border-right: 1px solid #1c1c1c;
   /* ILI-818 — anchor for the 4 absolutely-positioned
      .frame-corner brackets that frame the column. */
   position: relative;
