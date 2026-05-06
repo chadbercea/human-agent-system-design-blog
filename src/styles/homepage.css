@@ -1059,7 +1059,7 @@ body.is-index-booting.boot-stage-footer .site-footer {
 
 .article-inner {
   width: 100%;
-  padding: 4rem 4rem 6rem;
+  padding: 3.5rem 3rem 4rem;
   opacity: 0;
   transform: translateX(16px);
   transition: opacity 0.4s ease 0.3s, transform 0.4s ease 0.3s;
@@ -1094,14 +1094,11 @@ body.is-index-booting.boot-stage-footer .site-footer {
 .art-h1 {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: clamp(32px, 5vw, 64px);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
+  font-size: 4vw;
+  line-height: 1.03;
+  letter-spacing: -0.03em;
   text-transform: uppercase;
   color: var(--white);
-  max-width: 20ch;
-  word-break: break-word;
-  hyphens: none;
   margin-bottom: 1.5rem;
   clip-path: inset(0 100% 0 0);
 }
