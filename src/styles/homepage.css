@@ -915,14 +915,11 @@ body.is-index-booting.boot-stage-footer .site-footer {
 .post-card-title {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: clamp(20px, 2.4vw, 28px);
+  font-size: 1.5vw;
   line-height: 1.1;
   letter-spacing: -0.01em;
   text-transform: uppercase;
   color: var(--white);
-  max-width: 24ch;
-  word-break: break-word;
-  hyphens: none;
   transition: color 0.2s ease;
 }
 .post-card:hover .post-card-title,
