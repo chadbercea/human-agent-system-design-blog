@@ -118,4 +118,4 @@ User-agent: Bytespider
 Allow: /
 
 # ─── Sitemap ───
-Sitemap: https://humanagentsystem.design/sitemap-index.xml
+Sitemap: https://www.humanagentsystem.blog/sitemap-index.xml
