@@ -60,11 +60,11 @@ test.describe('ILI-789 — index boot sequence', () => {
     await page.goto(INDEX);
     await page.waitForLoadState('domcontentloaded');
 
-    // ILI-818 — cold load reveals 40 scan-lines at 145ms cadence,
-    // then a 200ms breath, then 400ms glass fade, then 5 frame
-    // lines × 145ms + 320ms transition ≈ 7.8s hero settle. Panels
-    // start revealing then.
-    await page.waitForTimeout(7900);
+    // ILI-825 — panels are now the FIRST phase of the cold load.
+    // PANEL_START_AT = 3600, STAGE_CADENCE = 180. At t=3700ms the
+    // header has just started its 320ms reveal and the later
+    // panels (rail/list/footer) are still hidden.
+    await page.waitForTimeout(3700);
     const afterHeader = await page.evaluate(() => {
       return {
         header: Number(getComputedStyle(document.querySelector('.site-header')!).opacity),
@@ -73,12 +73,11 @@ test.describe('ILI-789 — index boot sequence', () => {
         footer: Number(getComputedStyle(document.querySelector('.site-footer')!).opacity),
       };
     });
-    // Header has had time to start its 320ms transition; rail/list/footer still 0.
     expect(afterHeader.header).toBeGreaterThan(0);
     expect(afterHeader.footer).toBe(0);
 
-    // Allow full sequence + tail to settle.
-    await page.waitForTimeout(2000);
+    // Full boot ends after the hero phase (~12.7s); wait past it.
+    await page.waitForTimeout(10000);
 
     const final = await page.evaluate(() => ({
       header: Number(getComputedStyle(document.querySelector('.site-header')!).opacity),
@@ -114,10 +113,10 @@ test.describe('ILI-789 — index boot sequence', () => {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const page = await context.newPage();
 
-    // First visit — let it run. ILI-818 — full boot is ~9s
-    // (7.8s hero settle + ~1.3s panel reveals + 400ms tail).
+    // First visit — let it run. ILI-825 — panels reveal at 3.6s
+    // and the hero (final phase) ends around 12.7s; wait past it.
     await page.goto(INDEX);
-    await page.waitForTimeout(9500);
+    await page.waitForTimeout(13500);
     expect(await page.evaluate(() => sessionStorage.getItem('has_index_booted'))).toBe('1');
 
     // Second visit (reload) — should skip the boot entirely.

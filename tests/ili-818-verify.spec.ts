@@ -4,13 +4,16 @@ const PORT = process.env.PORT || 4322;
 const INDEX = `http://localhost:${PORT}/`;
 const ABOUT = `http://localhost:${PORT}/about`;
 
-/* ILI-818 — cold load reveals 28 pre-rendered scan-lines at
-   145ms cadence (canonical boot reveal), then a 200ms breath,
-   then the glass blur fades on, then 5 frame-lines write in.
-   Once everything has loaded in, the one-in/one-out varied-
-   interval loop begins (and runs forever after). Return visits
-   and reduced-motion paint everything visible from first paint. */
+/* ILI-818 / ILI-825 — cold load now runs the hero as the FINAL
+   phase, offset by HERO_START_AT after the panel reveals. The
+   sequence inside the hero phase is unchanged: 40 pre-rendered
+   scan-lines reveal at 145ms cadence, then a 200ms breath, then
+   the glass blur fades on, then 5 frame-lines write in. Once
+   everything has loaded in, the one-in/one-out varied-interval
+   loop begins (and runs forever after). Return visits and
+   reduced-motion paint everything visible from first paint. */
 
+const HERO_START_AT = 4500;
 const INITIAL_DELAY = 280;
 const CADENCE = 145;
 const REVEAL_TRANSITION = 320;
@@ -20,7 +23,7 @@ const SCAN_LINES_COUNT = 40;
 const FRAME_LINES_COUNT = 5;
 const POST_LOCKUP_BREATH = 400;
 
-const LAST_SCAN_AT = INITIAL_DELAY + (SCAN_LINES_COUNT - 1) * CADENCE;
+const LAST_SCAN_AT = HERO_START_AT + INITIAL_DELAY + (SCAN_LINES_COUNT - 1) * CADENCE;
 const SCAN_SETTLE_AT = LAST_SCAN_AT + REVEAL_TRANSITION;
 const LOCKUP_REVEAL_AT = SCAN_SETTLE_AT + SCAN_BREATH;
 const FRAME_LINES_START_AT = LOCKUP_REVEAL_AT + GLASS_FADE;
