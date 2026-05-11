@@ -4,7 +4,7 @@ import mdx from '@astrojs/mdx';
 
 const site =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, '') ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:4321');
+  'https://www.humanagentsystem.blog';
 
 // Monochrome Shiki theme — reads as telemetry printout, not a rainbow IDE.
 // Only uses --white / --light / --mid / --dim. Weight differentiates tokens.
