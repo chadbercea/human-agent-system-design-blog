@@ -1331,15 +1331,14 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
       /* ILI-818 / ILI-825 — frame-hero backdrop + lockup orchestrator.
 
          Cold load (body.has-hero-frame-play set pre-paint):
-         hero is now the FINAL phase of the boot. The panel
-         orchestrator owns the first half (header/rail/list/
-         footer reveal at ~3.6s). This script holds back until
-         HERO_START_AT (~4.5s), then runs the canonical reveal:
-         scan-lines fill the column at 145ms cadence, then the
-         lockup writes in — glass blur fades 0→1 over GLASS_FADE,
-         then the 5 frame-lines reveal at 145ms cadence. Once
-         everything has loaded in, the one-in/one-out varied-
-         interval loop starts and runs forever.
+         the scan-line reveal is the INITIAL animation — it runs
+         first, on its own clock (40 lines × 145ms cadence). The
+         panel orchestrator slots in at the half-mark of that
+         clock. Once the scan-lines settle, the hero CONTENT
+         (lockup) writes in as the final step — glass blur fades
+         0→1 over GLASS_FADE, then the 5 frame-lines reveal at
+         145ms cadence. Once everything has loaded in, the one-
+         in/one-out varied-interval loop starts and runs forever.
 
          Return visit / reduced-motion: pre-rendered lines are
          visible from first paint, lockup is visible from first
@@ -1406,10 +1405,10 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           return;
         }
 
-        // Cold load — hero is the final phase. Hold for HERO_START_AT
-        // while the panel orchestrator reveals header/rail/list/footer
-        // first, then run the canonical reveal sequence.
-        var HERO_START_AT = 4500;     // ILI-825 — hero begins after panels
+        // Cold load — scan-lines run first as the initial animation,
+        // then the lockup writes in as the final step. Panels are
+        // owned by the orchestrator below and slot in at the half-
+        // mark of the scan-line clock.
         var INITIAL_DELAY = 280;
         var CADENCE = 145;
         var REVEAL_TRANSITION = 320;
@@ -1421,10 +1420,10 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         preLines.forEach(function (el, i) {
           window.setTimeout(function () {
             el.classList.add('is-visible');
-          }, HERO_START_AT + INITIAL_DELAY + i * CADENCE);
+          }, INITIAL_DELAY + i * CADENCE);
         });
 
-        var lastScanAt = HERO_START_AT + INITIAL_DELAY + Math.max(0, preLines.length - 1) * CADENCE;
+        var lastScanAt = INITIAL_DELAY + Math.max(0, preLines.length - 1) * CADENCE;
         var scanSettleAt = lastScanAt + REVEAL_TRANSITION;
         var lockupRevealAt = scanSettleAt + SCAN_BREATH;
 
@@ -1463,28 +1462,40 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
     </script>
 
     <script is:inline data-astro-rerun>
-      /* ILI-789 / ILI-825 — index boot orchestrator. Panels are now
-         the FIRST phase of the cold load: at PANEL_START_AT (~half of
-         the original total) the four panels — header, rail, article
-         list, footer — reveal in sequence at 180ms cadence. Each
-         stage class flips a single panel's opacity/translateY
-         transition; the body background fades from #000 to its
-         natural color when the header stage class is added.
+      /* ILI-789 / ILI-825 — index boot orchestrator. Phase 1 is the
+         scan-line reveal (owned by the script above). Half-way
+         through that clock, this script slots the four panels —
+         header, rail, article list, footer — in at 180ms cadence.
+         The hero CONTENT (lockup) follows once the scan-lines
+         settle and runs as the final step.
 
-         After panels settle, the hero orchestrator (script above)
-         runs the final phase — scan-lines fill, then the lockup
-         writes in. This script computes the hero-phase end time
-         from the same constants so it can strip every boot class
-         once the whole sequence is done, leaving view-transition
-         re-entries on end-state. */
+         Each stage class flips a single panel's opacity/translateY
+         transition; the body background fades from #000 to its
+         natural color when the header stage lands. After the hero
+         lockup settles + a tail breath, this script strips every
+         boot class so view-transition re-entries land on end-state. */
       (function () {
         if (!document.body.classList.contains('is-index-booting')) return;
 
-        // Phase A — panels reveal at half-time
-        var PANEL_START_AT = 3600;
-        var STAGE_CADENCE = 180;
+        // Constants mirror the hero orchestrator above so both
+        // scripts agree on timing without sharing state.
+        var INITIAL_DELAY = 280;
+        var CADENCE = 145;
         var REVEAL_TRANSITION = 320;
+        var SCAN_BREATH = 200;
+        var GLASS_FADE = 400;
+        var SCAN_LINES_COUNT = 40;
+        var FRAME_LINES = 5;
+        var STAGE_CADENCE = 180;
         var POST_FOOTER_DELAY = 400;
+        var POST_LOCKUP_BREATH = 400;
+
+        var lastScanAt = INITIAL_DELAY + (SCAN_LINES_COUNT - 1) * CADENCE;
+
+        // Panels slot in at the half-time of the scan clock,
+        // running in their canonical 180ms cadence while the
+        // scan animation finishes its second half.
+        var PANEL_START_AT = Math.floor(lastScanAt / 2);
 
         var stages = ['boot-stage-header', 'boot-stage-rail', 'boot-stage-list', 'boot-stage-footer'];
         stages.forEach(function (cls, i) {
@@ -1494,19 +1505,8 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           }, PANEL_START_AT + i * STAGE_CADENCE);
         });
 
-        // Phase B — hero runs as the final step. Constants mirror
-        // the hero orchestrator above so we can compute when the
-        // whole boot ends and strip the boot classes.
-        var HERO_START_AT = 4500;
-        var INITIAL_DELAY = 280;
-        var CADENCE = 145;
-        var SCAN_BREATH = 200;
-        var GLASS_FADE = 400;
-        var SCAN_LINES_COUNT = 40;
-        var FRAME_LINES = 5;
-        var POST_LOCKUP_BREATH = 400;
-
-        var lastScanAt = HERO_START_AT + INITIAL_DELAY + (SCAN_LINES_COUNT - 1) * CADENCE;
+        // Hero lockup follows the scan-line settle as the final
+        // step (mirrors the hero orchestrator's timing).
         var scanSettleAt = lastScanAt + REVEAL_TRANSITION;
         var lockupRevealAt = scanSettleAt + SCAN_BREATH;
         var frameLinesStartAt = lockupRevealAt + GLASS_FADE;

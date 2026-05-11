@@ -6,17 +6,25 @@ const INDEX = `http://localhost:${PORT}/`;
 /**
  * ILI-825 — cold load animation sequence rework.
  *
- * New order: panels reveal at half-time first, then hero
- * (scan-lines → blur fade → frame-lines) runs as the final
- * step. Blur layer is 0% opacity until `.frame-block.is-revealing`
- * lands, then transitions to 100% during GLASS_FADE.
+ * Order:
+ *   1. Scan-line reveal is the INITIAL animation (runs from t=0).
+ *   2. At the half-mark of the scan clock (~3s), panels slot in
+ *      at their canonical 180ms cadence — header → rail → list → footer.
+ *   3. Hero CONTENT (lockup) is the FINAL step. Glass blur fades
+ *      0 → 1 during GLASS_FADE just before the first frame-line
+ *      writes in.
  *
- * Constants in ArticleListView.astro:
- *   PANEL_START_AT = 3600
- *   HERO_START_AT  = 4500
+ * Computed timing (mirrors the orchestrator constants):
+ *   INITIAL_DELAY=280, CADENCE=145, SCAN_LINES_COUNT=40
+ *   lastScanAt        = 280 + 39*145 = 5935
+ *   PANEL_START_AT    = floor(5935/2) = 2967
+ *   scanSettleAt      = 5935 + 320   = 6255
+ *   lockupRevealAt    = 6255 + 200   = 6455   (blur fades here)
+ *   frameLinesStartAt = 6455 + 400   = 6855
+ *   bootEndAt         ≈ 8155ms
  */
 test.describe('ILI-825 — cold load reorder', () => {
-  test('phase 0 — black field on first paint', async ({ page }) => {
+  test('phase 0 — black field on first paint, scan + blur both hidden', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(INDEX);
     await page.waitForLoadState('domcontentloaded');
@@ -39,77 +47,79 @@ test.describe('ILI-825 — cold load reorder', () => {
     });
   });
 
-  test('phase A — panels reveal at ~3.6s before hero scan starts', async ({ page }) => {
+  test('scan-lines are the initial animation — printing while panels are still hidden', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(INDEX);
     await page.waitForLoadState('domcontentloaded');
 
-    // At t=3000ms (before panels start), everything should still be hidden
-    // and hero scan-lines should still be hidden too.
-    await page.waitForTimeout(3000);
-    const at3s = await page.evaluate(() => ({
+    // At t=1500ms, the scan-line reveal is mid-run and the panels
+    // (which slot in at ~2967ms) are still hidden.
+    await page.waitForTimeout(1500);
+    const at1_5s = await page.evaluate(() => {
+      const lines = Array.from(document.querySelectorAll('.scan-stack .scan-line'));
+      return {
+        scanVisible: lines.filter((l) => l.classList.contains('is-visible')).length,
+        scanTotal: lines.length,
+        header: Number(getComputedStyle(document.querySelector('.site-header')!).opacity),
+        footer: Number(getComputedStyle(document.querySelector('.site-footer')!).opacity),
+      };
+    });
+    expect(at1_5s.scanVisible).toBeGreaterThan(0);
+    expect(at1_5s.scanVisible).toBeLessThan(at1_5s.scanTotal);
+    expect(at1_5s.header).toBe(0);
+    expect(at1_5s.footer).toBe(0);
+
+    await page.screenshot({
+      path: 'verification-screenshots/ili-825-phaseA-scan.png',
+      fullPage: false,
+    });
+  });
+
+  test('panels slot in at the half-mark of the scan clock', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(INDEX);
+    await page.waitForLoadState('domcontentloaded');
+
+    // At t=3050ms (just after PANEL_START_AT=2967), the header has
+    // begun its reveal; later panels (footer at 3507) are still hidden.
+    await page.waitForTimeout(3050);
+    const midPanel = await page.evaluate(() => ({
       header: Number(getComputedStyle(document.querySelector('.site-header')!).opacity),
       footer: Number(getComputedStyle(document.querySelector('.site-footer')!).opacity),
-      firstScanVisible: document.querySelector('.scan-line')?.classList.contains('is-visible'),
     }));
-    expect(at3s.header).toBe(0);
-    expect(at3s.footer).toBe(0);
-    expect(at3s.firstScanVisible).toBe(false);
+    expect(midPanel.header).toBeGreaterThan(0);
+    expect(midPanel.footer).toBe(0);
 
-    // At t=4200ms (after panels start at 3600, before hero scan at 4500),
-    // panels should be visible/revealing but hero scan-lines still hidden.
-    await page.waitForTimeout(1200);
-    const at4_2s = await page.evaluate(() => ({
-      header: Number(getComputedStyle(document.querySelector('.site-header')!).opacity),
-      rail:   Number(getComputedStyle(document.querySelector('.rail')!).opacity),
-      firstScanVisible: document.querySelector('.scan-line')?.classList.contains('is-visible'),
-    }));
-    expect(at4_2s.header).toBe(1);
-    expect(at4_2s.rail).toBeGreaterThan(0);
-    expect(at4_2s.firstScanVisible).toBe(false);
+    // By t=4300ms all four panels have started and the last has
+    // settled; scan-lines are still printing.
+    await page.waitForTimeout(1250);
+    const afterPanels = await page.evaluate(() => {
+      const lines = Array.from(document.querySelectorAll('.scan-stack .scan-line'));
+      return {
+        header: Number(getComputedStyle(document.querySelector('.site-header')!).opacity),
+        footer: Number(getComputedStyle(document.querySelector('.site-footer')!).opacity),
+        scanVisible: lines.filter((l) => l.classList.contains('is-visible')).length,
+        scanTotal: lines.length,
+      };
+    });
+    expect(afterPanels.header).toBe(1);
+    expect(afterPanels.footer).toBe(1);
+    expect(afterPanels.scanVisible).toBeLessThan(afterPanels.scanTotal);
 
     await page.screenshot({
-      path: 'verification-screenshots/ili-825-phaseA-panels.png',
+      path: 'verification-screenshots/ili-825-phaseB-panels.png',
       fullPage: false,
     });
   });
 
-  test('phase B — hero scan starts at ~4.5s (panels already settled)', async ({ page }) => {
+  test('blur fades on just before frame-lines write in', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(INDEX);
     await page.waitForLoadState('domcontentloaded');
 
-    // Just after HERO_START_AT + INITIAL_DELAY (4500 + 280 ≈ 4800ms),
-    // the first scan-line should have started revealing.
-    await page.waitForTimeout(5000);
-    const firstScanVisible = await page.evaluate(() =>
-      document.querySelector('.scan-line')?.classList.contains('is-visible'),
-    );
-    expect(firstScanVisible).toBe(true);
-
-    // Blur is still 0 — only flips on at lockupRevealAt.
-    const blurOpacity = await page.evaluate(() => {
-      const fb = document.querySelector('.frame-block');
-      const cs = getComputedStyle(fb!, '::before');
-      return Number(cs.opacity);
-    });
-    expect(blurOpacity).toBe(0);
-
-    await page.screenshot({
-      path: 'verification-screenshots/ili-825-phaseB-scanning.png',
-      fullPage: false,
-    });
-  });
-
-  test('blur fades on before frame-lines write in', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(INDEX);
-    await page.waitForLoadState('domcontentloaded');
-
-    // Wait past lockupRevealAt so `.is-revealing` has landed and the blur
-    // transition has run. HERO_START_AT(4500) + INITIAL_DELAY(280) +
-    // 39*145 + 320 + 200 = ~10955ms.  Wait 11400 to clear the 400ms fade.
-    await page.waitForTimeout(11400);
+    // Wait past lockupRevealAt + GLASS_FADE (6455 + 400 = 6855ms).
+    // Add a small buffer to clear the transition.
+    await page.waitForTimeout(7000);
 
     const result = await page.evaluate(() => {
       const fb = document.querySelector('.frame-block');
@@ -126,13 +136,13 @@ test.describe('ILI-825 — cold load reorder', () => {
     });
   });
 
-  test('end state — boot classes cleared, lockup visible', async ({ page }) => {
+  test('end state — boot classes cleared, lockup visible (~8.2s)', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(INDEX);
     await page.waitForLoadState('domcontentloaded');
 
-    // Full boot ≈ 12.7s with current scan-line cadence. Wait 13.5s.
-    await page.waitForTimeout(13500);
+    // Full boot ≈ 8.2s. Wait past bootEndAt with a buffer.
+    await page.waitForTimeout(8800);
 
     const result = await page.evaluate(() => ({
       isBooting: document.body.classList.contains('is-index-booting'),
