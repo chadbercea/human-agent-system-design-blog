@@ -1840,9 +1840,9 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
     display: flex;
     flex-direction: column;
   }
-  .col-hero.has-hero-frame .frame-corner--tl { top: 16px; left: 32px; }
+  .col-hero.has-hero-frame .frame-corner--tl { top: 16px; left: 16px; }
   .col-hero.has-hero-frame .frame-corner--tr { top: 16px; right: 16px; }
-  .col-hero.has-hero-frame .frame-corner--bl { bottom: 16px; left: 32px; }
+  .col-hero.has-hero-frame .frame-corner--bl { bottom: 16px; left: 16px; }
   .col-hero.has-hero-frame .frame-corner--br { bottom: 16px; right: 16px; }
   .col-hero.has-hero-frame .frame-block::before {
     mask-image: linear-gradient(
