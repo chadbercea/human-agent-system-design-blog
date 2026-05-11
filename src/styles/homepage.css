@@ -1905,6 +1905,10 @@ body.hero-hover .hud-corner.br { transform: translate(-8.49px, -8.49px); }
     margin-bottom: 0.7rem;
   }
   .post-card-body { margin-bottom: 0.75rem; }
+  .post-card-title {
+    font-size: 17px;
+    line-height: 1.35;
+  }
   .post-card-dek {
     font-size: 14px;
     line-height: 1.5;
