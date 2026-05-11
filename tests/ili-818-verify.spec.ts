@@ -4,12 +4,13 @@ const PORT = process.env.PORT || 4322;
 const INDEX = `http://localhost:${PORT}/`;
 const ABOUT = `http://localhost:${PORT}/about`;
 
-/* ILI-818 — cold load reveals 28 pre-rendered scan-lines at
-   145ms cadence (canonical boot reveal), then a 200ms breath,
-   then the glass blur fades on, then 5 frame-lines write in.
-   Once everything has loaded in, the one-in/one-out varied-
-   interval loop begins (and runs forever after). Return visits
-   and reduced-motion paint everything visible from first paint. */
+/* ILI-818 / ILI-825 — cold load reveals 40 pre-rendered scan-lines
+   at 145ms cadence (canonical boot reveal — the INITIAL animation),
+   then a 200ms breath, then the glass blur fades on, then 5 frame-
+   lines write in (FINAL step). Once everything has loaded in, the
+   one-in/one-out varied-interval loop begins (and runs forever
+   after). Return visits and reduced-motion paint everything visible
+   from first paint. */
 
 const INITIAL_DELAY = 280;
 const CADENCE = 145;

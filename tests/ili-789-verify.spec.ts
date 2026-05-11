@@ -37,7 +37,8 @@ test.describe('ILI-789 — index boot sequence', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(INDEX);
     await page.waitForLoadState('domcontentloaded');
-    // ~1.5s in: scan lines partially printed, panels still masked.
+    // ILI-825 — panels slot in at ~2967ms. At 1.5s the scan-line
+    // reveal is mid-run and all four panels are still masked.
     await page.waitForTimeout(1500);
 
     const headerOpacity = await page.locator('.site-header').evaluate((el) => Number(getComputedStyle(el).opacity));
@@ -60,11 +61,11 @@ test.describe('ILI-789 — index boot sequence', () => {
     await page.goto(INDEX);
     await page.waitForLoadState('domcontentloaded');
 
-    // ILI-818 — cold load reveals 40 scan-lines at 145ms cadence,
-    // then a 200ms breath, then 400ms glass fade, then 5 frame
-    // lines × 145ms + 320ms transition ≈ 7.8s hero settle. Panels
-    // start revealing then.
-    await page.waitForTimeout(7900);
+    // ILI-825 — panels slot in at the half-mark of the scan clock
+    // (PANEL_START_AT ≈ 2967, STAGE_CADENCE = 180). At t=3050ms the
+    // header has just started its 320ms reveal and footer (3507)
+    // is still hidden.
+    await page.waitForTimeout(3050);
     const afterHeader = await page.evaluate(() => {
       return {
         header: Number(getComputedStyle(document.querySelector('.site-header')!).opacity),
@@ -73,12 +74,11 @@ test.describe('ILI-789 — index boot sequence', () => {
         footer: Number(getComputedStyle(document.querySelector('.site-footer')!).opacity),
       };
     });
-    // Header has had time to start its 320ms transition; rail/list/footer still 0.
     expect(afterHeader.header).toBeGreaterThan(0);
     expect(afterHeader.footer).toBe(0);
 
-    // Allow full sequence + tail to settle.
-    await page.waitForTimeout(2000);
+    // Full boot ends after the hero lockup (~8.2s); wait past it.
+    await page.waitForTimeout(5800);
 
     const final = await page.evaluate(() => ({
       header: Number(getComputedStyle(document.querySelector('.site-header')!).opacity),
@@ -114,10 +114,10 @@ test.describe('ILI-789 — index boot sequence', () => {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const page = await context.newPage();
 
-    // First visit — let it run. ILI-818 — full boot is ~9s
-    // (7.8s hero settle + ~1.3s panel reveals + 400ms tail).
+    // First visit — let it run. ILI-825 — scan-lines run from t=0,
+    // panels slot in at ~3s, hero lockup completes ~8.2s; wait past.
     await page.goto(INDEX);
-    await page.waitForTimeout(9500);
+    await page.waitForTimeout(8800);
     expect(await page.evaluate(() => sessionStorage.getItem('has_index_booted'))).toBe('1');
 
     // Second visit (reload) — should skip the boot entirely.

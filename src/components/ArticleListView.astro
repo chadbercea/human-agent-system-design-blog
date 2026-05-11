@@ -1328,17 +1328,17 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
     </script>
 
     <script is:inline data-astro-rerun>
-      /* ILI-818 — frame-hero backdrop + lockup orchestrator.
+      /* ILI-818 / ILI-825 — frame-hero backdrop + lockup orchestrator.
 
          Cold load (body.has-hero-frame-play set pre-paint):
-         pre-rendered scan-lines start hidden via the body class.
-         JS reveals them one by one at 145ms cadence — the
-         canonical boot reveal — filling the column from the
-         bottom up. After the last scan-line settles + a short
-         breath, the lockup writes in: glass blur fades on,
-         then the 5 frame-lines reveal at the same 145ms
-         cadence. Once everything has loaded in, the one-in/
-         one-out varied-interval loop starts and runs forever.
+         the scan-line reveal is the INITIAL animation — it runs
+         first, on its own clock (40 lines × 145ms cadence). The
+         panel orchestrator slots in at the half-mark of that
+         clock. Once the scan-lines settle, the hero CONTENT
+         (lockup) writes in as the final step — glass blur fades
+         0→1 over GLASS_FADE, then the 5 frame-lines reveal at
+         145ms cadence. Once everything has loaded in, the one-
+         in/one-out varied-interval loop starts and runs forever.
 
          Return visit / reduced-motion: pre-rendered lines are
          visible from first paint, lockup is visible from first
@@ -1405,7 +1405,10 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
           return;
         }
 
-        // Cold load — orchestrate the canonical reveal sequence.
+        // Cold load — scan-lines run first as the initial animation,
+        // then the lockup writes in as the final step. Panels are
+        // owned by the orchestrator below and slot in at the half-
+        // mark of the scan-line clock.
         var INITIAL_DELAY = 280;
         var CADENCE = 145;
         var REVEAL_TRANSITION = 320;
@@ -1459,25 +1462,23 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
     </script>
 
     <script is:inline data-astro-rerun>
-      /* ILI-789 — index boot orchestrator. Phase 1 (the frame
-         hero scan) is owned by the script above. This script
-         owns phase 2: after the hero's last frame-line settles,
-         reveal the four panels — header, rail, article list,
-         footer — at a 180ms cadence. Each stage class flips a
-         single panel's opacity/translateY transition; the body
-         background also fades from #000 to its natural color
-         when the header stage class is added. After the footer
-         stage settles, set sessionStorage and strip every boot
-         class so view-transition re-entries land on end-state.
-         Hero-completion timing is recomputed locally from the
-         same constants as the hero orchestrator. */
+      /* ILI-789 / ILI-825 — index boot orchestrator. Phase 1 is the
+         scan-line reveal (owned by the script above). Half-way
+         through that clock, this script slots the four panels —
+         header, rail, article list, footer — in at 180ms cadence.
+         The hero CONTENT (lockup) follows once the scan-lines
+         settle and runs as the final step.
+
+         Each stage class flips a single panel's opacity/translateY
+         transition; the body background fades from #000 to its
+         natural color when the header stage lands. After the hero
+         lockup settles + a tail breath, this script strips every
+         boot class so view-transition re-entries land on end-state. */
       (function () {
         if (!document.body.classList.contains('is-index-booting')) return;
 
-        /* Mirrors the frame-hero orchestrator: 28 scan-lines
-           reveal at 145ms cadence, then a 200ms breath, then
-           the lockup writes in (glass fade + 5 frame-lines).
-           Hero settles when the last frame-line reveal completes. */
+        // Constants mirror the hero orchestrator above so both
+        // scripts agree on timing without sharing state.
         var INITIAL_DELAY = 280;
         var CADENCE = 145;
         var REVEAL_TRANSITION = 320;
@@ -1487,23 +1488,38 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         var FRAME_LINES = 5;
         var STAGE_CADENCE = 180;
         var POST_FOOTER_DELAY = 400;
+        var POST_LOCKUP_BREATH = 400;
 
         var lastScanAt = INITIAL_DELAY + (SCAN_LINES_COUNT - 1) * CADENCE;
-        var scanSettleAt = lastScanAt + REVEAL_TRANSITION;
-        var lockupRevealAt = scanSettleAt + SCAN_BREATH;
-        var frameLinesStartAt = lockupRevealAt + GLASS_FADE;
-        var lastFrameAt = frameLinesStartAt + (FRAME_LINES - 1) * CADENCE;
-        var heroSettleAt = lastFrameAt + REVEAL_TRANSITION;
+
+        // Panels slot in at the half-time of the scan clock,
+        // running in their canonical 180ms cadence while the
+        // scan animation finishes its second half.
+        var PANEL_START_AT = Math.floor(lastScanAt / 2);
 
         var stages = ['boot-stage-header', 'boot-stage-rail', 'boot-stage-list', 'boot-stage-footer'];
         stages.forEach(function (cls, i) {
           window.setTimeout(function () {
             if (!document.body.classList.contains('is-index-booting')) return;
             document.body.classList.add(cls);
-          }, heroSettleAt + i * STAGE_CADENCE);
+          }, PANEL_START_AT + i * STAGE_CADENCE);
         });
 
-        var endAt = heroSettleAt + (stages.length - 1) * STAGE_CADENCE + REVEAL_TRANSITION + POST_FOOTER_DELAY;
+        // Hero lockup follows the scan-line settle as the final
+        // step (mirrors the hero orchestrator's timing).
+        var scanSettleAt = lastScanAt + REVEAL_TRANSITION;
+        var lockupRevealAt = scanSettleAt + SCAN_BREATH;
+        var frameLinesStartAt = lockupRevealAt + GLASS_FADE;
+        var lastFrameAt = frameLinesStartAt + (FRAME_LINES - 1) * CADENCE;
+        var lockupSettleAt = lastFrameAt + REVEAL_TRANSITION;
+        var heroEndAt = lockupSettleAt + POST_LOCKUP_BREATH;
+
+        // Boot ends with whichever phase finishes last. With current
+        // constants the hero phase ends after the panels — guard with
+        // Math.max in case future tuning flips the order.
+        var panelsEndAt = PANEL_START_AT + (stages.length - 1) * STAGE_CADENCE + REVEAL_TRANSITION + POST_FOOTER_DELAY;
+        var endAt = Math.max(panelsEndAt, heroEndAt);
+
         window.setTimeout(function () {
           try { sessionStorage.setItem('has_index_booted', '1'); } catch (e) {}
           document.body.classList.remove('is-index-booting');

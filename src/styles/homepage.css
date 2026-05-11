@@ -492,7 +492,14 @@ body.has-hero-frame-play .scan-line.is-visible {
    subtle enough that the body gridlines barely register;
    the 80px mask gradient on top and bottom dissolves the
    blur into the surrounding sharp content so the lockup has
-   no hard rectangle boundary. */
+   no hard rectangle boundary.
+
+   ILI-825 — cold-load fade-in. Default opacity is 1 (return
+   visits and reduced-motion show the blur from first paint).
+   During cold load (`body.has-hero-frame-play`) the layer
+   starts hidden and fades to 1 when the orchestrator adds
+   `.is-revealing` to .frame-block, 400ms before the first
+   frame-line writes in. */
 .frame-block::before {
   content: '';
   position: absolute;
@@ -515,6 +522,14 @@ body.has-hero-frame-play .scan-line.is-visible {
     #000 calc(100% - 80px),
     transparent 100%
   );
+  opacity: 1;
+  transition: opacity 0.4s cubic-bezier(.4, .1, .2, 1);
+}
+body.has-hero-frame-play .frame-block::before {
+  opacity: 0;
+}
+body.has-hero-frame-play .frame-block.is-revealing::before {
+  opacity: 1;
 }
 
 /* Frame-line wrapper — same reveal as .scan-line, taller
