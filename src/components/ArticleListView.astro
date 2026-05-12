@@ -10,13 +10,14 @@ import { getAllCategories, type CategorySlug } from '../lib/has-framework';
 const CATEGORY_SLUGS: CategorySlug[] = ['axioms', 'constraints', 'design-requirements'];
 
 export interface Props {
-  pageArticles: CollectionEntry<'articles'>[];
-  allArticles: CollectionEntry<'articles'>[];
-  currentPage: number;
-  totalPages: number;
+  /* ILI-828 — client-side pagination. We render every article's
+     card + body up-front and let JS swap the visible slice. The
+     route files just hand over the full sorted, published list. */
+  articles: CollectionEntry<'articles'>[];
+  pageSize: number;
   /* ILI-787 — index swaps the HUD logo hero for a NASA-terminal
      boot sequence that resolves into a #FFF frame block. /blog
-     paginated pages keep the original HUD hero. */
+     keeps the original HUD hero. */
   heroVariant?: 'hud' | 'frame';
   /* ILI-790 — when set, render the article-selected view at SSR
      with this slug pre-opened. Used by /blog to default to the
@@ -26,13 +27,14 @@ export interface Props {
 }
 
 const {
-  pageArticles,
-  allArticles,
-  currentPage,
-  totalPages,
+  articles,
+  pageSize,
   heroVariant = 'hud',
   defaultOpenSlug,
 } = Astro.props;
+
+const totalPages = Math.max(1, Math.ceil(articles.length / pageSize));
+const currentPage = 1;
 
 function formatDate(d: Date): string {
   const y = d.getUTCFullYear();
@@ -41,9 +43,9 @@ function formatDate(d: Date): string {
   return `${y}.${m}.${day}`;
 }
 
-const totalEntries = allArticles.length;
+const totalEntries = articles.length;
 const entryCount = String(totalEntries).padStart(3, '0');
-const lastUpdated = totalEntries > 0 ? formatDate(allArticles[0].data.date) : '—';
+const lastUpdated = totalEntries > 0 ? formatDate(articles[0].data.date) : '—';
 
 /* ILI-818 — scan-line backdrop. Pre-rendered set fills the
    column at default 0.5 opacity. A JS loop on a varied
@@ -97,7 +99,7 @@ const SCAN_LINES: [string, string, string][] = [
 ];
 
 const rendered = await Promise.all(
-  pageArticles.map(async (a) => {
+  articles.map(async (a) => {
     const { Content } = await a.render();
     return { article: a, Content };
   })
@@ -108,7 +110,7 @@ function readMinutes(body: string): number {
   return Math.max(1, Math.ceil(words / 220));
 }
 
-const cards = pageArticles.map((a) => ({
+const cards = articles.map((a, i) => ({
   slug: a.slug,
   title: a.data.title,
   date: a.data.date,
@@ -120,6 +122,9 @@ const cards = pageArticles.map((a) => ({
      bar above the body for those, and hides it for everything else. */
   hasFramework: (a.data.references ?? []).length > 0,
   category: a.data.category,
+  /* ILI-828 — which page slot this card occupies. JS uses this
+     to swap visible cards on pagination clicks. */
+  page: Math.floor(i / pageSize) + 1,
 }));
 
 const articleMeta = cards.map((c) => ({
@@ -133,18 +138,17 @@ const articleMeta = cards.map((c) => ({
   category: c.category ?? '',
 }));
 
-const featured = pageArticles[0] ?? allArticles[0];
+const featured = articles[0];
 const siteDescription = featured?.data.description
   ?? 'A blog about Human-Agent-System Design. Humans, agents, and systems shipping products together.';
 
-const pageSuffix = currentPage > 1 ? ` // Page ${String(currentPage).padStart(2, '0')}` : '';
-const title = `HAS Design${pageSuffix}`;
+const title = 'HAS Design';
 
-/* ILI-790 — resolve the default-open article. defaultOpenSlug
-   must match an article in pageArticles so prev/next mapping
-   stays consistent with the rendered list. */
+/* ILI-790 — resolve the default-open article. ILI-828 — meta now
+   spans every article (client-side pagination), so this idx is
+   the global position in the sorted list. */
 const defaultOpenIdx = defaultOpenSlug
-  ? pageArticles.findIndex((a) => a.slug === defaultOpenSlug)
+  ? articles.findIndex((a) => a.slug === defaultOpenSlug)
   : -1;
 const defaultOpen = defaultOpenIdx >= 0
   ? {
@@ -398,7 +402,12 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
         <span>Home</span>
       </button>
       <span class="list-label">Published Articles</span>
-      <ul class="post-card-list" id="article-list">
+      <ul
+        class="post-card-list"
+        id="article-list"
+        data-current-page={currentPage}
+        data-page-size={pageSize}
+      >
         {cards.map((c, i) => (
           <PostCard
             index={i}
@@ -410,6 +419,8 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
             minutes={c.minutes}
             active={defaultOpen?.idx === i}
             category={c.category}
+            page={c.page}
+            pageHidden={c.page !== currentPage}
           />
         ))}
       </ul>
@@ -506,6 +517,156 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
     </div>
 
     <script type="application/json" id="article-meta" is:inline set:html={JSON.stringify(articleMeta)} />
+
+    <script is:inline data-astro-rerun>
+      /* ILI-828 — client-side pagination. The PaginationFooter renders
+         page-1 chrome at SSR (buttons, not links); this script wires
+         clicks, swaps which `.post-card` data-page slot is visible,
+         and rebuilds the strip in place. No URL changes — the reader,
+         hero, and history stack stay untouched. The reader (next
+         script) calls into `window.__hasdPagination.setPageForIdx`
+         when opening an article whose card lives on another page,
+         so its `active` highlight stays visible. */
+      (function () {
+        var list = document.getElementById('article-list');
+        var footer = document.querySelector('.pagination-footer[data-pagination]');
+        if (!list) return;
+
+        var pageSize = parseInt(list.getAttribute('data-page-size') || '5', 10) || 5;
+        var totalPages = footer
+          ? (parseInt(footer.getAttribute('data-total-pages') || '1', 10) || 1)
+          : 1;
+        var currentPage = footer
+          ? (parseInt(footer.getAttribute('data-current-page') || '1', 10) || 1)
+          : 1;
+        var cards = Array.prototype.slice.call(list.querySelectorAll('.post-card'));
+
+        function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+        function buildTokens(current, total) {
+          if (total <= 6) {
+            var arr = [];
+            for (var i = 1; i <= total; i++) arr.push({ kind: 'page', n: i });
+            return arr;
+          }
+          var tokens = [];
+          tokens.push({ kind: 'page', n: 1 });
+          tokens.push({ kind: 'page', n: 2 });
+          if (current > 3) tokens.push({ kind: 'gap' });
+          if (current > 2 && current < total - 1) tokens.push({ kind: 'page', n: current });
+          if (current < total - 2) tokens.push({ kind: 'gap' });
+          tokens.push({ kind: 'page', n: total - 1 });
+          tokens.push({ kind: 'page', n: total });
+          var out = [];
+          for (var j = 0; j < tokens.length; j++) {
+            var t = tokens[j];
+            var last = out[out.length - 1];
+            if (t.kind === 'page' && last && last.kind === 'page' && last.n === t.n) continue;
+            if (t.kind === 'gap' && last && last.kind === 'gap') continue;
+            out.push(t);
+          }
+          return out;
+        }
+
+        function rebuildStrip(page) {
+          if (!footer) return;
+          var strip = footer.querySelector('[data-pagination-strip]');
+          if (!strip) return;
+
+          var prevDisabled = page <= 1;
+          var nextDisabled = page >= totalPages;
+          var prevBtn = strip.querySelector('[data-pagination-prev]');
+          var nextBtn = strip.querySelector('[data-pagination-next]');
+          if (prevBtn) {
+            prevBtn.disabled = prevDisabled;
+            prevBtn.classList.toggle('is-disabled', prevDisabled);
+            if (prevDisabled) prevBtn.setAttribute('aria-disabled', 'true');
+            else prevBtn.removeAttribute('aria-disabled');
+          }
+          if (nextBtn) {
+            nextBtn.disabled = nextDisabled;
+            nextBtn.classList.toggle('is-disabled', nextDisabled);
+            if (nextDisabled) nextBtn.setAttribute('aria-disabled', 'true');
+            else nextBtn.removeAttribute('aria-disabled');
+          }
+
+          var pagesEl = strip.querySelector('[data-pagination-pages]');
+          if (!pagesEl) return;
+          var tokens = buildTokens(page, totalPages);
+          var html = '';
+          for (var i = 0; i < tokens.length; i++) {
+            var t = tokens[i];
+            if (i > 0) html += '<span class="pagination-sep" aria-hidden="true">·</span>';
+            if (t.kind === 'gap') {
+              html += '<span class="pagination-gap" aria-hidden="true">…</span>';
+            } else {
+              var active = t.n === page;
+              html += '<button type="button" class="pagination-page'
+                + (active ? ' is-active' : '')
+                + '" data-pagination-page="' + t.n + '"'
+                + (active ? ' aria-current="page"' : '')
+                + '>' + pad2(t.n) + '</button>';
+            }
+          }
+          pagesEl.innerHTML = html;
+        }
+
+        function setPage(p, opts) {
+          if (totalPages <= 1) return;
+          if (p < 1) p = 1;
+          if (p > totalPages) p = totalPages;
+          var changed = p !== currentPage;
+          currentPage = p;
+          if (footer) footer.setAttribute('data-current-page', String(p));
+          list.setAttribute('data-current-page', String(p));
+          for (var i = 0; i < cards.length; i++) {
+            var c = cards[i];
+            var cp = parseInt(c.getAttribute('data-page') || '1', 10) || 1;
+            if (cp === p) c.removeAttribute('data-page-hidden');
+            else c.setAttribute('data-page-hidden', 'true');
+          }
+          rebuildStrip(p);
+          if (changed && (!opts || opts.scroll !== false)) {
+            // Snap the list back to the top so the new slice doesn't
+            // start mid-scroll where the previous page left off.
+            var col = list.parentElement;
+            if (col && typeof col.scrollTop === 'number') col.scrollTop = 0;
+          }
+        }
+
+        if (footer) {
+          footer.addEventListener('click', function (e) {
+            var target = e.target;
+            if (!target || target.nodeType !== 1) return;
+            var pageBtn = target.closest && target.closest('[data-pagination-page]');
+            if (pageBtn) {
+              e.preventDefault();
+              var n = parseInt(pageBtn.getAttribute('data-pagination-page') || '0', 10) || 0;
+              if (n > 0) setPage(n);
+              return;
+            }
+            var prev = target.closest && target.closest('[data-pagination-prev]');
+            if (prev) { e.preventDefault(); setPage(currentPage - 1); return; }
+            var next = target.closest && target.closest('[data-pagination-next]');
+            if (next) { e.preventDefault(); setPage(currentPage + 1); }
+          });
+        }
+
+        window.__hasdPagination = {
+          setPage: setPage,
+          pageForIdx: function (idx) {
+            if (idx < 0) return currentPage;
+            return Math.floor(idx / pageSize) + 1;
+          },
+          setPageForIdx: function (idx) {
+            if (idx < 0) return;
+            var p = Math.floor(idx / pageSize) + 1;
+            if (p !== currentPage) setPage(p, { scroll: false });
+          },
+          current: function () { return currentPage; },
+        };
+      })();
+    </script>
 
     <script is:inline data-astro-rerun>
       (function () {
@@ -624,6 +785,13 @@ const DefaultOpenContent = defaultOpen ? rendered[defaultOpen.idx]?.Content : nu
             });
           }
           renderFooter(idx);
+          /* ILI-828 — if the target article lives on a page slot
+             that's currently hidden, swap the visible slice so its
+             active card is on-screen. Reader prev/next across the
+             page boundary stays continuous this way. */
+          if (window.__hasdPagination) {
+            window.__hasdPagination.setPageForIdx(idx);
+          }
           items.forEach(function (el) { el.classList.remove('active'); });
           var activeEl = items[idx];
           if (activeEl) activeEl.classList.add('active');

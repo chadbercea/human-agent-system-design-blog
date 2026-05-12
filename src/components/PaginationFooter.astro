@@ -1,9 +1,13 @@
 ---
 /* Pagination footer — chrome pinned to the bottom of the article list
-   panel. Always rendered. Page size 10. With ≤10 articles it reads
-   `01 / 01` and shows no nav controls; the footer's job is also to fill
-   the visual gap below the last card so the page grid doesn't bleed
-   through. ILI-773. */
+   panel. Always rendered. With ≤PAGE_SIZE articles it reads `01 / 01`
+   and shows no nav controls; the footer's job is also to fill the
+   visual gap below the last card so the page grid doesn't bleed
+   through. ILI-773.
+
+   ILI-828 — pagination is now client-side. The strip is rendered with
+   buttons (not anchors) so clicks don't navigate; the ArticleListView
+   script wires them up and rebuilds the strip on page changes. */
 
 export interface Props {
   currentPage: number;
@@ -14,10 +18,6 @@ export interface Props {
 const { currentPage, totalPages, articleCount } = Astro.props;
 
 const pad = (n: number) => String(n).padStart(2, '0');
-
-function pageHref(p: number): string {
-  return p === 1 ? '/blog' : `/blog/${p}`;
-}
 
 // Above 6 pages, collapse the middle so the strip stays one mono line:
 //   ← 01 · 02 · … · 11 · 12 →
@@ -55,44 +55,53 @@ const nextDisabled = currentPage >= totalPages;
 const empty = articleCount === 0;
 const singleLabel = empty ? `${pad(0)} / ${pad(0)}` : `${pad(currentPage)} / ${pad(totalPages || 1)}`;
 ---
-<nav class="pagination-footer" aria-label="Article list pagination">
+<nav
+  class="pagination-footer"
+  aria-label="Article list pagination"
+  data-pagination
+  data-current-page={currentPage}
+  data-total-pages={totalPages}
+>
   {!hasNav && (
-    <span class="pagination-single">{singleLabel}</span>
+    <span class="pagination-single" data-pagination-label>{singleLabel}</span>
   )}
   {hasNav && (
-    <div class="pagination-strip">
-      <a
+    <div class="pagination-strip" data-pagination-strip>
+      <button
+        type="button"
         class:list={['pagination-arrow', { 'is-disabled': prevDisabled }]}
-        href={prevDisabled ? undefined : pageHref(currentPage - 1)}
+        data-pagination-prev
         aria-label="Previous page"
         aria-disabled={prevDisabled ? 'true' : undefined}
-        tabindex={prevDisabled ? -1 : undefined}
-      >&larr;</a>
+        disabled={prevDisabled}
+      >&larr;</button>
 
-      <span class="pagination-pages">
+      <span class="pagination-pages" data-pagination-pages>
         {tokens.map((t, i) => (
           <Fragment>
             {i > 0 && <span class="pagination-sep" aria-hidden="true">·</span>}
             {t.kind === 'gap' ? (
               <span class="pagination-gap" aria-hidden="true">&hellip;</span>
             ) : (
-              <a
+              <button
+                type="button"
                 class:list={['pagination-page', { 'is-active': t.n === currentPage }]}
-                href={pageHref(t.n)}
+                data-pagination-page={t.n}
                 aria-current={t.n === currentPage ? 'page' : undefined}
-              >{pad(t.n)}</a>
+              >{pad(t.n)}</button>
             )}
           </Fragment>
         ))}
       </span>
 
-      <a
+      <button
+        type="button"
         class:list={['pagination-arrow', { 'is-disabled': nextDisabled }]}
-        href={nextDisabled ? undefined : pageHref(currentPage + 1)}
+        data-pagination-next
         aria-label="Next page"
         aria-disabled={nextDisabled ? 'true' : undefined}
-        tabindex={nextDisabled ? -1 : undefined}
-      >&rarr;</a>
+        disabled={nextDisabled}
+      >&rarr;</button>
     </div>
   )}
 </nav>

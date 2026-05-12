@@ -8,7 +8,11 @@ import ArticleListView from '../../components/ArticleListView.astro';
    there is no flash of the empty "waiting" state. Publishing a new
    article and redeploying changes which article populates here
    automatically. Tie-break on identical publish dates falls back
-   to the most recently updated entry. */
+   to the most recently updated entry.
+
+   ILI-828 — pagination is client-side. ArticleListView gets the
+   full sorted list; JS swaps which page slot is visible when the
+   pagination buttons are clicked. /blog/2, /blog/3 routes are gone. */
 const PAGE_SIZE = 5;
 
 const articles = (await getCollection('articles'))
@@ -19,15 +23,11 @@ const articles = (await getCollection('articles'))
     return b.id.localeCompare(a.id);
   });
 
-const totalPages = Math.max(1, Math.ceil(articles.length / PAGE_SIZE));
-const pageArticles = articles.slice(0, PAGE_SIZE);
-const latestSlug = pageArticles[0]?.slug;
+const latestSlug = articles[0]?.slug;
 ---
 <ArticleListView
-  pageArticles={pageArticles}
-  allArticles={articles}
-  currentPage={1}
-  totalPages={totalPages}
+  articles={articles}
+  pageSize={PAGE_SIZE}
   heroVariant="frame"
   defaultOpenSlug={latestSlug}
 />
