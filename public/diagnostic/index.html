@@ -348,6 +348,26 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   padding: 10px 18px;
 }
 
+/* ── Compact desktop (≤900px-tall laptops) ──────────── */
+/* Fit the whole page in short viewports without scrolling. */
+@media (min-width: 901px) and (max-height: 920px) {
+  .diag-panel { padding: 24px 64px 0; }
+  .panel-head { padding-bottom: 8px; margin-bottom: 16px; }
+  .diag-title { font-size: 38px; margin-bottom: 10px; }
+  .diag-help { font-size: 17px; line-height: 1.35; margin-bottom: 20px; }
+  .slider { padding: 8px 0 6px; }
+  .slider-head { gap: 2px; margin-bottom: 6px; }
+  .slider-label { font-size: 18px; }
+  .slider-prompt { font-size: 15px; line-height: 1.25; }
+  .segment-numbers { margin-top: 2px; height: 11px; font-size: 9px; }
+  .diag-grid { gap: 48px; margin-bottom: 20px; }
+  .diagnosis-title { font-size: 44px; margin-bottom: 14px; }
+  .paragraph { font-size: 17px; line-height: 1.4; }
+  .actions { margin-top: 18px; padding-top: 12px; }
+  .actions .btn { padding: 10px 18px; }
+  .diag-foot { padding: 12px 0; min-height: 56px; }
+}
+
 /* ── Mobile ──────────────────────────────────────────── */
 @media (max-width: 900px) {
   .diag-panel { padding: 32px 20px 0; }
