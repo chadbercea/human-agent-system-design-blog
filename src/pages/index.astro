@@ -2,23 +2,19 @@
 import { getCollection } from 'astro:content';
 import ArticleListView from '../components/ArticleListView.astro';
 
-// Homepage renders the same article list as `/blog` page 1. `/blog`
-// is the canonical paginated archive (ILI-773) — pages 2+ live there
-// at `/blog/2`, `/blog/3`, … — but `/` keeps the article view
-// available at the bare-domain URL too.
+/* Homepage renders the same article list as `/blog`. ILI-828 —
+   pagination is client-side now; there are no /blog/2 routes.
+   ArticleListView receives the full sorted list and lets JS
+   swap the visible slice when the pagination buttons are
+   clicked. */
 const PAGE_SIZE = 5;
 
 const articles = (await getCollection('articles'))
   .filter((a) => !a.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-
-const totalPages = Math.max(1, Math.ceil(articles.length / PAGE_SIZE));
-const pageArticles = articles.slice(0, PAGE_SIZE);
 ---
 <ArticleListView
-  pageArticles={pageArticles}
-  allArticles={articles}
-  currentPage={1}
-  totalPages={totalPages}
+  articles={articles}
+  pageSize={PAGE_SIZE}
   heroVariant="frame"
 />

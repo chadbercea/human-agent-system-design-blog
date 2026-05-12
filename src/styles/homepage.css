@@ -1019,6 +1019,19 @@ body.is-index-booting.boot-stage-footer .site-footer {
 .pagination-sep,
 .pagination-gap { color: var(--dim); }
 
+/* ILI-828 — pagination became button-based (no URL nav). Reset
+   UA button chrome so the existing tokens drive the look. */
+.pagination-page,
+.pagination-arrow {
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
 .pagination-page {
   color: var(--mid);
   padding: 0.25rem 0.35rem;
@@ -1042,6 +1055,7 @@ body.is-index-booting.boot-stage-footer .site-footer {
 .pagination-arrow {
   color: var(--mid);
   padding: 0.25rem 0.35rem;
+  border: 0;
   letter-spacing: 0;
   font-size: 0.85vw;
   line-height: 1;
@@ -1052,11 +1066,17 @@ body.is-index-booting.boot-stage-footer .site-footer {
   color: var(--white);
   outline: none;
 }
-.pagination-arrow.is-disabled {
+.pagination-arrow.is-disabled,
+.pagination-arrow:disabled {
   color: var(--dim);
   pointer-events: none;
   cursor: default;
 }
+
+/* ILI-828 — cards outside the active page slot stay in the DOM
+   (so reader prev/next can still reach them) but are removed
+   from layout. */
+.post-card[data-page-hidden] { display: none; }
 
 /* ───────────── COL 3: ARTICLE READER ───────────── */
 .col-article {

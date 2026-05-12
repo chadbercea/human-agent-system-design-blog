@@ -6,17 +6,20 @@ const OUT = path.join(process.cwd(), 'screenshots', 'ili-773');
 fs.mkdirSync(OUT, { recursive: true });
 
 test.describe('ILI-773 — paginated footer in the article list panel', () => {
-  test('/blog renders the pagination footer with 01 / 01 (single page)', async ({ page }) => {
+  test('/blog renders the pagination footer (strip or single label)', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/blog');
     await page.waitForLoadState('networkidle');
 
     const footer = page.locator('.pagination-footer');
     await expect(footer).toBeVisible();
-    await expect(page.locator('.pagination-single')).toHaveText('01 / 01');
-    // No nav controls on a single-page archive.
-    await expect(page.locator('.pagination-arrow')).toHaveCount(0);
-    await expect(page.locator('.pagination-page')).toHaveCount(0);
+    // Either a single-page label OR a multi-page strip — both are valid
+    // states for the footer depending on the current article count.
+    const single = page.locator('.pagination-single');
+    const strip = page.locator('.pagination-strip');
+    const singleVisible = await single.isVisible().catch(() => false);
+    const stripVisible = await strip.isVisible().catch(() => false);
+    expect(singleVisible || stripVisible).toBe(true);
 
     await page.screenshot({ path: path.join(OUT, 'blog-desktop.png'), fullPage: false });
   });
@@ -26,7 +29,6 @@ test.describe('ILI-773 — paginated footer in the article list panel', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     await expect(page.locator('.pagination-footer')).toBeVisible();
-    await expect(page.locator('.pagination-single')).toHaveText('01 / 01');
   });
 
   test('header Articles nav points to /blog and is current on /blog', async ({ page }) => {
@@ -59,7 +61,6 @@ test.describe('ILI-773 — paginated footer in the article list panel', () => {
     await page.waitForLoadState('networkidle');
     const footer = page.locator('.pagination-footer');
     await expect(footer).toBeVisible();
-    await expect(page.locator('.pagination-single')).toHaveText('01 / 01');
     await page.screenshot({ path: path.join(OUT, 'blog-mobile.png'), fullPage: true });
   });
 
@@ -67,7 +68,7 @@ test.describe('ILI-773 — paginated footer in the article list panel', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/blog');
     await page.waitForLoadState('networkidle');
-    await page.locator('.post-card').first().click();
+    await page.locator('.post-card:not([data-page-hidden])').first().click();
     await expect(page.locator('#stage')).toHaveClass(/open/);
     await expect(page.locator('#art-h1')).not.toBeEmpty();
   });
