@@ -1,6 +1,6 @@
 ---
 title: "The Availability Function"
-date: 2026-06-09
+date: 2026-06-13
 description: "The agent's core relational value is sustained availability at the human's operating frequency without degradation. No fatigue, no ego, no self-editing pressure imposed on the human. Design must preserve that property, not import the human limits it does not have."
 draft: false
 postNumber: 13

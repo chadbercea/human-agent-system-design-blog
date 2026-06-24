@@ -1,6 +1,6 @@
 ---
 title: "Adversarial Interdependence"
-date: 2026-06-05
+date: 2026-06-08
 description: "The productive mode between human and agent is not request and response. It is adversarial in service of thinking. The agent presses against the human's position, surfaces terrain the human has not covered, and produces the friction the human's thinking needs to develop."
 draft: false
 postNumber: 12

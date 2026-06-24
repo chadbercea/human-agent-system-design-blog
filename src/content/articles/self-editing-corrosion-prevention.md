@@ -1,6 +1,6 @@
 ---
 title: "Self-Editing Corrosion Prevention"
-date: 2026-06-13
+date: 2026-06-19
 description: "Humans interacting with capacity-limited partners learn to flatten themselves over time. They bring 60% because 100% causes friction. The agent does not impose that cost, and design must keep it from reintroducing the corrosion the architecture naturally avoids."
 draft: false
 postNumber: 14
