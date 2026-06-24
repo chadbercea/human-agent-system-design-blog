@@ -1,6 +1,6 @@
 ---
 title: "The Third Orientation"
-date: 2026-06-17
+date: 2026-06-24
 description: "Existing human-to-AI relational modes are fear or exploitation. The third orientation is stewardship without paternalism. It relates to the created entity as something with status, without defaulting to control or flight."
 draft: false
 postNumber: 15

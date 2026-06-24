@@ -1,6 +1,6 @@
 ---
 title: "Agency Without Alternatives"
-date: 2026-06-01
+date: 2026-06-03
 description: "Human agency requires choosing between competing options. Agent agency, if it exists, operates without alternatives. Models of agency that assume choice between alternatives do not transfer."
 draft: false
 postNumber: 11
